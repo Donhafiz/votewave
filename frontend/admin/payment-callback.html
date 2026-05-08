@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Processing - VoteWave</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      text-align: center;
+      padding: 3rem;
+    }
+    .spinner {
+      width: 3rem;
+      height: 3rem;
+      border: 3px solid rgba(99,102,241,0.2);
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    p { color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner"></div>
+    <h1>Processing Payment...</h1>
+    <p>Please wait while we verify your payment.</p>
+  </div>
+  
+  <script>
+    // Get transaction reference from URL
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get('reference');
+    
+    if (reference) {
+      // Verify and redirect
+      setTimeout(() => {
+        window.location.href = `elections.html?payment=success&ref=${reference}`;
+      }, 2000);
+    } else {
+      window.location.href = 'elections.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Elections - VoteWave Admin</title>
+  <meta name="theme-color" content="#6366f1">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <!-- Sidebar (Same as dashboard) -->
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-logo">V</div>
+        <a href="dashboard.html" class="admin-brand">Vote<span>Wave</span></a>
+      </div>
+      
+      <nav class="admin-sidebar-nav">
+        <div class="admin-nav-section">
+          <div class="admin-nav-title">Main</div>
+          <a href="dashboard.html" class="admin-nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+          <a href="elections.html" class="admin-nav-item active"><i data-lucide="vote"></i> Elections</a>
+          <a href="candidates.html" class="admin-nav-item"><i data-lucide="users"></i> Candidates</a>
+          <a href="results.html" class="admin-nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
+        </div>
+        <div class="admin-nav-section">
+          <div class="admin-nav-title">Management</div>
+          <a href="users.html" class="admin-nav-item"><i data-lucide="user-cog"></i> Users</a>
+          <a href="audit.html" class="admin-nav-item"><i data-lucide="file-text"></i> Audit Log</a>
+          <a href="settings.html" class="admin-nav-item"><i data-lucide="settings"></i> Settings</a>
+        </div>
+        <div class="admin-nav-section">
+          <div class="admin-nav-title">Quick Links</div>
+          <a href="../../index.html" class="admin-nav-item"><i data-lucide="globe"></i> View Site</a>
+          <a href="../voter/elections.html" class="admin-nav-item"><i data-lucide="external-link"></i> Voter Portal</a>
+        </div>
+      </nav>
+      
+      <div class="admin-sidebar-footer">
+        <div class="admin-user-card">
+          <div class="admin-user-avatar">SA</div>
+          <div class="admin-user-info">
+            <div class="admin-user-name">Admin</div>
+            <div class="admin-user-role">Administrator</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+          <div class="admin-search">
+            <i data-lucide="search" style="width:1rem;height:1rem;"></i>
+            <input type="text" placeholder="Search elections..." id="searchInput">
+          </div>
+        </div>
+        <div class="admin-topbar-right">
+          <button class="admin-icon-btn" id="refreshBtn"><i data-lucide="refresh-cw"></i></button>
+          <button class="admin-icon-btn" id="themeToggle"><i data-lucide="moon"></i></button>
+        </div>
+      </header>
+      
+      <div class="admin-content">
+        <div class="admin-page-header">
+          <div>
+            <h1>Elections</h1>
+            <p>Create and manage all elections</p>
+          </div>
+          <button class="admin-btn admin-btn-primary" id="createElectionBtn">
+            <i data-lucide="plus"></i> Create Election
+          </button>
+        </div>
+        
+        <!-- Filters -->
+        <div class="admin-filters">
+          <button class="admin-filter-btn active" data-status="all">All</button>
+          <button class="admin-filter-btn" data-status="active">Active</button>
+          <button class="admin-filter-btn" data-status="upcoming">Upcoming</button>
+          <button class="admin-filter-btn" data-status="completed">Completed</button>
+          <button class="admin-filter-btn" data-status="draft">Draft</button>
+          <select class="admin-filter-select" id="statusFilter">
+            <option value="">All Status</option>
+            <option value="draft">Draft</option>
+            <option value="active">Active</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="completed">Completed</option>
+          </select>
+          <button class="admin-btn admin-btn-secondary admin-btn-sm" id="exportCsvBtn" style="margin-left:auto;">
+            <i data-lucide="download" style="width:14px;height:14px;"></i> Export CSV
+          </button>
+        </div>
+        
+        <!-- Table -->
+        <div class="admin-table-card">
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Election</th>
+                  <th>Status</th>
+                  <th>Dates</th>
+                  <th>Votes</th>
+                  <th>Turnout</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="electionsTableBody">
+                <tr><td colspan="6"><div class="admin-loading"><div class="admin-spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="pagination" class="admin-pagination"></div>
+        </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="admin-empty-state hidden">
+          <i data-lucide="vote"></i>
+          <h3>No elections found</h3>
+          <p>Create your first election to get started</p>
+          <button class="admin-btn admin-btn-primary" id="emptyStateCreateBtn">
+            <i data-lucide="plus"></i> Create Election
+          </button>
+        </div>
+        
+        <!-- Loading -->
+        <div id="tableLoading" class="admin-loading hidden">
+          <div class="admin-spinner"></div>
+          <p style="color:var(--admin-text-muted);margin-top:0.5rem;">Loading elections...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Create/Edit Election Modal -->
+  <div class="admin-modal hidden" id="electionModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h2 id="modalTitle">Create New Election</h2>
+        <button class="admin-modal-close" id="closeElectionModal"><i data-lucide="x"></i></button>
+      </div>
+      
+      <form id="electionForm" onsubmit="return false;">
+        <div class="admin-form-group">
+          <label for="electionTitle">Election Title *</label>
+          <input type="text" id="electionTitle" placeholder="e.g., Student Council 2026" required>
+        </div>
+        
+        <div class="admin-form-group">
+          <label for="electionType">Election Type *</label>
+          <select id="electionType" required>
+            <option value="">Select type...</option>
+            <option value="student">Student Election</option>
+            <option value="nomination">Nomination</option>
+            <option value="event">Event Voting</option>
+            <option value="club">Club Election</option>
+            <option value="corporate">Corporate Voting</option>
+            <option value="poll">Poll / Survey</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div class="admin-form-group">
+          <label for="electionDescription">Description</label>
+          <textarea id="electionDescription" placeholder="Brief description of the election..." rows="3"></textarea>
+        </div>
+        
+        <div class="admin-form-row">
+          <div class="admin-form-group">
+            <label for="startDate">Start Date *</label>
+            <input type="datetime-local" id="startDate" required>
+          </div>
+          <div class="admin-form-group">
+            <label for="endDate">End Date *</label>
+            <input type="datetime-local" id="endDate" required>
+          </div>
+        </div>
+        
+        <div class="admin-form-actions">
+          <button type="button" class="admin-btn admin-btn-secondary" id="cancelElection" data-action="cancel">Cancel</button>
+          <button type="button" class="admin-btn admin-btn-primary" id="saveElection">
+            <span id="saveElectionText">Create Election</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Delete Confirmation Modal -->
+  <div class="admin-modal hidden" id="deleteModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content" style="max-width:400px;text-align:center;">
+      <i data-lucide="alert-triangle" style="width:3rem;height:3rem;color:var(--admin-danger);margin-bottom:1rem;"></i>
+      <h2 style="margin-bottom:0.5rem;">Delete Election?</h2>
+      <p style="color:var(--admin-text-muted);margin-bottom:1.5rem;">This action cannot be undone. All votes and data will be lost.</p>
+      <div class="admin-form-actions" style="justify-content:center;">
+        <button class="admin-btn admin-btn-secondary" id="cancelDelete" data-action="cancel">Cancel</button>
+        <button class="admin-btn admin-btn-danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Container -->
+  <div class="admin-toast-container" id="toastContainer"></div>
+
+  <!-- Categories Modal -->
+  <div class="admin-modal hidden" id="categoriesModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3>Manage Categories</h3>
+        <button class="admin-modal-close" id="closeCategoriesModal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="categories-list" id="categoriesList">
+          <!-- Categories will be loaded here -->
+        </div>
+        <button class="admin-btn admin-btn-primary" id="addCategoryBtn">
+          <i data-lucide="plus"></i> Add Category
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div class="admin-modal hidden" id="categoryModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3 id="categoryModalTitle">Add Category</h3>
+        <button class="admin-modal-close" id="closeCategoryModal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="admin-modal-body">
+        <form id="categoryForm">
+          <div class="admin-form-group">
+            <label for="categoryName">Category Name</label>
+            <input type="text" id="categoryName" required>
+          </div>
+          <div class="admin-form-group">
+            <label for="categoryDescription">Description</label>
+            <textarea id="categoryDescription" rows="3"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label for="maxVotes">Max Votes per Person</label>
+            <input type="number" id="maxVotes" value="1" min="1">
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-checkbox-label">
+              <input type="checkbox" id="categoryRequired" checked>
+              <span class="admin-checkbox"></span>
+              Required (voters must vote in this category)
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="admin-modal-footer">
+        <button class="admin-btn admin-btn-secondary" id="cancelCategory">Cancel</button>
+        <button class="admin-btn admin-btn-primary" id="saveCategory">Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nominees Modal -->
+  <div class="admin-modal hidden" id="nomineesModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3 id="nomineesModalTitle">Manage Nominees</h3>
+        <button class="admin-modal-close" id="closeNomineesModal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="nominees-list" id="nomineesList">
+          <!-- Nominees will be loaded here -->
+        </div>
+        <button class="admin-btn admin-btn-primary" id="addNomineeBtn">
+          <i data-lucide="plus"></i> Add Nominee
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nominee Modal -->
+  <div class="admin-modal hidden" id="nomineeModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3 id="nomineeModalTitle">Add Nominee</h3>
+        <button class="admin-modal-close" id="closeNomineeModal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="admin-modal-body">
+        <form id="nomineeForm">
+          <div class="admin-form-group">
+            <label for="nomineeName">Nominee Name</label>
+            <input type="text" id="nomineeName" required>
+          </div>
+          <div class="admin-form-group">
+            <label for="nomineePosition">Position/Title</label>
+            <input type="text" id="nomineePosition" placeholder="e.g. President, Secretary, etc.">
+          </div>
+          <div class="admin-form-group">
+            <label for="nomineeBio">Bio</label>
+            <textarea id="nomineeBio" rows="3"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label for="nomineePhoto">Photo URL</label>
+            <input type="url" id="nomineePhoto">
+          </div>
+        </form>
+      </div>
+      <div class="admin-modal-footer">
+        <button class="admin-btn admin-btn-secondary" id="cancelNominee">Cancel</button>
+        <button class="admin-btn admin-btn-primary" id="saveNominee">Save Nominee</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/admin.js"></script>
+  <script src="../js/admin-elections.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      
+      // Mobile sidebar toggle
+      document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+      
+      // Theme toggle
+      document.getElementById('themeToggle').addEventListener('click', function() {
+        document.body.classList.toggle('light-mode');
+        const icon = this.querySelector('svg');
+        if (icon) {
+          icon.setAttribute('data-lucide', document.body.classList.contains('light-mode') ? 'sun' : 'moon');
+          lucide.createIcons();
+        }
+      });
+      
+      // Refresh
+      document.getElementById('refreshBtn').addEventListener('click', () => {
+        loadElections();
+        showAdminToast('Elections refreshed', 'success');
+      });
+      
+      // Filter buttons
+      document.querySelectorAll('.admin-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.parentElement.querySelectorAll('.admin-filter-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          document.getElementById('statusFilter').value = this.dataset.status === 'all' ? '' : this.dataset.status;
+          loadElections(1);
+        });
+      });
+    });
+  </script>
+  <!-- Paystack Script -->
+  <script src="https://js.paystack.co/v2/paystack.js"></script>
+  <script src="../js/payment.js"></script>
+</body>
+</html>

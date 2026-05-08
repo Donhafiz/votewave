@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Election Results - VoteWave Admin</title>
+  <meta name="theme-color" content="#6366f1">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-logo">V</div>
+        <a href="dashboard.html" class="admin-brand">Vote<span>Wave</span></a>
+      </div>
+      <nav class="admin-sidebar-nav">
+        <a href="dashboard.html" class="admin-nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="elections.html" class="admin-nav-item"><i data-lucide="vote"></i> Elections</a>
+        <a href="candidates.html" class="admin-nav-item"><i data-lucide="users"></i> Candidates</a>
+        <a href="results.html" class="admin-nav-item active"><i data-lucide="bar-chart-3"></i> Results</a>
+        <a href="users.html" class="admin-nav-item"><i data-lucide="user-cog"></i> Users</a>
+        <a href="settings.html" class="admin-nav-item"><i data-lucide="settings"></i> Settings</a>
+      </nav>
+    </aside>
+    
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+          <h1 style="font-size:1.1rem;font-weight:600;">Results & Analytics</h1>
+        </div>
+        <div class="admin-topbar-right">
+          <button class="admin-btn admin-btn-secondary admin-btn-sm" onclick="exportResults()"><i data-lucide="download"></i> Export PDF</button>
+          <button class="admin-btn admin-btn-primary admin-btn-sm" onclick="exportTableToCSV('.admin-table','results.csv')"><i data-lucide="file-text"></i> Export CSV</button>
+        </div>
+      </header>
+      
+      <div class="admin-content">
+        <!-- Election Selector -->
+        <div class="admin-filters" style="margin-bottom:2rem;">
+          <select class="admin-filter-select" id="electionSelect" style="min-width:300px;" onchange="loadResults(this.value)">
+            <option value="">Select an election to view results...</option>
+          </select>
+        </div>
+        
+        <!-- Results Overview -->
+        <div class="admin-stats-grid" id="resultsStats" style="display:none;">
+          <div class="admin-stat-card"><div class="admin-stat-icon purple"><i data-lucide="users"></i></div><div class="admin-stat-value" id="totalEligible">0</div><div class="admin-stat-label">Eligible Voters</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon green"><i data-lucide="check-circle"></i></div><div class="admin-stat-value" id="totalVotesCast">0</div><div class="admin-stat-label">Votes Cast</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon cyan"><i data-lucide="activity"></i></div><div class="admin-stat-value" id="turnoutPercent">0%</div><div class="admin-stat-label">Turnout</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon orange"><i data-lucide="clock"></i></div><div class="admin-stat-value" id="timeRemaining">—</div><div class="admin-stat-label">Status</div></div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="admin-charts-grid" id="resultsCharts" style="display:none;">
+          <div class="admin-chart-card">
+            <div class="admin-chart-header"><h3>Vote Distribution</h3></div>
+            <div class="admin-chart-container" style="height:350px;"><canvas id="resultsBarChart"></canvas></div>
+          </div>
+          <div class="admin-chart-card">
+            <div class="admin-chart-header"><h3>Turnout Breakdown</h3></div>
+            <div class="admin-chart-container" style="height:350px;"><canvas id="turnoutChart"></canvas></div>
+          </div>
+        </div>
+        
+        <!-- Results Table -->
+        <div class="admin-table-card" id="resultsTable" style="display:none;">
+          <div class="admin-table-header"><h3>Detailed Results</h3></div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr><th>#</th><th>Candidate</th><th>Votes</th><th>Percentage</th><th>Status</th></tr>
+              </thead>
+              <tbody id="resultsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div class="admin-empty-state" id="noResults">
+          <i data-lucide="bar-chart-3"></i>
+          <h3>Select an Election</h3>
+          <p>Choose an election above to view its results and analytics</p>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div class="admin-toast-container" id="toastContainer"></div>
+  
+  <script src="../js/main.js"></script>
+  <script src="../js/admin.js"></script>
+  
+  <script>
+    let resultsChart = null;
+    let turnoutDoughnut = null;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+      loadElectionList();
+    });
+    
+    function loadElectionList() {
+      const select = document.getElementById('electionSelect');
+      let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
+      
+      if (elections.length === 0) {
+        elections = [
+          { _id: '1', title: 'Student Council 2026', status: 'active' },
+          { _id: '2', title: 'Best Teacher Award', status: 'active' },
+          { _id: '3', title: 'Annual Fest Theme', status: 'completed' },
+        ];
+      }
+      
+      elections.forEach(e => {
+        const option = document.createElement('option');
+        option.value = e._id;
+        option.textContent = `${e.title} (${e.status})`;
+        select.appendChild(option);
+      });
+    }
+    
+    function loadResults(electionId) {
+      if (!electionId) {
+        document.getElementById('resultsStats').style.display = 'none';
+        document.getElementById('resultsCharts').style.display = 'none';
+        document.getElementById('resultsTable').style.display = 'none';
+        document.getElementById('noResults').style.display = 'block';
+        return;
+      }
+      
+      document.getElementById('resultsStats').style.display = 'grid';
+      document.getElementById('resultsCharts').style.display = 'grid';
+      document.getElementById('resultsTable').style.display = 'block';
+      document.getElementById('noResults').style.display = 'none';
+      
+      // Sample results data
+      const candidates = [
+        { name: 'John Doe', votes: 520, percent: 42, status: 'Leading' },
+        { name: 'Jane Smith', votes: 380, percent: 30, status: 'Active' },
+        { name: 'Mike King', votes: 220, percent: 18, status: 'Active' },
+        { name: 'Sarah Davis', votes: 127, percent: 10, status: 'Active' },
+      ];
+      
+      document.getElementById('totalEligible').textContent = '1,500';
+      document.getElementById('totalVotesCast').textContent = '1,247';
+      document.getElementById('turnoutPercent').textContent = '83%';
+      document.getElementById('timeRemaining').textContent = 'Active';
+      
+      // Table
+      document.getElementById('resultsTableBody').innerHTML = candidates.map((c, i) => `
+        <tr>
+          <td><strong>${i + 1}</strong></td>
+          <td><strong>${c.name}</strong></td>
+          <td>${formatNumber(c.votes)}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+                <div style="height:100%;width:${c.percent}%;background:${i === 0 ? '#6366f1' : i === 1 ? '#8b5cf6' : i === 2 ? '#06b6d4' : '#10b981'};border-radius:3px;"></div>
+              </div>
+              <span style="font-weight:600;">${c.percent}%</span>
+            </div>
+          </td>
+          <td><span class="admin-badge ${c.status === 'Leading' ? 'success' : 'active'}">${c.status}</span></td>
+        </tr>
+      `).join('');
+      
+      // Charts
+      if (resultsChart) resultsChart.destroy();
+      if (turnoutDoughnut) turnoutDoughnut.destroy();
+      
+      const barCtx = document.getElementById('resultsBarChart');
+      if (barCtx && typeof Chart !== 'undefined') {
+        resultsChart = new Chart(barCtx, {
+          type: 'bar',
+          data: {
+            labels: candidates.map(c => c.name),
+            datasets: [{
+              data: candidates.map(c => c.votes),
+              backgroundColor: ['#6366f1','#8b5cf6','#06b6d4','#10b981'],
+              borderRadius: 8,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+            }
+          }
+        });
+      }
+      
+      const turnCtx = document.getElementById('turnoutChart');
+      if (turnCtx && typeof Chart !== 'undefined') {
+        turnoutDoughnut = new Chart(turnCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Voted','Did Not Vote'],
+            datasets: [{
+              data: [1247, 253],
+              backgroundColor: ['#10b981','rgba(255,255,255,0.1)'],
+              borderWidth: 0,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
+          }
+        });
+      }
+    }
+    
+    function exportResults() {
+      showAdminToast('Generating PDF report...', 'info');
+      setTimeout(() => showAdminToast('Report ready! Downloading...', 'success'), 1500);
+    }
+  </script>
+</body>
+</html>

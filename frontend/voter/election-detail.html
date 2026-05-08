@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Election Details - VoteWave</title>
+  <meta name="description" content="View election details and cast your vote">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.js"></script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3Cpath d='M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7z'/%3E%3Cpath d='M22 19H2'/%3E%3C/svg%3E" type="image/svg+xml">
+  
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">
+        <i data-lucide="vote" class="logo-icon"></i>
+        <span>VoteWave</span>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="../index.html" class="nav-link"><i data-lucide="home" style="width:16px;height:16px;"></i> Home</a></li>
+        <li><a href="elections.html" class="nav-link active">Elections</a></li>
+        <li><a href="history.html" class="nav-link">My Votes</a></li>
+      </ul>
+      
+      <div class="nav-actions" id="navActions">
+        <a href="../auth/login.html" class="btn btn-ghost">Sign In</a>
+        <a href="../auth/register.html" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <!-- Back Link -->
+      <a href="elections.html" class="back-link">
+        <i data-lucide="arrow-left"></i>
+        <span>Back to Elections</span>
+      </a>
+
+      <!-- Election Header -->
+      <div class="election-header" id="electionHeader">
+        <div class="loading-state">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+      <!-- Election Content -->
+      <div class="election-layout" id="electionLayout">
+        <!-- Candidates Section -->
+        <div class="candidates-section">
+          <h2>Candidates</h2>
+          <div class="candidates-grid" id="candidatesGrid">
+            <!-- Candidates will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="election-sidebar">
+          <!-- Vote Status Card -->
+          <div class="sidebar-card" id="voteStatusCard">
+            <h3>Voting Status</h3>
+            <div id="voteStatusContent">
+              <!-- Vote status content will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Results Card (shown when closed) -->
+          <div class="sidebar-card hidden" id="resultsCard">
+            <h3>Results</h3>
+            <div class="results-chart-container">
+              <canvas id="resultsChart"></canvas>
+            </div>
+            <div class="results-list" id="resultsList">
+              <!-- Results list will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Election Info -->
+          <div class="sidebar-card">
+            <h3>Election Details</h3>
+            <div class="info-list" id="electionInfo">
+              <!-- Info will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Vote Confirmation Modal -->
+  <div class="modal hidden" id="voteModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Confirm Your Vote</h3>
+        <button class="modal-close" id="closeVoteModal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="vote-confirmation" id="voteConfirmation">
+          <!-- Vote confirmation content -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelVote">Cancel</button>
+        <button class="btn btn-primary" id="confirmVote">
+          <span>Confirm Vote</span>
+          <i data-lucide="check"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vote Success Modal -->
+  <div class="modal hidden" id="successModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content success-modal">
+      <div class="success-icon">
+        <i data-lucide="check-circle"></i>
+      </div>
+      <h3>Vote Cast Successfully!</h3>
+      <p>Your vote has been recorded securely.</p>
+      <div class="confirmation-code" id="confirmationCode">
+        <!-- Confirmation code will be shown here -->
+      </div>
+      <button class="btn btn-primary" id="closeSuccessModal">Done</button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="footer" style="margin-top: var(--space-16);">
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: var(--space-6);">
+        <p>&copy; 2026 VoteWave. All rights reserved.</p>
+        <p class="powered-by">Site powered by <strong>Star Media Tech</strong></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/election-detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nominations - VoteWave</title>
+  <meta name="theme-color" content="#6366f1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root { --bg:#0f172a; --surface:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.06); --text:#f1f5f9; --text-muted:#94a3b8; --primary:#6366f1; --success:#10b981; --warning:#f59e0b; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    .container { max-width:1200px; margin:0 auto; padding:2rem 1.5rem; }
+    
+    .navbar { background:var(--bg); border-bottom:1px solid var(--border); padding:0 1.5rem; position:sticky; top:0; z-index:100; }
+    .nav-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:4rem; }
+    .nav-logo { font-size:1.25rem; font-weight:800; color:var(--text); text-decoration:none; }
+    .nav-logo span { background:linear-gradient(135deg,#818cf8,#c084fc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .nav-links { display:flex; gap:1.5rem; }
+    .nav-links a { color:var(--text-muted); text-decoration:none; font-size:0.9rem; font-weight:500; }
+    .nav-links a:hover,.nav-links a.active { color:var(--text); }
+    
+    .page-header { text-align:center; padding:3rem 0 2rem; }
+    .page-header h1 { font-size:2.5rem; font-weight:800; margin-bottom:0.5rem; }
+    .page-header p { color:var(--text-muted); font-size:1.1rem; }
+    
+    .nominations-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:1.5rem; }
+    
+    .nomination-card { background:var(--surface); border:1px solid var(--border); border-radius:1rem; padding:1.75rem; transition:all 0.3s; cursor:pointer; }
+    .nomination-card:hover { border-color:rgba(99,102,241,0.3); transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+    
+    .card-badge { display:inline-block; padding:0.2rem 0.75rem; border-radius:100px; font-size:0.7rem; font-weight:600; margin-bottom:1rem; }
+    .card-badge.active { background:rgba(16,185,129,0.15); color:var(--success); }
+    .card-badge.upcoming { background:rgba(245,158,11,0.15); color:var(--warning); }
+    
+    .nomination-card h3 { font-size:1.25rem; font-weight:700; margin-bottom:0.5rem; }
+    .nomination-card p { font-size:0.9rem; color:var(--text-muted); margin-bottom:1.25rem; line-height:1.5; }
+    
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.6rem 1.25rem; font-size:0.875rem; font-weight:600; border:none; border-radius:0.5rem; cursor:pointer; transition:all 0.2s; font-family:inherit; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; text-decoration:none; }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(99,102,241,0.4); }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo">🏆 Vote<span>Wave</span></a>
+      <div class="nav-links">
+        <a href="../../index.html">Home</a>
+        <a href="elections.html">Elections</a>
+        <a href="nominations.html" class="active">Nominations</a>
+        <a href="events.html">Events</a>
+        <a href="club-elections.html">Clubs</a>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <div class="page-header">
+      <h1>🏆 Nominations</h1>
+      <p>Nominate outstanding individuals for awards and recognition</p>
+    </div>
+    
+    <div class="nominations-grid" id="nominationsGrid"></div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const nominations = [
+        { id:'1', title:'Best Teacher Award 2026', description:'Recognize teachers who have gone above and beyond. Categories include Best Lecturer, Most Supportive, Innovation in Teaching, and Rising Star.', status:'active', deadline:'Mar 18, 2026', nominees:15, categories:['Best Lecturer','Most Supportive','Innovation in Teaching','Rising Star'] },
+        { id:'2', title:'Student Leader of the Year', description:'Honor outstanding student leaders who have made significant contributions to campus life and community service.', status:'active', deadline:'Mar 25, 2026', nominees:22, categories:['Student Government','Community Service','Sports Leadership'] },
+        { id:'3', title:'Innovation Excellence Award', description:'Nominate individuals or teams for groundbreaking innovations, research, and entrepreneurial initiatives.', status:'upcoming', deadline:'Apr 10, 2026', nominees:0, categories:['Technology','Research','Entrepreneurship'] },
+        { id:'4', title:'Community Impact Award', description:'Recognize students, faculty, and staff who have made meaningful contributions to the local community.', status:'active', deadline:'Mar 30, 2026', nominees:18, categories:['Volunteer Work','Social Justice','Environmental Action'] },
+      ];
+      
+      document.getElementById('nominationsGrid').innerHTML = nominations.map(n => `
+        <div class="nomination-card" onclick="window.location.href='vote.html?id=${n.id}'">
+          <span class="card-badge ${n.status}">${n.status.toUpperCase()}</span>
+          <h3>${n.title}</h3>
+          <p>${n.description}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:1rem;">
+            ${n.categories.map(c => `<span style="padding:0.2rem 0.6rem;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:100px;font-size:0.7rem;color:var(--text-muted);">📋 ${c}</span>`).join('')}
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:1rem;border-top:1px solid var(--border);">
+            <span style="font-size:0.85rem;color:var(--text-muted);">📅 ${n.deadline} | 👥 ${n.nominees} nominees</span>
+            <a href="vote.html?id=${n.id}" class="btn">${n.status === 'active' ? 'Nominate Now' : 'Preview'}</a>
+          </div>
+        </div>
+      `).join('');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - VoteWave Admin</title>
+  <meta name="theme-color" content="#6366f1">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-logo">V</div>
+        <a href="dashboard.html" class="admin-brand">Vote<span>Wave</span></a>
+      </div>
+      <nav class="admin-sidebar-nav">
+        <a href="dashboard.html" class="admin-nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="elections.html" class="admin-nav-item"><i data-lucide="vote"></i> Elections</a>
+        <a href="candidates.html" class="admin-nav-item"><i data-lucide="users"></i> Candidates</a>
+        <a href="results.html" class="admin-nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
+        <a href="users.html" class="admin-nav-item"><i data-lucide="user-cog"></i> Users</a>
+        <a href="settings.html" class="admin-nav-item active"><i data-lucide="settings"></i> Settings</a>
+      </nav>
+    </aside>
+    
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+          <h1 style="font-size:1.1rem;">System Settings</h1>
+        </div>
+      </header>
+      
+      <div class="admin-content">
+        <div class="admin-table-card" style="margin-bottom:2rem;">
+          <div class="admin-table-header"><h3>General Settings</h3></div>
+          <div style="padding:2rem;">
+            <div class="admin-form-row" style="margin-bottom:1.5rem;">
+              <div class="admin-form-group">
+                <label>Site Name</label>
+                <input type="text" value="VoteWave" id="siteName">
+              </div>
+              <div class="admin-form-group">
+                <label>Default Timezone</label>
+                <select id="timezone">
+                  <option>UTC</option>
+                  <option>America/New_York</option>
+                  <option>Europe/London</option>
+                  <option>Asia/Kolkata</option>
+                  <option selected>Africa/Accra</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="admin-form-checkbox" style="margin-bottom:1rem;">
+              <input type="checkbox" id="registrationEnabled" checked>
+              <span>Enable new user registration</span>
+            </div>
+            <div class="admin-form-checkbox" style="margin-bottom:1rem;">
+              <input type="checkbox" id="emailVerification" checked>
+              <span>Require email verification</span>
+            </div>
+            <div class="admin-form-checkbox" style="margin-bottom:1rem;">
+              <input type="checkbox" id="maintenanceMode">
+              <span>Maintenance mode (disables voting)</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="admin-table-card" style="margin-bottom:2rem;">
+          <div class="admin-table-header"><h3>Security Settings</h3></div>
+          <div style="padding:2rem;">
+            <div class="admin-form-row" style="margin-bottom:1.5rem;">
+              <div class="admin-form-group">
+                <label>Session Timeout (hours)</label>
+                <input type="number" value="24" id="sessionTimeout">
+              </div>
+              <div class="admin-form-group">
+                <label>Min Password Length</label>
+                <input type="number" value="6" id="passwordMinLength">
+              </div>
+            </div>
+            <div class="admin-form-checkbox" style="margin-bottom:1rem;">
+              <input type="checkbox" id="twoFactorAuth">
+              <span>Enable Two-Factor Authentication</span>
+            </div>
+            <div class="admin-form-checkbox" style="margin-bottom:1rem;">
+              <input type="checkbox" id="auditLogging" checked>
+              <span>Enable audit logging</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display:flex;gap:1rem;justify-content:flex-end;">
+          <button class="admin-btn admin-btn-secondary" onclick="resetSettings()">
+            <i data-lucide="rotate-ccw"></i> Reset to Defaults
+          </button>
+          <button class="admin-btn admin-btn-primary" onclick="saveSettings()">
+            <i data-lucide="save"></i> Save Settings
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div class="admin-toast-container" id="toastContainer"></div>
+  
+  <script src="../js/main.js"></script>
+  <script src="../js/admin.js"></script>
+  <script src="../js/admin-settings.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+      loadSettings();
+    });
+    
+    function loadSettings() {
+      const settings = JSON.parse(localStorage.getItem('votewave_settings') || '{}');
+      document.getElementById('siteName').value = settings.siteName || 'VoteWave';
+      document.getElementById('timezone').value = settings.timezone || 'Africa/Accra';
+      document.getElementById('registrationEnabled').checked = settings.registrationEnabled !== false;
+      document.getElementById('emailVerification').checked = settings.emailVerification !== false;
+      document.getElementById('maintenanceMode').checked = settings.maintenanceMode || false;
+      document.getElementById('sessionTimeout').value = settings.sessionTimeout || 24;
+      document.getElementById('passwordMinLength').value = settings.passwordMinLength || 6;
+      document.getElementById('twoFactorAuth').checked = settings.twoFactorAuth || false;
+      document.getElementById('auditLogging').checked = settings.auditLogging !== false;
+    }
+    
+    function saveSettings() {
+      const settings = {
+        siteName: document.getElementById('siteName').value,
+        timezone: document.getElementById('timezone').value,
+        registrationEnabled: document.getElementById('registrationEnabled').checked,
+        emailVerification: document.getElementById('emailVerification').checked,
+        maintenanceMode: document.getElementById('maintenanceMode').checked,
+        sessionTimeout: parseInt(document.getElementById('sessionTimeout').value),
+        passwordMinLength: parseInt(document.getElementById('passwordMinLength').value),
+        twoFactorAuth: document.getElementById('twoFactorAuth').checked,
+        auditLogging: document.getElementById('auditLogging').checked,
+      };
+      
+      localStorage.setItem('votewave_settings', JSON.stringify(settings));
+      showAdminToast('Settings saved successfully!', 'success');
+    }
+    
+    function resetSettings() {
+      if (!confirm('Reset all settings to defaults?')) return;
+      localStorage.removeItem('votewave_settings');
+      loadSettings();
+      showAdminToast('Settings reset to defaults', 'success');
+    }
+  </script>
+</body>
+</html>

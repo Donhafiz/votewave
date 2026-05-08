@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Log - VoteWave Admin</title>
+  <meta name="theme-color" content="#6366f1">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-logo">V</div>
+        <a href="dashboard.html" class="admin-brand">Vote<span>Wave</span></a>
+      </div>
+      <nav class="admin-sidebar-nav">
+        <a href="dashboard.html" class="admin-nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="elections.html" class="admin-nav-item"><i data-lucide="vote"></i> Elections</a>
+        <a href="candidates.html" class="admin-nav-item"><i data-lucide="users"></i> Candidates</a>
+        <a href="results.html" class="admin-nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
+        <a href="users.html" class="admin-nav-item"><i data-lucide="user-cog"></i> Users</a>
+        <a href="audit.html" class="admin-nav-item active"><i data-lucide="file-text"></i> Audit Log</a>
+        <a href="settings.html" class="admin-nav-item"><i data-lucide="settings"></i> Settings</a>
+      </nav>
+    </aside>
+    
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+          <h1 style="font-size:1.1rem;">Audit Log</h1>
+        </div>
+        <div class="admin-topbar-right">
+          <button class="admin-btn admin-btn-secondary admin-btn-sm" onclick="exportAuditLog()"><i data-lucide="download"></i> Export Log</button>
+          <button class="admin-btn admin-btn-danger admin-btn-sm" onclick="clearAuditLog()"><i data-lucide="trash-2"></i> Clear Log</button>
+        </div>
+      </header>
+      
+      <div class="admin-content">
+        <!-- Filters -->
+        <div class="admin-filters">
+          <button class="admin-filter-btn active" data-type="all">All Events</button>
+          <button class="admin-filter-btn" data-type="election">Elections</button>
+          <button class="admin-filter-btn" data-type="user">Users</button>
+          <button class="admin-filter-btn" data-type="vote">Votes</button>
+          <button class="admin-filter-btn" data-type="system">System</button>
+          <input type="text" class="admin-filter-select" id="searchAudit" placeholder="Search audit log..." style="margin-left:auto;min-width:200px;">
+        </div>
+        
+        <!-- Audit Table -->
+        <div class="admin-table-card">
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Type</th>
+                  <th>Details</th>
+                  <th>IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div class="admin-toast-container" id="toastContainer"></div>
+  
+  <script src="../js/main.js"></script>
+  <script src="../js/admin.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+      
+      initAdminAuth();
+      loadAuditLogs();
+      
+      // Filter buttons
+      document.querySelectorAll('.admin-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.admin-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          loadAuditLogs();
+        });
+      });
+      
+      // Search
+      document.getElementById('searchAudit').addEventListener('input', debounce(loadAuditLogs, 300));
+    });
+    
+    async function loadAuditLogs() {
+      try {
+        const typeFilter = document.querySelector('.admin-filter-btn.active')?.dataset.type;
+        const searchQuery = document.getElementById('searchAudit')?.value;
+        
+        let endpoint = '/admin/audit-logs?page=1&limit=50';
+        if (typeFilter && typeFilter !== 'all') {
+          // Map frontend types to backend actions
+          const actionMap = {
+            'election': 'ELECTION_CREATED,ELECTION_UPDATED,ELECTION_ACTIVATED,ELECTION_CLOSED',
+            'user': 'USER_REGISTERED,USER_LOGIN,USER_BANNED,USER_UNBANNED,ROLE_CHANGE',
+            'vote': 'VOTE_CAST',
+            'system': 'SETTINGS_CHANGED'
+          };
+          if (actionMap[typeFilter]) {
+            endpoint += `&action=${actionMap[typeFilter]}`;
+          }
+        }
+        
+        const response = await adminApiRequest(endpoint);
+        
+        if (response.success) {
+          const logs = response.data || [];
+          renderAuditLogs(logs);
+        } else {
+          showAdminToast('Failed to load audit logs', 'error');
+          renderAuditLogs([]);
+        }
+      } catch (error) {
+        console.error('Error loading audit logs:', error);
+        showAdminToast('Error loading audit logs', 'error');
+        renderAuditLogs([]);
+      }
+    }
+    
+    function renderAuditLogs(logs) {
+      const typeBadge = (action) => {
+        const colors = { 
+          'ELECTION_CREATED':'#6366f1', 'ELECTION_UPDATED':'#6366f1', 'ELECTION_ACTIVATED':'#6366f1', 'ELECTION_CLOSED':'#6366f1',
+          'USER_REGISTERED':'#10b981', 'USER_LOGIN':'#10b981', 'USER_BANNED':'#10b981', 'USER_UNBANNED':'#10b981', 'ROLE_CHANGE':'#10b981',
+          'VOTE_CAST':'#f59e0b',
+          'SETTINGS_CHANGED':'#06b6d4'
+        };
+        const type = action.split('_')[0].toLowerCase();
+        return `<span style="display:inline-block;padding:0.15rem 0.6rem;border-radius:100px;font-size:0.7rem;font-weight:600;background:${colors[action] || '#64748b'}22;color:${colors[action] || '#94a3b8'};">${type.toUpperCase()}</span>`;
+      };
+      
+      document.getElementById('auditTableBody').innerHTML = logs.map(log => `
+        <tr>
+          <td style="white-space:nowrap;">${new Date(log.timestamp).toLocaleString()}</td>
+          <td><strong>${escapeHtml(log.user?.firstName + ' ' + log.user?.lastName || 'System')}</strong></td>
+          <td>${escapeHtml(log.action.replace(/_/g, ' '))}</td>
+          <td>${typeBadge(log.action)}</td>
+          <td>${escapeHtml(log.details || 'No details')}</td>
+          <td style="font-family:monospace;font-size:0.8rem;">${log.ipAddress || 'N/A'}</td>
+        </tr>
+      `).join('');
+    }
+    
+    function exportAuditLog() {
+      // Export current table data
+      const table = document.querySelector('.admin-table');
+      if (!table) return;
+      
+      let csv = 'Timestamp,User,Action,Type,Details,IP Address\n';
+      table.querySelectorAll('tbody tr').forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const rowData = Array.from(cells).map(cell => `"${cell.textContent.replace(/"/g, '""')}"`);
+        csv += rowData.join(',') + '\n';
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `audit-log-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+    
+    function clearAuditLog() {
+      if (!confirm('This will only clear logs from the current view. Database logs cannot be cleared.')) return;
+      document.getElementById('auditTableBody').innerHTML = '';
+      showAdminToast('Audit log view cleared', 'success');
+    }
+    
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+  </script>
+</body>
+</html>

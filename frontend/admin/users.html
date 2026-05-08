@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Users - VoteWave Admin</title>
+  <meta name="theme-color" content="#6366f1">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-logo">V</div>
+        <a href="dashboard.html" class="admin-brand">Vote<span>Wave</span></a>
+      </div>
+      
+      <nav class="admin-sidebar-nav">
+        <div class="admin-nav-section">
+          <div class="admin-nav-title">Main</div>
+          <a href="dashboard.html" class="admin-nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+          <a href="elections.html" class="admin-nav-item"><i data-lucide="vote"></i> Elections</a>
+          <a href="candidates.html" class="admin-nav-item"><i data-lucide="users"></i> Candidates</a>
+          <a href="results.html" class="admin-nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
+        </div>
+        <div class="admin-nav-section">
+          <div class="admin-nav-title">Management</div>
+          <a href="users.html" class="admin-nav-item active"><i data-lucide="user-cog"></i> Users</a>
+          <a href="audit.html" class="admin-nav-item"><i data-lucide="file-text"></i> Audit Log</a>
+          <a href="settings.html" class="admin-nav-item"><i data-lucide="settings"></i> Settings</a>
+        </div>
+      </nav>
+    </aside>
+    
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+          <div class="admin-search">
+            <i data-lucide="search" style="width:1rem;height:1rem;"></i>
+            <input type="text" placeholder="Search users..." id="searchInput">
+          </div>
+        </div>
+        <div class="admin-topbar-right">
+          <button class="admin-icon-btn" id="inviteBtn" title="Invite Users"><i data-lucide="mail-plus"></i></button>
+          <button class="admin-icon-btn" id="refreshBtn"><i data-lucide="refresh-cw"></i></button>
+        </div>
+      </header>
+      
+      <div class="admin-content">
+        <div class="admin-page-header">
+          <div>
+            <h1>Users</h1>
+            <p>Manage all registered users and administrators</p>
+          </div>
+          <div style="display:flex;gap:0.75rem;">
+            <button class="admin-btn admin-btn-secondary" onclick="exportTableToCSV('.admin-table','users-export.csv')">
+              <i data-lucide="download" style="width:14px;height:14px;"></i> Export
+            </button>
+            <button class="admin-btn admin-btn-primary" id="addUserBtn">
+              <i data-lucide="user-plus"></i> Add User
+            </button>
+          </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="admin-filters">
+          <button class="admin-filter-btn active" data-role="all">All Users</button>
+          <button class="admin-filter-btn" data-role="voter">Voters</button>
+          <button class="admin-filter-btn" data-role="admin">Admins</button>
+          <button class="admin-filter-btn" data-role="superadmin">Super Admins</button>
+          <select class="admin-filter-select" id="statusFilter">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="banned">Banned</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        
+        <!-- Users Table -->
+        <div class="admin-table-card">
+          <div style="overflow-x:auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                  <th>Votes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr><td colspan="6"><div class="admin-loading"><div class="admin-spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="pagination" class="admin-pagination"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Edit User Modal -->
+  <div class="admin-modal hidden" id="editUserModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h2>Edit User</h2>
+        <button class="admin-modal-close" onclick="document.getElementById('editUserModal').classList.add('hidden')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="editUserForm" onsubmit="return false;">
+        <div class="admin-form-row">
+          <div class="admin-form-group">
+            <label>First Name</label>
+            <input type="text" id="editFirstName" required>
+          </div>
+          <div class="admin-form-group">
+            <label>Last Name</label>
+            <input type="text" id="editLastName" required>
+          </div>
+        </div>
+        <div class="admin-form-group">
+          <label>Email</label>
+          <input type="email" id="editEmail" required>
+        </div>
+        <div class="admin-form-group">
+          <label>Role</label>
+          <select id="editRole">
+            <option value="voter">Voter</option>
+            <option value="admin">Admin</option>
+            <option value="superadmin">Super Admin</option>
+          </select>
+        </div>
+        <div class="admin-form-actions">
+          <button type="button" class="admin-btn admin-btn-secondary" onclick="document.getElementById('editUserModal').classList.add('hidden')">Cancel</button>
+          <button type="button" class="admin-btn admin-btn-primary" id="saveUserBtn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Ban Modal -->
+  <div class="admin-modal hidden" id="banModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content" style="max-width:450px;">
+      <div class="admin-modal-header">
+        <h2>Ban User</h2>
+        <button class="admin-modal-close" onclick="document.getElementById('banModal').classList.add('hidden')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="admin-form-group">
+        <label>Reason for Ban *</label>
+        <textarea id="banReason" placeholder="Explain why this user is being banned..." rows="3" required></textarea>
+      </div>
+      <div class="admin-form-group">
+        <label>Duration (days, leave empty for permanent)</label>
+        <input type="number" id="banDuration" placeholder="e.g., 30">
+      </div>
+      <div class="admin-form-actions">
+        <button class="admin-btn admin-btn-secondary" onclick="document.getElementById('banModal').classList.add('hidden')">Cancel</button>
+        <button class="admin-btn admin-btn-danger" id="confirmBan">Ban User</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Delete Modal -->
+  <div class="admin-modal hidden" id="deleteModal">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content" style="max-width:400px;text-align:center;">
+      <i data-lucide="alert-triangle" style="width:3rem;height:3rem;color:#ef4444;margin-bottom:1rem;"></i>
+      <h2 style="margin-bottom:0.5rem;">Delete User?</h2>
+      <p style="color:#94a3b8;margin-bottom:1.5rem;">All data associated with this user will be permanently removed.</p>
+      <div class="admin-form-actions" style="justify-content:center;">
+        <button class="admin-btn admin-btn-secondary" onclick="document.getElementById('deleteModal').classList.add('hidden')">Cancel</button>
+        <button class="admin-btn admin-btn-danger" id="confirmDelete">Delete User</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Container -->
+  <div class="admin-toast-container" id="toastContainer"></div>
+  
+  <script src="../js/main.js"></script>
+  <script src="../js/admin.js"></script>
+  <script src="../js/admin-users.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      
+      document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+      
+      document.getElementById('refreshBtn').addEventListener('click', () => {
+        loadUsers();
+        showAdminToast('Users refreshed', 'success');
+      });
+      
+      document.getElementById('inviteBtn').addEventListener('click', () => {
+        const email = prompt('Enter email address to invite:');
+        if (email && validateEmail(email)) {
+          showAdminToast(`Invitation sent to ${email}!`, 'success');
+        } else if (email) {
+          showAdminToast('Please enter a valid email', 'error');
+        }
+      });
+      
+      document.getElementById('addUserBtn').addEventListener('click', () => {
+        document.getElementById('editUserModal').classList.remove('hidden');
+        document.getElementById('editUserForm').reset();
+        document.getElementById('saveUserBtn').textContent = 'Add User';
+      });
+      
+      document.querySelectorAll('.admin-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.parentElement.querySelectorAll('.admin-filter-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          loadUsers(this.dataset.role);
+        });
+      });
+      
+      document.getElementById('statusFilter').addEventListener('change', function() {
+        loadUsers(document.querySelector('.admin-filter-btn.active')?.dataset.role || 'all');
+      });
+      
+      function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+    });
+  </script>
+</body>
+</html>

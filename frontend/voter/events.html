@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Voting - VoteWave</title>
+  <meta name="theme-color" content="#6366f1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root { --bg:#0f172a; --surface:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.06); --text:#f1f5f9; --text-muted:#94a3b8; --primary:#6366f1; --success:#10b981; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    .container { max-width:1200px; margin:0 auto; padding:2rem 1.5rem; }
+    
+    .navbar { background:var(--bg); border-bottom:1px solid var(--border); padding:0 1.5rem; position:sticky; top:0; }
+    .nav-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:4rem; }
+    .nav-logo { font-size:1.25rem; font-weight:800; color:var(--text); text-decoration:none; }
+    .nav-logo span { background:linear-gradient(135deg,#818cf8,#c084fc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .nav-links { display:flex; gap:1.5rem; }
+    .nav-links a { color:var(--text-muted); text-decoration:none; font-size:0.9rem; font-weight:500; }
+    .nav-links a:hover,.nav-links a.active { color:var(--text); }
+    
+    .page-header { text-align:center; padding:3rem 0 2rem; }
+    .page-header h1 { font-size:2.5rem; font-weight:800; }
+    .page-header p { color:var(--text-muted); }
+    
+    .events-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:1.5rem; }
+    
+    .event-card { background:var(--surface); border:1px solid var(--border); border-radius:1rem; padding:1.75rem; transition:all 0.3s; cursor:pointer; }
+    .event-card:hover { border-color:rgba(99,102,241,0.3); transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+    .event-icon { font-size:3rem; margin-bottom:1rem; }
+    .event-card h3 { font-size:1.25rem; font-weight:700; margin-bottom:0.5rem; }
+    .event-card p { font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem; line-height:1.5; }
+    
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.6rem 1.25rem; font-size:0.875rem; font-weight:600; border:none; border-radius:0.5rem; cursor:pointer; transition:all 0.2s; font-family:inherit; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white; text-decoration:none; }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(99,102,241,0.4); }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo">🎪 Vote<span>Wave</span></a>
+      <div class="nav-links">
+        <a href="../../index.html">Home</a>
+        <a href="elections.html">Elections</a>
+        <a href="nominations.html">Nominations</a>
+        <a href="events.html" class="active">Events</a>
+        <a href="club-elections.html">Clubs</a>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <div class="page-header">
+      <h1>🎪 Event Voting</h1>
+      <p>Live polling and instant feedback for events</p>
+    </div>
+    
+    <div class="events-grid" id="eventsGrid"></div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const events = [
+        { id:'1', icon:'🎭', title:'Annual Fest Theme Vote', description:'Vote for the theme of this year\'s annual cultural festival. Options: Futuristic, Retro, Nature, Bollywood.', status:'active', responses:2150, participants:3200 },
+        { id:'2', icon:'🎤', title:'Battle of Bands - Audience Choice', description:'Cast your vote for the best performing band at the inter-college music competition. Live results displayed on screen!', status:'active', responses:890, participants:1200 },
+        { id:'3', icon:'🍕', title:'Campus Food Festival Menu', description:'Help decide which cuisines should be featured at the upcoming food festival! Vote for your favorite dishes.', status:'upcoming', responses:0, participants:0 },
+        { id:'4', icon:'🎬', title:'Movie Night Selection', description:'What should we screen at the monthly campus movie night? Choose from the shortlisted films.', status:'completed', responses:450, participants:600 },
+      ];
+      
+      document.getElementById('eventsGrid').innerHTML = events.map(e => `
+        <div class="event-card" onclick="window.location.href='vote.html?id=${e.id}'">
+          <div class="event-icon">${e.icon}</div>
+          <span style="display:inline-block;padding:0.2rem 0.75rem;border-radius:100px;font-size:0.7rem;font-weight:600;margin-bottom:0.75rem;background:${e.status==='active'?'rgba(16,185,129,0.15)':e.status==='completed'?'rgba(100,116,139,0.15)':'rgba(245,158,11,0.15)'};color:${e.status==='active'?'#10b981':e.status==='completed'?'#94a3b8':'#f59e0b'}">${e.status.toUpperCase()}</span>
+          <h3>${e.title}</h3>
+          <p>${e.description}</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+            <span style="font-size:0.85rem;color:var(--text-muted);">📊 ${e.responses} responses | 👥 ${e.participants} participants</span>
+            <a href="vote.html?id=${e.id}" class="btn">${e.status==='active'?'Vote Now':'View Results'}</a>
+          </div>
+        </div>
+      `).join('');
+    });
+  </script>
+</body>
+</html>
