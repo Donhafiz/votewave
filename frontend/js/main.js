@@ -6,7 +6,11 @@
 
 // ─── API Configuration ───
 const API_BASE_URL = (() => {
-  // If running on Vercel/Railway (production), use the live backend
+  // Allow an explicit override for the API base URL in production if needed.
+  if (window.CUSTOM_API_BASE_URL) {
+    return window.CUSTOM_API_BASE_URL;
+  }
+
   const hostname = window.location.hostname;
   const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
   
