@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/$1" }
+  ],
+  "redirects": [
+    { "source": "/", "destination": "/frontend/index.html", "statusCode": 301 }
+  ]
+}
