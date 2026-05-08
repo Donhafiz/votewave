@@ -150,6 +150,13 @@ app.get('/api/health', (req, res) => {
 // API 404 Handler
 app.use('/api', notFound);
 
+// FRONTEND SHORTCUTS
+app.get(['/login', '/register', '/auth/login', '/auth/register'], (req, res) => {
+  const frontendPath = path.join(__dirname, '..', 'frontend');
+  const target = req.path.endsWith('/login') ? '/auth/login.html' : '/auth/register.html';
+  return res.sendFile(path.join(frontendPath, target));
+});
+
 // ========================================
 // FRONTEND ROUTES - Serve HTML files
 // ========================================
