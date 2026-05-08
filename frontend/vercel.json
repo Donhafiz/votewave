@@ -5,6 +5,14 @@
       "destination": "/frontend/:path*"
     },
     {
+      "source": "/auth/:path*",
+      "destination": "/frontend/auth/:path*"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/frontend/admin/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/index.html"
     }

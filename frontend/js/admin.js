@@ -251,8 +251,9 @@ async function adminApiRequest(endpoint, options = {}) {
     return window.VoteWave.apiRequest(endpoint, options);
   }
   
-  // Fallback
-  const url = `http://localhost:5000/api${endpoint}`;
+  // Fallback to configured API base URL or localhost during development
+  const apiBase = window.API_BASE_URL || 'http://localhost:5000/api';
+  const url = `${apiBase}${endpoint}`;
   const token = localStorage.getItem('accessToken');
   
   const config = {
