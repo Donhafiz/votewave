@@ -126,6 +126,7 @@ function initAnimations() {
 
   // Features section animation
   gsap.from('.features-section .section-header', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.features-section',
       start: 'top 80%',
@@ -137,6 +138,7 @@ function initAnimations() {
   });
 
   gsap.from('.feature-card-advanced', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.features-grid-advanced',
       start: 'top 80%',
@@ -150,6 +152,7 @@ function initAnimations() {
 
   // How it works section
   gsap.from('.how-it-works-section .section-header', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.how-it-works-section',
       start: 'top 80%',
@@ -161,6 +164,7 @@ function initAnimations() {
   });
 
   gsap.from('.step-item', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.steps-visual',
       start: 'top 80%',
@@ -174,6 +178,7 @@ function initAnimations() {
 
   // CTA section
   gsap.from('.cta-card', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.cta-section',
       start: 'top 80%',
@@ -186,6 +191,7 @@ function initAnimations() {
 
   // Testimonials section
   gsap.from('.testimonials-section .section-header', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.testimonials-section',
       start: 'top 80%',
@@ -197,6 +203,7 @@ function initAnimations() {
   });
 
   gsap.from('.testimonial-card', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.testimonials-grid',
       start: 'top 80%',
@@ -210,6 +217,7 @@ function initAnimations() {
 
   // Pricing section
   gsap.from('.pricing-section .section-header', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.pricing-section',
       start: 'top 80%',
@@ -221,6 +229,7 @@ function initAnimations() {
   });
 
   gsap.from('.pricing-card', {
+    immediateRender: false,
     scrollTrigger: {
       trigger: '.pricing-grid',
       start: 'top 80%',
