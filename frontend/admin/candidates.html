@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Candidates - VoteWave Admin</title>
+  <title>Candidates - VoteWave Admin</title>
+  <meta name="theme-color" content="#6366f1">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../css/style.css">
@@ -11,70 +12,135 @@
 </head>
 <body class="admin-body">
   <div class="admin-layout">
+    <!-- SIDEBAR -->
     <aside class="admin-sidebar" id="sidebar">
-      <div class="admin-sidebar-header"><div class="admin-logo">V</div><a href="dashboard.html" class="admin-brand">Vote<span>Wave</span></a></div>
-      <nav class="admin-sidebar-nav">
-        <a href="dashboard.html" class="admin-nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
-        <a href="elections.html" class="admin-nav-item"><i data-lucide="vote"></i> Elections</a>
-        <a href="candidates.html" class="admin-nav-item active"><i data-lucide="users"></i> Candidates</a>
-        <a href="results.html" class="admin-nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
-        <a href="users.html" class="admin-nav-item"><i data-lucide="user-cog"></i> Users</a>
-        <a href="settings.html" class="admin-nav-item"><i data-lucide="settings"></i> Settings</a>
+      <div class="sidebar-header">
+        <div class="sidebar-logo">V</div>
+        <a href="dashboard.html" class="sidebar-brand">Vote<span>Wave</span></a>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="dashboard.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+          <a href="elections.html" class="nav-item"><i data-lucide="vote"></i> Elections</a>
+          <a href="candidates.html" class="nav-item active"><i data-lucide="users"></i> Candidates</a>
+          <a href="results.html" class="nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Management</div>
+          <a href="users.html" class="nav-item"><i data-lucide="user-cog"></i> Users</a>
+          <a href="audit.html" class="nav-item"><i data-lucide="file-text"></i> Audit Log</a>
+          <a href="settings.html" class="nav-item"><i data-lucide="settings"></i> Settings</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Quick Links</div>
+          <a href="../../index.html" class="nav-item"><i data-lucide="globe"></i> View Site</a>
+          <a href="../voter/elections.html" class="nav-item"><i data-lucide="external-link"></i> Voter Portal</a>
+        </div>
       </nav>
     </aside>
+
+    <!-- MAIN -->
     <main class="admin-main">
       <header class="admin-topbar">
-        <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
-        <input type="text" id="searchInput" placeholder="Search candidates..." style="background:var(--admin-bg);border:1px solid var(--admin-border);color:white;padding:0.5rem 1rem;border-radius:0.5rem;width:250px;">
-        <button class="admin-btn admin-btn-primary" id="addCandidateBtn"><i data-lucide="user-plus"></i> Add Candidate</button>
-      </header>
-      <div class="admin-content">
-        <div class="admin-filters">
-          <select id="electionFilter" class="admin-filter-select"><option value="">All Elections</option></select>
-          <button class="admin-btn admin-btn-secondary" onclick="exportTableToCSV('.admin-table','candidates.csv')"><i data-lucide="download"></i> Export</button>
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+          <div style="display:flex;align-items:center;gap:0.5rem;background:var(--admin-surface);border:1px solid var(--admin-border);border-radius:0.5rem;padding:0.4rem 0.85rem;">
+            <i data-lucide="search" style="width:1rem;height:1rem;color:var(--admin-text-muted);"></i>
+            <input type="text" id="tableSearch" placeholder="Search candidates..." style="background:none;border:none;color:var(--admin-text);font-size:0.85rem;font-family:inherit;outline:none;width:200px;">
+          </div>
         </div>
-        <div class="admin-table-card">
-          <table class="admin-table">
-            <thead><tr><th>Candidate</th><th>Election</th><th>Position</th><th>Status</th><th>Votes</th><th>Actions</th></tr></thead>
-            <tbody id="candidatesTableBody"></tbody>
-          </table>
+        <div class="topbar-right">
+          <button class="topbar-icon" id="refreshBtn"><i data-lucide="refresh-cw"></i></button>
+        </div>
+      </header>
+
+      <div class="admin-content">
+        <div class="page-header">
+          <div>
+            <h1>Candidates</h1>
+            <p class="greeting">Manage nominees for every election.</p>
+          </div>
+          <button class="btn btn-primary btn-lg" id="addCandidateBtn"><i data-lucide="user-plus"></i> Add Candidate</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+          <select id="electionFilter" class="filter-select" style="min-width:220px;">
+            <option value="">All Elections</option>
+          </select>
+          <button class="filter-btn active" data-status="all">All</button>
+          <button class="filter-btn" data-status="approved">Approved</button>
+          <button class="filter-btn" data-status="pending">Pending</button>
+          <select id="statusFilter" class="filter-select" style="margin-left:auto;">
+            <option value="">All Status</option>
+            <option value="approved">Approved</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr><th>Candidate</th><th>Election</th><th>Position</th><th>Status</th><th>Votes</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="candidatesTableBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Add/Edit Modal -->
-  <div class="admin-modal hidden" id="candidateModal">
-    <div class="admin-modal-overlay"></div>
-    <div class="admin-modal-content" style="max-width:600px;">
-      <h2 id="modalTitle">Add Candidate</h2>
-      <form id="candidateForm">
-        <div class="admin-form-row">
-          <div class="admin-form-group"><label>First Name *</label><input type="text" id="candFirstName" required></div>
-          <div class="admin-form-group"><label>Last Name *</label><input type="text" id="candLastName" required></div>
+  <!-- ADD/EDIT MODAL -->
+  <div class="modal hidden" id="candidateModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add Candidate</h2>
+        <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
+      </div>
+      <form id="candidateForm" onsubmit="return false;">
+        <div class="form-row">
+          <div class="form-group"><label>First Name *</label><input type="text" id="firstName" required></div>
+          <div class="form-group"><label>Last Name *</label><input type="text" id="lastName" required></div>
         </div>
-        <div class="admin-form-group"><label>Email</label><input type="email" id="candEmail"></div>
-        <div class="admin-form-group"><label>Select Election *</label><select id="candElection" required></select></div>
-        <div class="admin-form-group"><label>Position *</label><select id="candPosition" required></select></div>
-        <div class="admin-form-group"><label>Bio / Manifesto</label><textarea id="candBio" rows="3"></textarea></div>
-        <div class="admin-form-actions">
-          <button type="button" class="admin-btn admin-btn-secondary" onclick="closeModal()">Cancel</button>
-          <button type="button" class="admin-btn admin-btn-primary" id="saveCandidateBtn">Save</button>
+        <div class="form-group"><label>Email</label><input type="email" id="email"></div>
+        <div class="form-group"><label>Election *</label><select id="candElection" required></select></div>
+        <div class="form-group"><label>Position *</label><select id="candPosition" required></select></div>
+        <div class="form-group"><label>Bio / Manifesto</label><textarea id="bio" rows="3"></textarea></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
         </div>
       </form>
     </div>
   </div>
 
+  <div class="toast-container" id="toastContainer"></div>
+
   <script src="../js/main.js"></script>
+  <script src="../js/admin.js"></script>
   <script>
     let editingId = null;
-
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      document.getElementById('menuToggle').onclick = () => document.getElementById('sidebar').classList.toggle('open');
-      document.getElementById('addCandidateBtn').onclick = () => openModal();
-      document.getElementById('saveCandidateBtn').onclick = saveCandidate;
-      document.getElementById('candElection').onchange = loadPositions;
+      document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+      document.getElementById('refreshBtn').addEventListener('click', loadCandidates);
+      document.getElementById('addCandidateBtn').addEventListener('click', () => openModal());
+      document.getElementById('saveBtn').addEventListener('click', saveCandidate);
+      document.getElementById('candElection').addEventListener('change', loadPositions);
+      document.getElementById('tableSearch').addEventListener('input', loadCandidates);
+      document.getElementById('electionFilter').addEventListener('change', loadCandidates);
+      document.getElementById('statusFilter').addEventListener('change', loadCandidates);
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('statusFilter').value = this.dataset.status === 'all' ? '' : this.dataset.status;
+        loadCandidates();
+      }));
       loadElectionFilter();
       loadCandidates();
     });
@@ -88,7 +154,6 @@
         filter.appendChild(opt.cloneNode(true));
         candSelect.appendChild(opt);
       });
-      filter.onchange = loadCandidates;
     }
 
     function loadPositions() {
@@ -97,49 +162,47 @@
       const election = elections.find(e => e._id === electionId);
       const posSelect = document.getElementById('candPosition');
       posSelect.innerHTML = '<option value="">Select position</option>';
-      if (election && election.positions) {
+      if (election?.positions) {
         election.positions.forEach(p => posSelect.innerHTML += `<option value="${p}">${p}</option>`);
       }
     }
 
     function loadCandidates() {
       let candidates = JSON.parse(localStorage.getItem('votewave_candidates') || '[]');
-      const filterElection = document.getElementById('electionFilter')?.value;
-      if (filterElection) candidates = candidates.filter(c => c.electionId === filterElection);
-
+      const electionFilter = document.getElementById('electionFilter')?.value;
+      const status = document.getElementById('statusFilter')?.value;
+      const search = document.getElementById('tableSearch')?.value?.toLowerCase();
+      if (electionFilter) candidates = candidates.filter(c => c.electionId === electionFilter);
+      if (status) candidates = candidates.filter(c => c.status === status);
+      if (search) candidates = candidates.filter(c => (c.firstName + ' ' + c.lastName).toLowerCase().includes(search));
       const tbody = document.getElementById('candidatesTableBody');
       tbody.innerHTML = candidates.map(c => `
         <tr>
-          <td><div class="cell-user"><div class="cell-avatar">${c.firstName[0]}${c.lastName[0]}</div><div><strong>${c.firstName} ${c.lastName}</strong><br><small>${c.email||''}</small></div></div></td>
+          <td><strong>${c.firstName} ${c.lastName}</strong><br><small>${c.email||''}</small></td>
           <td>${c.electionName||'—'}</td>
           <td>${c.position||'—'}</td>
-          <td><span class="admin-badge ${c.status||'active'}">${c.status||'approved'}</span></td>
+          <td><span class="badge badge-${c.status||'approved'}">${c.status||'approved'}</span></td>
           <td>${c.votes||0}</td>
           <td>
-            <div class="admin-action-btns">
-              <button class="admin-action-btn" onclick="editCandidate('${c._id}')"><i data-lucide="edit-2" style="width:14px"></i></button>
-              <button class="admin-action-btn danger" onclick="deleteCandidate('${c._id}')"><i data-lucide="trash-2" style="width:14px"></i></button>
+            <div class="action-btns">
+              <button class="action-btn" onclick="editCandidate('${c._id}')"><i data-lucide="edit-2" style="width:14px"></i></button>
+              <button class="action-btn danger" onclick="deleteCandidate('${c._id}')"><i data-lucide="trash-2" style="width:14px"></i></button>
             </div>
           </td>
-        </tr>
-      `).join('');
+        </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:2rem;">No candidates</td></tr>';
       lucide.createIcons();
     }
 
-    function openModal(candidate = null) {
-      editingId = candidate?._id || null;
-      document.getElementById('modalTitle').textContent = candidate ? 'Edit Candidate' : 'Add Candidate';
-      if (candidate) {
-        document.getElementById('candFirstName').value = candidate.firstName;
-        document.getElementById('candLastName').value = candidate.lastName;
-        document.getElementById('candEmail').value = candidate.email || '';
-        document.getElementById('candElection').value = candidate.electionId;
-        loadPositions();
-        setTimeout(() => document.getElementById('candPosition').value = candidate.position, 100);
-        document.getElementById('candBio').value = candidate.bio || '';
-      } else {
-        document.getElementById('candidateForm').reset();
-      }
+    function openModal(c = null) {
+      editingId = c?._id || null;
+      document.getElementById('modalTitle').textContent = c ? 'Edit Candidate' : 'Add Candidate';
+      document.getElementById('firstName').value = c?.firstName || '';
+      document.getElementById('lastName').value = c?.lastName || '';
+      document.getElementById('email').value = c?.email || '';
+      document.getElementById('candElection').value = c?.electionId || '';
+      loadPositions();
+      setTimeout(() => { document.getElementById('candPosition').value = c?.position || ''; }, 100);
+      document.getElementById('bio').value = c?.bio || '';
       document.getElementById('candidateModal').classList.remove('hidden');
     }
 
@@ -147,28 +210,23 @@
 
     function saveCandidate() {
       const data = {
-        firstName: document.getElementById('candFirstName').value.trim(),
-        lastName: document.getElementById('candLastName').value.trim(),
-        email: document.getElementById('candEmail').value.trim(),
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        email: document.getElementById('email').value.trim(),
         electionId: document.getElementById('candElection').value,
         electionName: document.getElementById('candElection').selectedOptions[0]?.text,
         position: document.getElementById('candPosition').value,
-        bio: document.getElementById('candBio').value.trim(),
+        bio: document.getElementById('bio').value.trim(),
         status: 'approved',
         votes: 0
       };
-      if (!data.firstName || !data.lastName || !data.electionId || !data.position) {
-        alert('Please fill required fields'); return;
-      }
+      if (!data.firstName || !data.lastName || !data.electionId || !data.position) { showToast('Fill required fields', 'error'); return; }
       let candidates = JSON.parse(localStorage.getItem('votewave_candidates') || '[]');
-      if (editingId) {
-        candidates = candidates.map(c => c._id === editingId ? {...c, ...data} : c);
-      } else {
-        data._id = Date.now().toString();
-        candidates.push(data);
-      }
+      if (editingId) candidates = candidates.map(c => c._id === editingId ? {...c, ...data} : c);
+      else { data._id = Date.now().toString(); candidates.push(data); }
       localStorage.setItem('votewave_candidates', JSON.stringify(candidates));
       closeModal();
+      showToast(editingId ? 'Updated' : 'Added', 'success');
       loadCandidates();
     }
 
@@ -179,15 +237,20 @@
     }
 
     function deleteCandidate(id) {
-      if (!confirm('Remove this candidate?')) return;
+      if (!confirm('Remove candidate?')) return;
       let candidates = JSON.parse(localStorage.getItem('votewave_candidates') || '[]');
       candidates = candidates.filter(c => c._id !== id);
       localStorage.setItem('votewave_candidates', JSON.stringify(candidates));
+      showToast('Removed', 'success');
       loadCandidates();
     }
 
-    window.editCandidate = editCandidate;
-    window.deleteCandidate = deleteCandidate;
+    function showToast(msg, type) {
+      const container = document.getElementById('toastContainer');
+      const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg;
+      container.appendChild(t);
+      setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='0.3s'; setTimeout(()=>t.remove(),300); }, 3500);
+    }
   </script>
 </body>
 </html>

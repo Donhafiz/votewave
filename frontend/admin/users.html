@@ -3,238 +3,289 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Users - VoteWave Admin</title>
+  <title>Users - VoteWave Admin</title>
   <meta name="theme-color" content="#6366f1">
-  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body class="admin-body">
   <div class="admin-layout">
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <aside class="admin-sidebar" id="sidebar">
-      <div class="admin-sidebar-header">
-        <div class="admin-logo">V</div>
-        <a href="dashboard.html" class="admin-brand">Vote<span>Wave</span></a>
+      <div class="sidebar-header">
+        <div class="sidebar-logo">V</div>
+        <a href="dashboard.html" class="sidebar-brand">Vote<span>Wave</span></a>
       </div>
-      
-      <nav class="admin-sidebar-nav">
-        <div class="admin-nav-section">
-          <div class="admin-nav-title">Main</div>
-          <a href="dashboard.html" class="admin-nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
-          <a href="elections.html" class="admin-nav-item"><i data-lucide="vote"></i> Elections</a>
-          <a href="candidates.html" class="admin-nav-item"><i data-lucide="users"></i> Candidates</a>
-          <a href="results.html" class="admin-nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="dashboard.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+          <a href="elections.html" class="nav-item"><i data-lucide="vote"></i> Elections</a>
+          <a href="candidates.html" class="nav-item"><i data-lucide="users"></i> Candidates</a>
+          <a href="results.html" class="nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
         </div>
-        <div class="admin-nav-section">
-          <div class="admin-nav-title">Management</div>
-          <a href="users.html" class="admin-nav-item active"><i data-lucide="user-cog"></i> Users</a>
-          <a href="audit.html" class="admin-nav-item"><i data-lucide="file-text"></i> Audit Log</a>
-          <a href="settings.html" class="admin-nav-item"><i data-lucide="settings"></i> Settings</a>
+        <div class="nav-section">
+          <div class="nav-section-title">Management</div>
+          <a href="users.html" class="nav-item active"><i data-lucide="user-cog"></i> Users</a>
+          <a href="audit.html" class="nav-item"><i data-lucide="file-text"></i> Audit Log</a>
+          <a href="settings.html" class="nav-item"><i data-lucide="settings"></i> Settings</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Quick Links</div>
+          <a href="../../index.html" class="nav-item"><i data-lucide="globe"></i> View Site</a>
+          <a href="../voter/elections.html" class="nav-item"><i data-lucide="external-link"></i> Voter Portal</a>
         </div>
       </nav>
     </aside>
-    
+
+    <!-- MAIN -->
     <main class="admin-main">
       <header class="admin-topbar">
-        <div class="admin-topbar-left">
-          <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
-          <div class="admin-search">
-            <i data-lucide="search" style="width:1rem;height:1rem;"></i>
-            <input type="text" placeholder="Search users..." id="searchInput">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+          <div style="display:flex;align-items:center;gap:0.5rem;background:var(--admin-surface);border:1px solid var(--admin-border);border-radius:0.5rem;padding:0.4rem 0.85rem;">
+            <i data-lucide="search" style="width:1rem;height:1rem;color:var(--admin-text-muted);"></i>
+            <input type="text" id="tableSearch" placeholder="Search users..." style="background:none;border:none;color:var(--admin-text);font-size:0.85rem;font-family:inherit;outline:none;width:220px;">
           </div>
         </div>
-        <div class="admin-topbar-right">
-          <button class="admin-icon-btn" id="inviteBtn" title="Invite Users"><i data-lucide="mail-plus"></i></button>
-          <button class="admin-icon-btn" id="refreshBtn"><i data-lucide="refresh-cw"></i></button>
+        <div class="topbar-right">
+          <button class="topbar-icon" id="refreshBtn"><i data-lucide="refresh-cw"></i></button>
+          <button class="topbar-icon" id="inviteBtn" title="Invite User"><i data-lucide="mail-plus"></i></button>
         </div>
       </header>
-      
+
       <div class="admin-content">
-        <div class="admin-page-header">
+        <div class="page-header">
           <div>
             <h1>Users</h1>
-            <p>Manage all registered users and administrators</p>
+            <p class="greeting">Manage voter accounts, admins, and roles.</p>
           </div>
-          <div style="display:flex;gap:0.75rem;">
-            <button class="admin-btn admin-btn-secondary" onclick="exportTableToCSV('.admin-table','users-export.csv')">
-              <i data-lucide="download" style="width:14px;height:14px;"></i> Export
-            </button>
-            <button class="admin-btn admin-btn-primary" id="addUserBtn">
-              <i data-lucide="user-plus"></i> Add User
-            </button>
-          </div>
+          <button class="btn btn-primary btn-lg" id="addUserBtn"><i data-lucide="user-plus"></i> Add User</button>
         </div>
-        
+
         <!-- Filters -->
-        <div class="admin-filters">
-          <button class="admin-filter-btn active" data-role="all">All Users</button>
-          <button class="admin-filter-btn" data-role="voter">Voters</button>
-          <button class="admin-filter-btn" data-role="admin">Admins</button>
-          <button class="admin-filter-btn" data-role="superadmin">Super Admins</button>
-          <select class="admin-filter-select" id="statusFilter">
+        <div class="filters">
+          <button class="filter-btn active" data-role="all">All</button>
+          <button class="filter-btn" data-role="voter">Voters</button>
+          <button class="filter-btn" data-role="admin">Admins</button>
+          <button class="filter-btn" data-role="superadmin">Super Admins</button>
+          <select id="statusFilter" class="filter-select" style="margin-left:auto;">
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="banned">Banned</option>
             <option value="pending">Pending</option>
           </select>
         </div>
-        
-        <!-- Users Table -->
-        <div class="admin-table-card">
+
+        <!-- Table -->
+        <div class="card">
           <div style="overflow-x:auto;">
-            <table class="admin-table">
+            <table class="table">
               <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Joined</th>
-                  <th>Votes</th>
-                  <th>Actions</th>
-                </tr>
+                <tr><th>User</th><th>Role</th><th>Status</th><th>Joined</th><th>Votes</th><th>Actions</th></tr>
               </thead>
-              <tbody id="usersTableBody">
-                <tr><td colspan="6"><div class="admin-loading"><div class="admin-spinner"></div></div></td></tr>
-              </tbody>
+              <tbody id="usersTableBody"></tbody>
             </table>
           </div>
-          <div id="pagination" class="admin-pagination"></div>
         </div>
       </div>
     </main>
   </div>
-  
-  <!-- Edit User Modal -->
-  <div class="admin-modal hidden" id="editUserModal">
-    <div class="admin-modal-overlay"></div>
-    <div class="admin-modal-content">
-      <div class="admin-modal-header">
-        <h2>Edit User</h2>
-        <button class="admin-modal-close" onclick="document.getElementById('editUserModal').classList.add('hidden')"><i data-lucide="x"></i></button>
+
+  <!-- EDIT USER MODAL -->
+  <div class="modal hidden" id="userModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Edit User</h2>
+        <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
       </div>
-      <form id="editUserForm" onsubmit="return false;">
-        <div class="admin-form-row">
-          <div class="admin-form-group">
-            <label>First Name</label>
-            <input type="text" id="editFirstName" required>
-          </div>
-          <div class="admin-form-group">
-            <label>Last Name</label>
-            <input type="text" id="editLastName" required>
-          </div>
+      <form id="userForm" onsubmit="return false;">
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" id="firstName" required></div>
+          <div class="form-group"><label>Last Name</label><input type="text" id="lastName" required></div>
         </div>
-        <div class="admin-form-group">
-          <label>Email</label>
-          <input type="email" id="editEmail" required>
-        </div>
-        <div class="admin-form-group">
+        <div class="form-group"><label>Email</label><input type="email" id="email" required></div>
+        <div class="form-group">
           <label>Role</label>
-          <select id="editRole">
+          <select id="role">
             <option value="voter">Voter</option>
             <option value="admin">Admin</option>
             <option value="superadmin">Super Admin</option>
           </select>
         </div>
-        <div class="admin-form-actions">
-          <button type="button" class="admin-btn admin-btn-secondary" onclick="document.getElementById('editUserModal').classList.add('hidden')">Cancel</button>
-          <button type="button" class="admin-btn admin-btn-primary" id="saveUserBtn">Save Changes</button>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
         </div>
       </form>
     </div>
   </div>
-  
-  <!-- Ban Modal -->
-  <div class="admin-modal hidden" id="banModal">
-    <div class="admin-modal-overlay"></div>
-    <div class="admin-modal-content" style="max-width:450px;">
-      <div class="admin-modal-header">
-        <h2>Ban User</h2>
-        <button class="admin-modal-close" onclick="document.getElementById('banModal').classList.add('hidden')"><i data-lucide="x"></i></button>
-      </div>
-      <div class="admin-form-group">
-        <label>Reason for Ban *</label>
-        <textarea id="banReason" placeholder="Explain why this user is being banned..." rows="3" required></textarea>
-      </div>
-      <div class="admin-form-group">
-        <label>Duration (days, leave empty for permanent)</label>
-        <input type="number" id="banDuration" placeholder="e.g., 30">
-      </div>
-      <div class="admin-form-actions">
-        <button class="admin-btn admin-btn-secondary" onclick="document.getElementById('banModal').classList.add('hidden')">Cancel</button>
-        <button class="admin-btn admin-btn-danger" id="confirmBan">Ban User</button>
+
+  <!-- BAN MODAL -->
+  <div class="modal hidden" id="banModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content" style="max-width:450px;">
+      <div class="modal-header"><h2>Ban User</h2><button class="modal-close" onclick="closeBanModal()"><i data-lucide="x"></i></button></div>
+      <div class="form-group"><label>Reason</label><textarea id="banReason" rows="2"></textarea></div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeBanModal()">Cancel</button>
+        <button class="btn btn-danger" id="confirmBan">Ban</button>
       </div>
     </div>
   </div>
-  
-  <!-- Delete Modal -->
-  <div class="admin-modal hidden" id="deleteModal">
-    <div class="admin-modal-overlay"></div>
-    <div class="admin-modal-content" style="max-width:400px;text-align:center;">
-      <i data-lucide="alert-triangle" style="width:3rem;height:3rem;color:#ef4444;margin-bottom:1rem;"></i>
-      <h2 style="margin-bottom:0.5rem;">Delete User?</h2>
-      <p style="color:#94a3b8;margin-bottom:1.5rem;">All data associated with this user will be permanently removed.</p>
-      <div class="admin-form-actions" style="justify-content:center;">
-        <button class="admin-btn admin-btn-secondary" onclick="document.getElementById('deleteModal').classList.add('hidden')">Cancel</button>
-        <button class="admin-btn admin-btn-danger" id="confirmDelete">Delete User</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Toast Container -->
-  <div class="admin-toast-container" id="toastContainer"></div>
-  
+
+  <div class="toast-container" id="toastContainer"></div>
+
   <script src="../js/main.js"></script>
   <script src="../js/admin.js"></script>
-  <script src="../js/admin-users.js"></script>
-  
   <script>
+    let editingUserId = null,
+        banningUserId = null;
     document.addEventListener('DOMContentLoaded', () => {
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-      
-      document.getElementById('menuToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
-      });
-      
-      document.getElementById('refreshBtn').addEventListener('click', () => {
+      lucide.createIcons();
+      document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+      document.getElementById('refreshBtn').addEventListener('click', loadUsers);
+      document.getElementById('addUserBtn').addEventListener('click', () => openUserModal());
+      document.getElementById('saveBtn').addEventListener('click', saveUser);
+      document.getElementById('confirmBan').addEventListener('click', banUser);
+      document.getElementById('tableSearch').addEventListener('input', loadUsers);
+      document.getElementById('statusFilter').addEventListener('change', loadUsers);
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
         loadUsers();
-        showAdminToast('Users refreshed', 'success');
-      });
-      
+      }));
       document.getElementById('inviteBtn').addEventListener('click', () => {
-        const email = prompt('Enter email address to invite:');
-        if (email && validateEmail(email)) {
-          showAdminToast(`Invitation sent to ${email}!`, 'success');
-        } else if (email) {
-          showAdminToast('Please enter a valid email', 'error');
-        }
+        const email = prompt('Enter email to invite:');
+        if (email && email.includes('@')) showToast(`Invitation sent to ${email}`, 'success');
       });
-      
-      document.getElementById('addUserBtn').addEventListener('click', () => {
-        document.getElementById('editUserModal').classList.remove('hidden');
-        document.getElementById('editUserForm').reset();
-        document.getElementById('saveUserBtn').textContent = 'Add User';
-      });
-      
-      document.querySelectorAll('.admin-filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          this.parentElement.querySelectorAll('.admin-filter-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          loadUsers(this.dataset.role);
-        });
-      });
-      
-      document.getElementById('statusFilter').addEventListener('change', function() {
-        loadUsers(document.querySelector('.admin-filter-btn.active')?.dataset.role || 'all');
-      });
-      
-      function validateEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      }
+      loadUsers();
     });
+
+    function loadUsers() {
+      let users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      if (users.length === 0) {
+        users = [
+          { _id:'1', firstName:'John', lastName:'Doe', email:'john@example.com', role:'voter', status:'active', createdAt:'2026-01-15', totalVotes:5 },
+          { _id:'2', firstName:'Jane', lastName:'Smith', email:'jane@example.com', role:'admin', status:'active', createdAt:'2026-01-20', totalVotes:12 },
+          { _id:'3', firstName:'Mike', lastName:'King', email:'mike@example.com', role:'voter', status:'banned', createdAt:'2026-02-01', totalVotes:0, banReason:'Violation' },
+          { _id:'4', firstName:'Super', lastName:'Admin', email:'admin@votewave.com', role:'superadmin', status:'active', createdAt:'2026-01-01', totalVotes:0 }
+        ];
+      }
+      const roleFilter = document.querySelector('.filter-btn.active')?.dataset.role || 'all';
+      const status = document.getElementById('statusFilter')?.value;
+      const search = document.getElementById('tableSearch')?.value?.toLowerCase();
+      let filtered = users;
+      if (roleFilter !== 'all') filtered = filtered.filter(u => u.role === roleFilter);
+      if (status) filtered = filtered.filter(u => u.status === status);
+      if (search) filtered = filtered.filter(u => (u.firstName+' '+u.lastName+' '+u.email).toLowerCase().includes(search));
+      document.getElementById('usersTableBody').innerHTML = filtered.map(u => `
+        <tr class="${u.status==='banned'?'banned':''}">
+          <td><strong>${u.firstName} ${u.lastName}</strong><br><small>${u.email}</small></td>
+          <td><span class="badge badge-${u.role==='voter'?'draft':u.role==='admin'?'active':'error'}">${u.role}</span></td>
+          <td><span class="badge badge-${u.status==='active'?'success':u.status==='banned'?'error':'warning'}">${u.status}</span></td>
+          <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+          <td>${u.totalVotes||0}</td>
+          <td>
+            <div class="action-btns">
+              <button class="action-btn" onclick="editUser('${u._id}')"><i data-lucide="edit-2" style="width:14px"></i></button>
+              ${u.status==='banned' 
+                ? `<button class="action-btn success" onclick="unbanUser('${u._id}')"><i data-lucide="unlock" style="width:14px"></i></button>`
+                : `<button class="action-btn warning" onclick="openBanModal('${u._id}')"><i data-lucide="ban" style="width:14px"></i></button>`}
+              <button class="action-btn" onclick="changeRole('${u._id}','${u.role}')"><i data-lucide="shield" style="width:14px"></i></button>
+              <button class="action-btn danger" onclick="deleteUser('${u._id}')"><i data-lucide="trash-2" style="width:14px"></i></button>
+            </div>
+          </td>
+        </tr>`).join('');
+      lucide.createIcons();
+    }
+
+    function openUserModal(user = null) {
+      editingUserId = user?._id || null;
+      document.getElementById('modalTitle').textContent = user ? 'Edit User' : 'Add User';
+      document.getElementById('firstName').value = user?.firstName || '';
+      document.getElementById('lastName').value = user?.lastName || '';
+      document.getElementById('email').value = user?.email || '';
+      document.getElementById('role').value = user?.role || 'voter';
+      document.getElementById('userModal').classList.remove('hidden');
+    }
+    function closeModal() { document.getElementById('userModal').classList.add('hidden'); editingUserId = null; }
+    function saveUser() {
+      const data = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        role: document.getElementById('role').value
+      };
+      if (!data.firstName || !data.email) return showToast('Fill required fields', 'error');
+      let users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      if (editingUserId) {
+        users = users.map(u => u._id === editingUserId ? {...u, ...data} : u);
+      } else {
+        data._id = Date.now().toString();
+        data.status = 'active';
+        data.createdAt = new Date().toISOString();
+        data.totalVotes = 0;
+        users.push(data);
+      }
+      localStorage.setItem('votewave_users', JSON.stringify(users));
+      closeModal();
+      showToast('Saved', 'success');
+      loadUsers();
+    }
+    function editUser(id) {
+      const users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      const u = users.find(x => x._id === id);
+      if (u) openUserModal(u);
+    }
+    function deleteUser(id) {
+      if (!confirm('Delete this user?')) return;
+      let users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      users = users.filter(u => u._id !== id);
+      localStorage.setItem('votewave_users', JSON.stringify(users));
+      showToast('Deleted', 'success');
+      loadUsers();
+    }
+    function openBanModal(id) { banningUserId = id; document.getElementById('banModal').classList.remove('hidden'); }
+    function closeBanModal() { document.getElementById('banModal').classList.add('hidden'); banningUserId = null; }
+    function banUser() {
+      const reason = document.getElementById('banReason').value.trim();
+      let users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      const u = users.find(x => x._id === banningUserId);
+      if (u) { u.status = 'banned'; u.banReason = reason; }
+      localStorage.setItem('votewave_users', JSON.stringify(users));
+      closeBanModal();
+      showToast('Banned', 'success');
+      loadUsers();
+    }
+    function unbanUser(id) {
+      let users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      const u = users.find(x => x._id === id);
+      if (u) { u.status = 'active'; delete u.banReason; }
+      localStorage.setItem('votewave_users', JSON.stringify(users));
+      showToast('Unbanned', 'success');
+      loadUsers();
+    }
+    function changeRole(id, currentRole) {
+      const roles = ['voter','admin','superadmin'];
+      const newRole = roles[(roles.indexOf(currentRole)+1)%3];
+      if (!confirm(`Change role to ${newRole}?`)) return;
+      let users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      const u = users.find(x => x._id === id);
+      if (u) u.role = newRole;
+      localStorage.setItem('votewave_users', JSON.stringify(users));
+      showToast('Role updated', 'success');
+      loadUsers();
+    }
+    function showToast(msg, type) {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='0.3s'; setTimeout(()=>t.remove(),300); }, 3500);
+    }
   </script>
 </body>
 </html>

@@ -3,975 +3,305 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - VoteWave</title>
+  <title>Dashboard - VoteWave Admin</title>
   <meta name="theme-color" content="#6366f1">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  
-  <style>
-    :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --surface-light: #334155;
-      --border: rgba(255,255,255,0.06);
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --primary: #6366f1;
-      --primary-light: #818cf8;
-      --secondary: #8b5cf6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --info: #06b6d4;
-    }
-    
-    * { margin:0; padding:0; box-sizing:border-box; }
-    
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-    
-    /* Sidebar */
-    .sidebar {
-      width: 260px;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      z-index: 100;
-      transition: transform 0.3s ease;
-    }
-    
-    .sidebar-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    
-    .sidebar-logo {
-      width: 2.5rem;
-      height: 2.5rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border-radius: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.25rem;
-      color: white;
-    }
-    
-    .sidebar-brand {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-    
-    .sidebar-brand span {
-      background: linear-gradient(135deg, #818cf8, #c084fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .sidebar-nav {
-      flex: 1;
-      padding: 1rem 0.75rem;
-      overflow-y: auto;
-    }
-    
-    .nav-section {
-      margin-bottom: 1.5rem;
-    }
-    
-    .nav-section-title {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-      padding: 0 0.75rem;
-      margin-bottom: 0.5rem;
-    }
-    
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.65rem 0.75rem;
-      border-radius: 0.5rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      margin-bottom: 0.15rem;
-    }
-    
-    .nav-item:hover {
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-    }
-    
-    .nav-item.active {
-      background: rgba(99,102,241,0.15);
-      color: var(--primary-light);
-    }
-    
-    .nav-item svg {
-      width: 1.25rem;
-      height: 1.25rem;
-      flex-shrink: 0;
-    }
-    
-    .nav-badge {
-      margin-left: auto;
-      padding: 0.15rem 0.5rem;
-      background: var(--primary);
-      border-radius: 100px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: white;
-    }
-    
-    .nav-badge.warning {
-      background: var(--warning);
-      color: #0f172a;
-    }
-    
-    .sidebar-footer {
-      padding: 1rem 0.75rem;
-      border-top: 1px solid var(--border);
-    }
-    
-    .user-card {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    
-    .user-card:hover {
-      background: rgba(255,255,255,0.04);
-    }
-    
-    .user-avatar {
-      width: 2.25rem;
-      height: 2.25rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: white;
-    }
-    
-    .user-info {
-      flex: 1;
-    }
-    
-    .user-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-    
-    .user-role {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-    
-    /* Main Content */
-    .main-content {
-      flex: 1;
-      margin-left: 260px;
-      min-height: 100vh;
-    }
-    
-    .top-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    
-    .top-bar-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    
-    .menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      padding: 0.5rem;
-    }
-    
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      color: var(--text-muted);
-    }
-    
-    .search-box input {
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 0.85rem;
-      outline: none;
-      width: 200px;
-    }
-    
-    .top-bar-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    
-    .icon-btn {
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-    
-    .icon-btn:hover {
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-    }
-    
-    .notification-dot {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      width: 8px;
-      height: 8px;
-      background: var(--danger);
-      border-radius: 50%;
-      border: 2px solid var(--surface);
-    }
-    
-    /* Dashboard Content */
-    .dashboard-content {
-      padding: 2rem;
-    }
-    
-    .page-header {
-      margin-bottom: 2rem;
-    }
-    
-    .page-header h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-    
-    .page-header p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-    
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2rem;
-    }
-    
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    
-    .stat-card:hover {
-      border-color: rgba(99,102,241,0.3);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-    
-    .stat-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-    
-    .stat-icon {
-      width: 3rem;
-      height: 3rem;
-      border-radius: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .stat-icon.purple { background: rgba(99,102,241,0.15); color: var(--primary-light); }
-    .stat-icon.green { background: rgba(16,185,129,0.15); color: var(--success); }
-    .stat-icon.orange { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .stat-icon.cyan { background: rgba(6,182,212,0.15); color: var(--info); }
-    
-    .stat-icon svg { width: 1.5rem; height: 1.5rem; }
-    
-    .stat-trend {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.2rem 0.5rem;
-      border-radius: 100px;
-    }
-    
-    .stat-trend.up { background: rgba(16,185,129,0.1); color: var(--success); }
-    .stat-trend.down { background: rgba(239,68,68,0.1); color: var(--danger); }
-    
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 0.25rem;
-    }
-    
-    .stat-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-    
-    /* Charts Grid */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 1.25rem;
-      margin-bottom: 2rem;
-    }
-    
-    .chart-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.5rem;
-    }
-    
-    .chart-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-    
-    .chart-card-header h3 {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-    
-    .chart-period {
-      display: flex;
-      gap: 0.25rem;
-    }
-    
-    .period-btn {
-      padding: 0.3rem 0.75rem;
-      border-radius: 0.4rem;
-      border: none;
-      background: none;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-    
-    .period-btn.active, .period-btn:hover {
-      background: rgba(99,102,241,0.15);
-      color: var(--primary-light);
-    }
-    
-    .chart-container {
-      position: relative;
-      height: 300px;
-    }
-    
-    /* Recent Elections Table */
-    .table-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      overflow: hidden;
-    }
-    
-    .table-card-header {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .table-card-header h3 {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-    
-    .view-all {
-      font-size: 0.85rem;
-      color: var(--primary-light);
-      text-decoration: none;
-      font-weight: 500;
-    }
-    
-    .view-all:hover { text-decoration: underline; }
-    
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    
-    .admin-table th {
-      text-align: left;
-      padding: 0.75rem 1.5rem;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-    }
-    
-    .admin-table td {
-      padding: 0.9rem 1.5rem;
-      font-size: 0.875rem;
-      border-bottom: 1px solid rgba(255,255,255,0.02);
-    }
-    
-    .admin-table tr:hover td {
-      background: rgba(255,255,255,0.01);
-    }
-    
-    .status-badge {
-      padding: 0.2rem 0.75rem;
-      border-radius: 100px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      display: inline-block;
-    }
-    
-    .status-badge.active { background: rgba(16,185,129,0.15); color: var(--success); }
-    .status-badge.upcoming { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .status-badge.completed { background: rgba(100,116,139,0.15); color: var(--text-muted); }
-    
-    .action-btn {
-      padding: 0.3rem 0.6rem;
-      border-radius: 0.4rem;
-      border: none;
-      background: rgba(255,255,255,0.04);
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-    
-    .action-btn:hover {
-      background: rgba(99,102,241,0.15);
-      color: var(--primary-light);
-    }
-    
-    .action-btn.danger:hover {
-      background: rgba(239,68,68,0.15);
-      color: var(--danger);
-    }
-    
-    /* Quick Actions */
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-    
-    .action-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      color: var(--text);
-    }
-    
-    .action-card:hover {
-      border-color: rgba(99,102,241,0.3);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-    
-    .action-card-icon {
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-    }
-    
-    .action-card h4 {
-      font-size: 0.95rem;
-      margin-bottom: 0.25rem;
-    }
-    
-    .action-card p {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin: 0;
-    }
-    
-    /* Responsive */
-    @media (max-width: 1024px) {
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-      
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      
-      .main-content {
-        margin-left: 0;
-      }
-      
-      .menu-toggle {
-        display: block;
-      }
-      
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-      
-      .dashboard-content {
-        padding: 1rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
 </head>
-<body>
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">V</div>
-      <div class="sidebar-brand">Vote<span>Wave</span></div>
-    </div>
-    
-    <nav class="sidebar-nav">
-      <div class="nav-section">
-        <div class="nav-section-title">Main</div>
-        <a href="dashboard.html" class="nav-item active">
-          <i data-lucide="layout-dashboard"></i>
-          Dashboard
-        </a>
-        <a href="elections.html" class="nav-item">
-          <i data-lucide="vote"></i>
-          Elections
-          <span class="nav-badge">3</span>
-        </a>
-        <a href="candidates.html" class="nav-item">
-          <i data-lucide="users"></i>
-          Candidates
-        </a>
-        <a href="results.html" class="nav-item">
-          <i data-lucide="bar-chart-3"></i>
-          Results
-        </a>
+<body class="admin-body">
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">V</div>
+        <a href="dashboard.html" class="sidebar-brand">Vote<span>Wave</span></a>
       </div>
-      
-      <div class="nav-section">
-        <div class="nav-section-title">Management</div>
-        <a href="users.html" class="nav-item">
-          <i data-lucide="user-cog"></i>
-          Users
-          <span class="nav-badge warning">2</span>
-        </a>
-        <a href="settings.html" class="nav-item">
-          <i data-lucide="settings"></i>
-          Settings
-        </a>
-        <a href="audit.html" class="nav-item">
-          <i data-lucide="file-text"></i>
-          Audit Log
-        </a>
-      </div>
-    </nav>
-    
-    <div class="sidebar-footer">
-      <div class="user-card" id="logoutCard" role="button" tabindex="0">
-        <div class="user-avatar">SA</div>
-        <div class="user-info">
-          <div class="user-name">Super Admin</div>
-          <div class="user-role">Administrator</div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="dashboard.html" class="nav-item active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+          <a href="elections.html" class="nav-item"><i data-lucide="vote"></i> Elections</a>
+          <a href="candidates.html" class="nav-item"><i data-lucide="users"></i> Candidates</a>
+          <a href="results.html" class="nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
         </div>
-        <i data-lucide="log-out" style="width:1.1rem;height:1.1rem;color:var(--text-muted);cursor:pointer;"></i>
-      </div>
-    </div>
-  </aside>
-  
-  <!-- Main Content -->
-  <main class="main-content">
-    <!-- Top Bar -->
-    <header class="top-bar">
-      <div class="top-bar-left">
-        <button class="menu-toggle" id="menuToggle">
-          <i data-lucide="menu"></i>
-        </button>
-        <div class="search-box">
-          <i data-lucide="search" style="width:1rem;height:1rem;"></i>
-          <input type="text" placeholder="Search elections, users...">
-          <kbd style="font-size:0.65rem;color:var(--text-muted);">⌘K</kbd>
+        <div class="nav-section">
+          <div class="nav-section-title">Management</div>
+          <a href="users.html" class="nav-item"><i data-lucide="user-cog"></i> Users</a>
+          <a href="audit.html" class="nav-item"><i data-lucide="file-text"></i> Audit Log</a>
+          <a href="settings.html" class="nav-item"><i data-lucide="settings"></i> Settings</a>
         </div>
-      </div>
-      
-      <div class="top-bar-right">
-        <button class="icon-btn">
-          <i data-lucide="bell"></i>
-          <span class="notification-dot"></span>
-        </button>
-        <button class="icon-btn" id="themeToggle">
-          <i data-lucide="moon"></i>
-        </button>
-        <button class="icon-btn">
-          <i data-lucide="help-circle"></i>
-        </button>
-      </div>
-    </header>
-    
-    <!-- Dashboard Content -->
-    <div class="dashboard-content">
-      <div class="page-header">
-        <h1>Dashboard Overview</h1>
-        <p>Welcome back! Here's what's happening with your elections.</p>
-      </div>
-      
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-icon purple">
-              <i data-lucide="vote"></i>
-            </div>
-            <span class="stat-trend up">↑ 12%</span>
+        <div class="nav-section">
+          <div class="nav-section-title">Quick Links</div>
+          <a href="../../index.html" class="nav-item"><i data-lucide="globe"></i> View Site</a>
+          <a href="../voter/elections.html" class="nav-item"><i data-lucide="external-link"></i> Voter Portal</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="user-avatar" id="sidebarAvatar">SA</div>
+          <div>
+            <div class="user-name" id="sidebarName">Admin</div>
+            <div class="user-role">Administrator</div>
           </div>
-          <div class="stat-value">1,247</div>
-          <div class="stat-label">Total Votes Cast</div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-icon green">
-              <i data-lucide="check-circle"></i>
-            </div>
-            <span class="stat-trend up">↑ 8%</span>
-          </div>
-          <div class="stat-value">89%</div>
-          <div class="stat-label">Average Turnout</div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-icon orange">
-              <i data-lucide="clock"></i>
-            </div>
-            <span class="stat-trend up">3 Active</span>
-          </div>
-          <div class="stat-value">12</div>
-          <div class="stat-label">Total Elections</div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-icon cyan">
-              <i data-lucide="users"></i>
-            </div>
-            <span class="stat-trend up">↑ 15%</span>
-          </div>
-          <div class="stat-value">2,450</div>
-          <div class="stat-label">Registered Voters</div>
+          <button onclick="logout()" style="background:none;border:none;color:var(--admin-text-muted);cursor:pointer;margin-left:auto;">
+            <i data-lucide="log-out" style="width:1.1rem;height:1.1rem;"></i>
+          </button>
         </div>
       </div>
-      
-      <!-- Charts -->
-      <div class="charts-grid">
-        <div class="chart-card">
-          <div class="chart-card-header">
-            <h3>Voting Activity</h3>
-            <div class="chart-period">
-              <button class="period-btn active">Week</button>
-              <button class="period-btn">Month</button>
-              <button class="period-btn">Year</button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+      <!-- TOP BAR -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+          <div style="display:flex;align-items:center;gap:0.5rem;background:var(--admin-surface);border:1px solid var(--admin-border);border-radius:0.5rem;padding:0.4rem 0.85rem;">
+            <i data-lucide="search" style="width:1rem;height:1rem;color:var(--admin-text-muted);"></i>
+            <input type="text" id="dashboardSearch" placeholder="Search elections..." style="background:none;border:none;color:var(--admin-text);font-size:0.85rem;font-family:inherit;outline:none;width:200px;">
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-icon" id="notificationBtn"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <button class="topbar-icon" id="themeToggle"><i data-lucide="moon"></i></button>
+          <button class="topbar-icon" id="refreshDashboard"><i data-lucide="refresh-cw"></i></button>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <div class="admin-content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1>Good morning, <strong id="welcomeName">Admin</strong></h1>
+            <p class="greeting">Here's an overview of your elections and voting activity.</p>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="window.location.href='elections.html?action=create'">
+            <i data-lucide="plus"></i> New Election
+          </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card" onclick="window.location.href='elections.html'">
+            <div class="stat-icon purple"><i data-lucide="vote"></i></div>
+            <div class="stat-value" id="totalElections">0</div>
+            <div class="stat-label">Total Elections</div>
+          </div>
+          <div class="stat-card" onclick="window.location.href='elections.html?status=active'">
+            <div class="stat-icon green"><i data-lucide="activity"></i></div>
+            <div class="stat-value" id="liveElections">0</div>
+            <div class="stat-label">Live Now</div>
+          </div>
+          <div class="stat-card" onclick="window.location.href='elections.html?status=draft'">
+            <div class="stat-icon orange"><i data-lucide="clock"></i></div>
+            <div class="stat-value" id="pendingElections">0</div>
+            <div class="stat-label">Pending</div>
+          </div>
+          <div class="stat-card" onclick="window.location.href='elections.html?status=completed'">
+            <div class="stat-icon cyan"><i data-lucide="check-circle"></i></div>
+            <div class="stat-value" id="completedElections">0</div>
+            <div class="stat-label">Completed</div>
+          </div>
+        </div>
+
+        <!-- Elections Table -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Your Elections</h3>
+            <div style="display:flex;gap:0.75rem;align-items:center;">
+              <input type="text" id="tableSearch" placeholder="Search..." class="search-input" style="min-width:180px;">
+              <select id="statusFilter" class="filter-select">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="completed">Completed</option>
+              </select>
             </div>
           </div>
-          <div class="chart-container">
-            <canvas id="activityChart"></canvas>
-          </div>
-        </div>
-        
-        <div class="chart-card">
-          <div class="chart-card-header">
-            <h3>Election Status</h3>
-          </div>
-          <div class="chart-container">
-            <canvas id="statusChart"></canvas>
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Election</th>
+                  <th>Status</th>
+                  <th>Dates</th>
+                  <th>Votes</th>
+                  <th>Turnout</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="electionsTableBody">
+                <tr><td colspan="6" style="text-align:center;padding:2rem;">Loading...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-      
-      <!-- Recent Elections -->
-      <div class="table-card" style="margin-bottom:2rem;">
-        <div class="table-card-header">
-          <h3>Recent Elections</h3>
-          <a href="elections.html" class="view-all">View All →</a>
-        </div>
-        <div style="overflow-x:auto;">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Election</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Voters</th>
-                <th>Turnout</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Student Council 2026</strong></td>
-                <td>Student</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>1,240</td>
-                <td>78%</td>
-                <td>Mar 15 - Mar 20</td>
-                <td>
-                  <button class="action-btn">Edit</button>
-                  <button class="action-btn danger">End</button>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Best Teacher Award</strong></td>
-                <td>Nomination</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>892</td>
-                <td>64%</td>
-                <td>Mar 10 - Mar 18</td>
-                <td>
-                  <button class="action-btn">Edit</button>
-                  <button class="action-btn danger">End</button>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Annual Fest Theme</strong></td>
-                <td>Event</td>
-                <td><span class="status-badge completed">Completed</span></td>
-                <td>2,150</td>
-                <td>92%</td>
-                <td>Feb 25 - Mar 5</td>
-                <td>
-                  <button class="action-btn">View</button>
-                  <button class="action-btn">Export</button>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Club President Election</strong></td>
-                <td>Club</td>
-                <td><span class="status-badge upcoming">Upcoming</span></td>
-                <td>450</td>
-                <td>—</td>
-                <td>Mar 25 - Mar 28</td>
-                <td>
-                  <button class="action-btn">Edit</button>
-                  <button class="action-btn">Cancel</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <!-- Quick Actions -->
-      <h3 style="margin-bottom:1rem;">Quick Actions</h3>
-      <div class="quick-actions">
-        <a href="elections.html#create" class="action-card">
-          <div class="action-card-icon">🗳️</div>
-          <h4>Create Election</h4>
-          <p>Set up a new election in minutes</p>
-        </a>
-        <a href="candidates.html#add" class="action-card">
-          <div class="action-card-icon">👤</div>
-          <h4>Add Candidate</h4>
-          <p>Register new candidates</p>
-        </a>
-        <a href="users.html#invite" class="action-card">
-          <div class="action-card-icon">📧</div>
-          <h4>Invite Voters</h4>
-          <p>Send bulk invitations</p>
-        </a>
-        <a href="results.html#export" class="action-card">
-          <div class="action-card-icon">📊</div>
-          <h4>Export Results</h4>
-          <p>Download CSV or PDF reports</p>
-        </a>
-      </div>
-    </div>
-  </main>
-  
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <script src="../js/main.js"></script>
   <script src="../js/admin.js"></script>
-  
   <script>
-    // Initialize icons
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-    
-    // Mobile sidebar toggle
-    document.getElementById('menuToggle')?.addEventListener('click', () => {
-      document.getElementById('sidebar')?.classList.toggle('open');
-    });
-    
-    // Theme toggle
-    document.getElementById('themeToggle')?.addEventListener('click', () => {
-      document.body.classList.toggle('light-mode');
+    // =========================== DASHBOARD SCRIPT ===========================
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      updateUserDisplay();
+      initSidebarToggle();
+      initThemeToggle();
+      initRefreshButton();
+      loadDashboardData();
+      initFilters();
+      // Refresh every 30 seconds
+      setInterval(loadDashboardData, 30000);
     });
 
-    // Logout card
-    document.getElementById('logoutCard')?.addEventListener('click', handleLogout);
-    document.getElementById('logoutCard')?.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        handleLogout();
-      }
-    });
-    
-    // Activity Chart
-    const activityCtx = document.getElementById('activityChart');
-    if (activityCtx && typeof Chart !== 'undefined') {
-      new Chart(activityCtx, {
-        type: 'bar',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{
-            label: 'Votes',
-            data: [120, 250, 180, 400, 350, 520, 480],
-            backgroundColor: 'rgba(99,102,241,0.6)',
-            borderRadius: 6,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#64748b' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }
-          }
+    function updateUserDisplay() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const firstName = user.firstName || 'Admin';
+      document.getElementById('welcomeName').textContent = firstName;
+      document.getElementById('sidebarName').textContent = firstName;
+      document.getElementById('sidebarAvatar').textContent = (firstName[0] || 'A') + (user.lastName ? user.lastName[0] : '');
+    }
+
+    function initSidebarToggle() {
+      document.getElementById('menuToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+    }
+
+    function initThemeToggle() {
+      document.getElementById('themeToggle').addEventListener('click', function() {
+        document.body.classList.toggle('light-mode');
+        const icon = this.querySelector('svg');
+        if (icon) {
+          icon.setAttribute('data-lucide', document.body.classList.contains('light-mode') ? 'sun' : 'moon');
+          lucide.createIcons();
         }
       });
     }
-    
-    // Status Chart (Doughnut)
-    const statusCtx = document.getElementById('statusChart');
-    if (statusCtx && typeof Chart !== 'undefined') {
-      new Chart(statusCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Active', 'Completed', 'Upcoming'],
-          datasets: [{
-            data: [3, 7, 2],
-            backgroundColor: ['#10b981', '#64748b', '#f59e0b'],
-            borderWidth: 0,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20, usePointStyle: true } }
-          }
-        }
+
+    function initRefreshButton() {
+      document.getElementById('refreshDashboard').addEventListener('click', () => {
+        loadDashboardData();
+        showToast('Dashboard refreshed', 'success');
       });
     }
-    
-    // Period buttons
-    document.querySelectorAll('.period-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        this.parentElement.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
-    
-    // Logout function
-    async function handleLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        try {
-          await adminApiRequest('/auth/logout', { method: 'POST' });
-          showToast('Logged out successfully', 'success');
-          setTimeout(() => {
-            window.location.href = '../auth/login.html';
-          }, 1000);
-        } catch (error) {
-          console.error('Logout error:', error);
-          // Force logout on frontend
-          clearTokens();
-          window.location.href = '../auth/login.html';
-        }
+
+    function loadDashboardData() {
+      const elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
+      
+      // Stats
+      document.getElementById('totalElections').textContent = elections.length;
+      document.getElementById('liveElections').textContent = elections.filter(e => e.status === 'active').length;
+      document.getElementById('pendingElections').textContent = elections.filter(e => e.status === 'draft' || e.status === 'upcoming').length;
+      document.getElementById('completedElections').textContent = elections.filter(e => e.status === 'completed').length;
+
+      // Table
+      renderElectionsTable(elections);
+    }
+
+    function renderElectionsTable(elections) {
+      const tbody = document.getElementById('electionsTableBody');
+      const search = document.getElementById('tableSearch')?.value?.toLowerCase() || '';
+      const statusFilter = document.getElementById('statusFilter')?.value || '';
+
+      let filtered = elections;
+      if (statusFilter) filtered = filtered.filter(e => e.status === statusFilter);
+      if (search) filtered = filtered.filter(e => e.title.toLowerCase().includes(search));
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--admin-text-muted);">No elections found</td></tr>';
+        return;
       }
+
+      tbody.innerHTML = filtered.map((e, idx) => {
+        const statusBadge = `<span class="badge badge-${e.status}">${e.status}</span>`;
+        const daysLeft = e.endDate ? Math.ceil((new Date(e.endDate) - new Date())/(1000*60*60*24)) : '-';
+        const actions = `
+          <div class="action-btns">
+            <button class="action-btn" onclick="window.location.href='elections.html?edit=${e._id}'"><i data-lucide="edit-2" style="width:14px;height:14px;"></i></button>
+            ${e.status === 'draft' ? `<button class="action-btn success" onclick="activateElection('${e._id}')"><i data-lucide="play" style="width:14px;height:14px;"></i></button>` : ''}
+            ${e.status === 'active' ? `<button class="action-btn warning" onclick="closeElection('${e._id}')"><i data-lucide="stop-circle" style="width:14px;height:14px;"></i></button>` : ''}
+            <button class="action-btn" onclick="window.location.href='results.html?id=${e._id}'"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i></button>
+            <button class="action-btn danger" onclick="deleteElection('${e._id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
+          </div>`;
+        return `
+          <tr>
+            <td><strong>${escapeHtml(e.title)}</strong></td>
+            <td>${statusBadge}</td>
+            <td>${e.startDate ? new Date(e.startDate).toLocaleDateString() : 'N/A'} → ${e.endDate ? new Date(e.endDate).toLocaleDateString() : 'N/A'}</td>
+            <td>${e.totalVotes || 0}</td>
+            <td>${e.turnout || 0}%</td>
+            <td>${actions}</td>
+          </tr>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function initFilters() {
+      document.getElementById('tableSearch').addEventListener('input', () => loadDashboardData());
+      document.getElementById('statusFilter').addEventListener('change', () => loadDashboardData());
+    }
+
+    // Quick action functions (connected to localStorage)
+    async function activateElection(id) {
+      if (!confirm('Activate this election?')) return;
+      let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
+      const idx = elections.findIndex(e => e._id === id);
+      if (idx !== -1) elections[idx].status = 'active';
+      localStorage.setItem('votewave_elections', JSON.stringify(elections));
+      showToast('Election activated', 'success');
+      loadDashboardData();
+    }
+
+    async function closeElection(id) {
+      if (!confirm('Close this election? Voters will no longer be able to vote.')) return;
+      let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
+      const idx = elections.findIndex(e => e._id === id);
+      if (idx !== -1) elections[idx].status = 'completed';
+      localStorage.setItem('votewave_elections', JSON.stringify(elections));
+      showToast('Election closed', 'success');
+      loadDashboardData();
+    }
+
+    async function deleteElection(id) {
+      if (!confirm('Delete this election? This cannot be undone.')) return;
+      let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
+      elections = elections.filter(e => e._id !== id);
+      localStorage.setItem('votewave_elections', JSON.stringify(elections));
+      showToast('Election deleted', 'success');
+      loadDashboardData();
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = '0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
     }
   </script>
-  <!-- Paystack -->
-  <script src="https://js.paystack.co/v2/paystack.js"></script>
-  <script src="../js/payment.js"></script>
 </body>
 </html>

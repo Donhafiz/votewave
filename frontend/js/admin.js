@@ -210,6 +210,18 @@ function exportTableToCSV(selector, filename) {
     const rowData = Array.from(cols).map(col => `"${col.textContent.trim().replace(/"/g, '""')}"`);
     csv.push(rowData.join(','));
   });
+
+  function showAdminToast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer') || (() => {
+    const c = document.createElement('div'); c.id = 'toastContainer'; c.className = 'toast-container'; document.body.appendChild(c); return c;
+  })();
+  const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg;
+  container.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='0.3s'; setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+  function escapeHtml(text) { const d = document.createElement('div'); d.textContent = text || ''; return d.innerHTML; }
+  function formatNumber(n) { return (n||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   
   const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
   const url = window.URL.createObjectURL(blob);
