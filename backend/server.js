@@ -7,20 +7,20 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const compression = require("compression");
 const session = require("express-session");
-const passport = require("./config/passport");
+const passport = require("./src/config/passport");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
 
 const { Server } = require("socket.io");
 
-const connectDB = require("./config/db");
-const { initializeSocket } = require("./utils/socketService");
-const { errorHandler, notFound } = require("./middleware");
-const User = require("./models/User");
+const connectDB = require("./src/config/db");
+const { initializeSocket } = require("./src/utils/socketService");
+const { errorHandler, notFound } = require("./src/middleware");
+const User = require("./src/models/User");
 
 const dashboardRoutes = require("./src/api/dashboard/dashboard.routes");
-const { bootstrapERIECluster } = require("./core/erie/erie.router");
+const { bootstrapERIECluster } = require("./src/core/erie/erie.router");
 
 const {
   authRoutes,
@@ -31,7 +31,7 @@ const {
   aiRoutes,
   adminRoutes,
   paymentRoutes,
-} = require("./routes");
+} = require("./src/routes");
 
 /* =========================================================
    APP + SERVER
@@ -202,7 +202,7 @@ app.use(errorHandler);
 ========================================================= */
 const realtime = {
   voteUpdate: async (electionId) => {
-    const Vote = require("./models/Vote");
+    const Vote = require("./src/models/Vote");
     const total = await Vote.countDocuments({ electionId });
 
     io.to(`election:${electionId}`).emit("voteUpdate", {
