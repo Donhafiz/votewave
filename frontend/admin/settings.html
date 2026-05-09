@@ -39,9 +39,9 @@
       </header>
       
       <div class="admin-content">
-        <div class="admin-table-card" style="margin-bottom:2rem;">
-          <div class="admin-table-header"><h3>General Settings</h3></div>
-          <div style="padding:2rem;">
+        <div class="card">
+          <div class="card-header"><h3>General Settings</h3></div>
+          <div class="card-body">
             <div class="admin-form-row" style="margin-bottom:1.5rem;">
               <div class="admin-form-group">
                 <label>Site Name</label>
@@ -74,9 +74,9 @@
           </div>
         </div>
         
-        <div class="admin-table-card" style="margin-bottom:2rem;">
-          <div class="admin-table-header"><h3>Security Settings</h3></div>
-          <div style="padding:2rem;">
+        <div class="card">
+          <div class="card-header"><h3>Security Settings</h3></div>
+          <div class="card-body">
             <div class="admin-form-row" style="margin-bottom:1.5rem;">
               <div class="admin-form-group">
                 <label>Session Timeout (hours)</label>
@@ -98,11 +98,11 @@
           </div>
         </div>
         
-        <div style="display:flex;gap:1rem;justify-content:flex-end;">
-          <button class="admin-btn admin-btn-secondary" onclick="resetSettings()">
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="resetSettings()">
             <i data-lucide="rotate-ccw"></i> Reset to Defaults
           </button>
-          <button class="admin-btn admin-btn-primary" onclick="saveSettings()">
+          <button class="btn btn-primary" onclick="saveSettings()">
             <i data-lucide="save"></i> Save Settings
           </button>
         </div>

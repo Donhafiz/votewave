@@ -373,7 +373,12 @@
       if (!confirm('Activate this election?')) return;
       let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
       const idx = elections.findIndex(e => e._id === id);
-      if (idx !== -1) elections[idx].status = 'active';
+      if (idx !== -1) {
+        elections[idx].status = 'active';
+        if (typeof logAuditEvent === 'function') {
+          logAuditEvent('ELECTION_ACTIVATED', `Activated election: ${elections[idx].title}`);
+        }
+      }
       localStorage.setItem('votewave_elections', JSON.stringify(elections));
       showToast('Election activated', 'success');
       loadDashboardData();
@@ -383,7 +388,12 @@
       if (!confirm('Close this election? Voters will no longer be able to vote.')) return;
       let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
       const idx = elections.findIndex(e => e._id === id);
-      if (idx !== -1) elections[idx].status = 'completed';
+      if (idx !== -1) {
+        if (typeof logAuditEvent === 'function') {
+          logAuditEvent('ELECTION_CLOSED', `Closed election: ${elections[idx].title}`);
+        }
+        elections[idx].status = 'completed';
+      }
       localStorage.setItem('votewave_elections', JSON.stringify(elections));
       showToast('Election closed', 'success');
       loadDashboardData();
@@ -392,6 +402,10 @@
     async function deleteElection(id) {
       if (!confirm('Delete this election? This cannot be undone.')) return;
       let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
+      const electionToDelete = elections.find(e => e._id === id);
+      if (electionToDelete && typeof logAuditEvent === 'function') {
+        logAuditEvent('ELECTION_DELETED', `Deleted election: ${electionToDelete.title}`);
+      }
       elections = elections.filter(e => e._id !== id);
       localStorage.setItem('votewave_elections', JSON.stringify(elections));
       showToast('Election deleted', 'success');
