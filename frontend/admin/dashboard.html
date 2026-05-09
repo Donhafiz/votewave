@@ -1,437 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - VoteWave Admin</title>
-  <meta name="theme-color" content="#6366f1">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="stylesheet" href="../css/admin.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VoteWave Dashboard</title>
+
+  <!-- Unified CSS (ONLY ONE FILE) -->
+  <link rel="stylesheet" href="admin.css" />
+
+  <!-- Icons (optional but used in layout) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="admin-body">
-  <div class="admin-layout">
 
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">V</div>
-        <a href="dashboard.html" class="sidebar-brand">Vote<span>Wave</span></a>
+<body>
+
+<div class="admin-layout">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="admin-sidebar">
+
+    <div class="admin-sidebar-header">
+      <div class="admin-logo">VW</div>
+      <a href="#" class="admin-brand">Vote<span>Wave</span></a>
+    </div>
+
+    <nav class="admin-sidebar-nav">
+
+      <a class="admin-nav-item active" href="#">
+        <i class="fa-solid fa-gauge"></i> Dashboard
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-check-to-slot"></i> Elections
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-users"></i> Candidates
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-chart-column"></i> Results
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-user"></i> Users
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-gear"></i> Settings
+      </a>
+
+    </nav>
+
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="admin-main">
+
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+
+      <div class="admin-topbar-left">
+        <h1>Dashboard</h1>
       </div>
-      <nav class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-section-title">Main</div>
-          <a href="dashboard.html" class="nav-item active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
-          <a href="elections.html" class="nav-item"><i data-lucide="vote"></i> Elections</a>
-          <a href="candidates.html" class="nav-item"><i data-lucide="users"></i> Candidates</a>
-          <a href="results.html" class="nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
-        </div>
-        <div class="nav-section">
-          <div class="nav-section-title">Management</div>
-          <a href="users.html" class="nav-item"><i data-lucide="user-cog"></i> Users</a>
-          <a href="audit-logs.html" class="nav-item"><i data-lucide="file-text"></i> Audit Log</a>
-          <a href="settings.html" class="nav-item"><i data-lucide="settings"></i> Settings</a>
-        </div>
-        <div class="nav-section">
-          <div class="nav-section-title">Quick Links</div>
-          <a href="../../index.html" class="nav-item"><i data-lucide="globe"></i> View Site</a>
-          <a href="../voter/elections.html" class="nav-item"><i data-lucide="external-link"></i> Voter Portal</a>
-        </div>
-      </nav>
-      <div class="sidebar-footer">
-        <div class="user-card">
-          <div class="user-avatar" id="sidebarAvatar">SA</div>
-          <div>
-            <div class="user-name" id="sidebarName">Admin</div>
-            <div class="user-role">Administrator</div>
-          </div>
-          <button onclick="logout()" style="background:none;border:none;color:var(--admin-text-muted);cursor:pointer;margin-left:auto;">
-            <i data-lucide="log-out" style="width:1.1rem;height:1.1rem;"></i>
-          </button>
+
+      <div class="admin-topbar-right">
+        <button class="btn btn-secondary">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+
+        <button class="btn btn-primary">
+          New Election
+        </button>
+      </div>
+
+    </header>
+
+    <!-- CONTENT -->
+    <div class="admin-content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div>
+          <h1>Welcome Back</h1>
+          <p>Manage elections, candidates, and results</p>
         </div>
       </div>
-    </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="admin-main" role="main" aria-label="Admin dashboard">
-      <div id="adminStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-      <!-- TOP BAR -->
-      <header class="admin-topbar">
-        <div class="topbar-left">
-          <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
-            <div style="display:flex;align-items:center;gap:0.5rem;background:var(--admin-surface);border:1px solid var(--admin-border);border-radius:0.5rem;padding:0.4rem 0.85rem;">
-            <i data-lucide="search" style="width:1rem;height:1rem;color:var(--admin-text-muted);"></i>
-            <input type="text" id="dashboardSearch" aria-label="Search dashboard" placeholder="Search elections..." style="background:none;border:none;color:var(--admin-text);font-size:0.85rem;font-family:inherit;outline:none;width:200px;">
-          </div>
-        </div>
-        <div class="topbar-right">
-          <button class="topbar-icon" id="notificationBtn"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
-          <button class="topbar-icon" id="themeToggle"><i data-lucide="moon"></i></button>
-          <button class="topbar-icon" id="refreshDashboard"><i data-lucide="refresh-cw"></i></button>
-        </div>
-      </header>
+      <!-- STATS -->
+      <section class="stats-grid">
 
-      <!-- CONTENT -->
-      <div class="admin-content">
-        <!-- Page Header -->
-        <div class="page-header">
-          <div>
-            <h1>Good morning, <strong id="welcomeName">Admin</strong></h1>
-            <p class="greeting">Here's an overview of your elections and voting activity.</p>
-          </div>
-          <button class="btn btn-primary btn-lg" onclick="window.location.href='elections.html?action=create'">
-            <i data-lucide="plus"></i> New Election
-          </button>
+        <div class="stat-card">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Active Elections</div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-          <div class="stat-card" onclick="window.location.href='elections.html'">
-            <div class="stat-icon purple"><i data-lucide="vote"></i></div>
-            <div class="stat-value" id="totalElections">0</div>
-            <div class="stat-label">Total Elections</div>
-          </div>
-          <div class="stat-card" onclick="window.location.href='elections.html?status=active'">
-            <div class="stat-icon green"><i data-lucide="activity"></i></div>
-            <div class="stat-value" id="liveElections">0</div>
-            <div class="stat-label">Live Now</div>
-          </div>
-          <div class="stat-card" onclick="window.location.href='elections.html?status=draft'">
-            <div class="stat-icon orange"><i data-lucide="clock"></i></div>
-            <div class="stat-value" id="pendingElections">0</div>
-            <div class="stat-label">Pending</div>
-          </div>
-          <div class="stat-card" onclick="window.location.href='elections.html?status=completed'">
-            <div class="stat-icon cyan"><i data-lucide="check-circle"></i></div>
-            <div class="stat-value" id="completedElections">0</div>
-            <div class="stat-label">Completed</div>
-          </div>
+        <div class="stat-card">
+          <div class="stat-value">48</div>
+          <div class="stat-label">Candidates</div>
         </div>
 
-        <!-- Analytics Chart -->
-        <div class="card" style="margin-top: 2rem;">
-          <div class="card-header">
-            <h3>Election Analytics</h3>
-            <div style="display:flex;gap:0.75rem;align-items:center;">
-              <select id="chartType" aria-label="Select chart type" class="filter-select" style="min-width:150px;">
-                <option value="votes">Votes Over Time</option>
-                <option value="turnout">Voter Turnout</option>
-                <option value="participation">Participation Rate</option>
-              </select>
-              <button onclick="updateChart()" class="btn btn-primary btn-sm" style="padding:0.4rem 0.8rem;">
-                <i data-lucide="refresh-cw" style="width:14px;height:14px;"></i>
-              </button>
+        <div class="stat-card">
+          <div class="stat-value">2,340</div>
+          <div class="stat-label">Total Votes</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">8</div>
+          <div class="stat-label">Completed Elections</div>
+        </div>
+
+      </section>
+
+      <!-- FILTERS -->
+      <div class="filters">
+
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Active</button>
+        <button class="filter-btn">Upcoming</button>
+        <button class="filter-btn">Closed</button>
+
+      </div>
+
+      <!-- ELECTION GRID -->
+      <section class="elections-grid">
+
+        <!-- CARD 1 -->
+        <div class="card election-card">
+
+          <div class="card-image">
+            <i class="fa-solid fa-vote-yea"></i>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Student Council Election</h3>
+            <p class="card-description">
+              Vote for your next student leaders and representatives.
+            </p>
+
+            <div class="card-meta">
+              <span class="badge badge-success">Active</span>
+              <span class="card-date">
+                <i class="fa-regular fa-calendar"></i>
+                May 2026
+              </span>
             </div>
           </div>
-          <div style="position:relative;height:300px;">
-            <canvas id="analyticsChart"></canvas>
-          </div>
+
         </div>
 
-        <!-- Elections Table -->
-        <div class="card">
-          <div class="card-header">
-            <h3>Your Elections</h3>
-              <div style="display:flex;gap:0.75rem;align-items:center;">
-              <input type="text" id="tableSearch" aria-label="Search elections table" placeholder="Search..." class="search-input" style="min-width:180px;">
-              <select id="statusFilter" aria-label="Filter by status" class="filter-select">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="draft">Draft</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="completed">Completed</option>
-              </select>
+        <!-- CARD 2 -->
+        <div class="card election-card">
+
+          <div class="card-image">
+            <i class="fa-solid fa-building"></i>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Department Head Vote</h3>
+            <p class="card-description">
+              Internal election for department leadership roles.
+            </p>
+
+            <div class="card-meta">
+              <span class="badge badge-warning">Upcoming</span>
+              <span class="card-date">
+                <i class="fa-regular fa-calendar"></i>
+                June 2026
+              </span>
             </div>
           </div>
-          <div style="overflow-x:auto;">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Election</th>
-                  <th>Status</th>
-                  <th>Dates</th>
-                  <th>Votes</th>
-                  <th>Turnout</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="electionsTableBody">
-                <tr><td colspan="6" style="text-align:center;padding:2rem;">Loading...</td></tr>
-              </tbody>
-            </table>
-          </div>
+
         </div>
-      </div>
-    </main>
-  </div>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
+        <!-- CARD 3 -->
+        <div class="card election-card">
 
-  <script src="../js/a11y.js"></script>
-  <script src="../js/main.js"></script>
-  <script src="../js/admin.js"></script>
-  <script>
-    // =========================== DASHBOARD SCRIPT ===========================
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-      updateUserDisplay();
-      initSidebarToggle();
-      initThemeToggle();
-      initRefreshButton();
-      loadDashboardData();
-      initFilters();
-      // Refresh every 30 seconds
-      setInterval(loadDashboardData, 30000);
-    });
+          <div class="card-image">
+            <i class="fa-solid fa-check"></i>
+          </div>
 
-    function updateUserDisplay() {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const firstName = user.firstName || 'Admin';
-      const welcomeEl = document.getElementById('welcomeName');
-      const sidebarNameEl = document.getElementById('sidebarName');
-      const sidebarAvatarEl = document.getElementById('sidebarAvatar');
-      if (welcomeEl) welcomeEl.textContent = firstName;
-      if (sidebarNameEl) sidebarNameEl.textContent = firstName;
-      if (sidebarAvatarEl) sidebarAvatarEl.textContent = (firstName[0] || 'A') + (user.lastName ? user.lastName[0] : '');
-    }
+          <div class="card-body">
+            <h3 class="card-title">Campus Referendum</h3>
+            <p class="card-description">
+              Voting on campus infrastructure improvements.
+            </p>
 
-    function initSidebarToggle() {
-      document.getElementById('menuToggle')?.addEventListener('click', () => {
-        document.getElementById('sidebar')?.classList.toggle('open');
-      });
-    }
+            <div class="card-meta">
+              <span class="badge badge-danger">Closed</span>
+              <span class="card-date">
+                <i class="fa-regular fa-calendar"></i>
+                April 2026
+              </span>
+            </div>
+          </div>
 
-    function initThemeToggle() {
-      document.getElementById('themeToggle')?.addEventListener('click', function() {
-        document.body.classList.toggle('light-mode');
-        const icon = this.querySelector('svg');
-        if (icon) {
-          icon.setAttribute('data-lucide', document.body.classList.contains('light-mode') ? 'sun' : 'moon');
-          if (typeof lucide !== 'undefined') lucide.createIcons();
-        }
-      });
-    }
+        </div>
 
-    function initRefreshButton() {
-      document.getElementById('refreshDashboard')?.addEventListener('click', () => {
-        loadDashboardData();
-        showToast('Dashboard refreshed', 'success');
-      });
-    }
+      </section>
 
-    function loadDashboardData() {
-      const elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
-      
-      // Stats
-      const totalEl = document.getElementById('totalElections');
-      const liveEl = document.getElementById('liveElections');
-      const pendingEl = document.getElementById('pendingElections');
-      const completedEl = document.getElementById('completedElections');
-      if (totalEl) totalEl.textContent = elections.length;
-      if (liveEl) liveEl.textContent = elections.filter(e => e.status === 'active').length;
-      if (pendingEl) pendingEl.textContent = elections.filter(e => e.status === 'draft' || e.status === 'upcoming').length;
-      if (completedEl) completedEl.textContent = elections.filter(e => e.status === 'completed').length;
+    </div>
 
-      // Table
-      renderElectionsTable(elections);
-    }
+  </main>
 
-    function renderElectionsTable(elections) {
-      const tbody = document.getElementById('electionsTableBody');
-      const search = document.getElementById('tableSearch')?.value?.toLowerCase() || '';
-      const statusFilter = document.getElementById('statusFilter')?.value || '';
+</div>
 
-      let filtered = elections;
-      if (statusFilter) filtered = filtered.filter(e => e.status === statusFilter);
-      if (search) filtered = filtered.filter(e => e.title.toLowerCase().includes(search));
-
-      if (!tbody) return;
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--admin-text-muted);">No elections found</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = filtered.map((e, idx) => {
-        const statusBadge = `<span class="badge badge-${e.status}">${e.status}</span>`;
-        const daysLeft = e.endDate ? Math.ceil((new Date(e.endDate) - new Date())/(1000*60*60*24)) : '-';
-        const actions = `
-          <div class="action-btns">
-            <button class="action-btn" onclick="window.location.href='elections.html?edit=${e._id}'"><i data-lucide="edit-2" style="width:14px;height:14px;"></i></button>
-            ${e.status === 'draft' ? `<button class="action-btn success" onclick="activateElection('${e._id}')"><i data-lucide="play" style="width:14px;height:14px;"></i></button>` : ''}
-            ${e.status === 'active' ? `<button class="action-btn warning" onclick="closeElection('${e._id}')"><i data-lucide="stop-circle" style="width:14px;height:14px;"></i></button>` : ''}
-            <button class="action-btn" onclick="window.location.href='results.html?id=${e._id}'"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i></button>
-            <button class="action-btn danger" onclick="deleteElection('${e._id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
-          </div>`;
-        return `
-          <tr>
-            <td><strong>${escapeHtml(e.title)}</strong></td>
-            <td>${statusBadge}</td>
-            <td>${e.startDate ? new Date(e.startDate).toLocaleDateString() : 'N/A'} → ${e.endDate ? new Date(e.endDate).toLocaleDateString() : 'N/A'}</td>
-            <td>${e.totalVotes || 0}</td>
-            <td>${e.turnout || 0}%</td>
-            <td>${actions}</td>
-          </tr>`;
-      }).join('');
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
-
-    function initFilters() {
-      document.getElementById('tableSearch')?.addEventListener('input', () => loadDashboardData());
-      document.getElementById('statusFilter')?.addEventListener('change', () => loadDashboardData());
-      document.getElementById('chartType')?.addEventListener('change', () => updateChart());
-    }
-    
-    function updateChart() {
-      const chartType = document.getElementById('chartType')?.value || 'votes';
-      const elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
-      const ctx = document.getElementById('analyticsChart')?.getContext('2d');
-      if (!ctx) return;
-      
-      let chartData, chartOptions;
-      
-      if (chartType === 'votes') {
-        chartData = {
-          labels: elections.map(e => e.title).slice(-6),
-          datasets: [{
-            label: 'Total Votes',
-            data: elections.map(e => e.totalVotes || 0).slice(-6),
-            borderColor: '#ff6b6b',
-            backgroundColor: 'rgba(255, 107, 107, 0.1)',
-            tension: 0.4
-          }]
-        };
-      } else if (chartType === 'turnout') {
-        chartData = {
-          labels: elections.map(e => e.title).slice(-6),
-          datasets: [{
-            label: 'Voter Turnout %',
-            data: elections.map(e => e.turnout || 0).slice(-6),
-            borderColor: '#2ed573',
-            backgroundColor: 'rgba(46, 213, 115, 0.1)',
-            tension: 0.4
-          }]
-        };
-      } else if (chartType === 'participation') {
-        chartData = {
-          labels: elections.map(e => e.title).slice(-6),
-          datasets: [{
-            label: 'Participation Rate %',
-            data: elections.map(e => Math.random() * 100).slice(-6), // Demo data
-            borderColor: '#ffa726',
-            backgroundColor: 'rgba(255, 167, 38, 0.1)',
-            tension: 0.4
-          }]
-        };
-      }
-      
-      chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: {
-              color: '#8888a0',
-              font: {
-                size: 11
-              }
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.05)'
-            },
-            x: {
-              grid: {
-                display: false
-              }
-          }
-        }
-      };
-      
-      // Destroy existing chart if present
-      if (window.currentChart) {
-        window.currentChart.destroy();
-      }
-      
-      window.currentChart = new Chart(ctx, {
-        type: 'line',
-        data: chartData,
-        options: chartOptions
-      });
-    }
-
-    // Quick action functions (connected to localStorage)
-    async function activateElection(id) {
-      if (!confirm('Activate this election?')) return;
-      let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
-      const idx = elections.findIndex(e => e._id === id);
-      if (idx !== -1) {
-        elections[idx].status = 'active';
-        if (typeof logAuditEvent === 'function') {
-          logAuditEvent('ELECTION_ACTIVATED', `Activated election: ${elections[idx].title}`);
-        }
-      }
-      localStorage.setItem('votewave_elections', JSON.stringify(elections));
-      showToast('Election activated', 'success');
-      loadDashboardData();
-    }
-
-    async function closeElection(id) {
-      if (!confirm('Close this election? Voters will no longer be able to vote.')) return;
-      let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
-      const idx = elections.findIndex(e => e._id === id);
-      if (idx !== -1) {
-        if (typeof logAuditEvent === 'function') {
-          logAuditEvent('ELECTION_CLOSED', `Closed election: ${elections[idx].title}`);
-        }
-        elections[idx].status = 'completed';
-      }
-      localStorage.setItem('votewave_elections', JSON.stringify(elections));
-      showToast('Election closed', 'success');
-      loadDashboardData();
-    }
-
-    async function deleteElection(id) {
-      if (!confirm('Delete this election? This cannot be undone.')) return;
-      let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
-      const electionToDelete = elections.find(e => e._id === id);
-      if (electionToDelete && typeof logAuditEvent === 'function') {
-        logAuditEvent('ELECTION_DELETED', `Deleted election: ${electionToDelete.title}`);
-      }
-      elections = elections.filter(e => e._id !== id);
-      localStorage.setItem('votewave_elections', JSON.stringify(elections));
-      showToast('Election deleted', 'success');
-      loadDashboardData();
-    }
-
-    function showToast(msg, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.textContent = msg;
-      container.appendChild(toast);
-      if (window.announce) window.announce(msg, 'polite');
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        toast.style.transition = '0.3s';
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text || '';
-      return div.innerHTML;
-    }
-  </script>
 </body>
 </html>
