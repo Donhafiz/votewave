@@ -35,13 +35,14 @@
     
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0f172a;
+      background: #0a0a14;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      color: #f0f0f5;
     }
     
     /* Animated Background */
@@ -620,6 +621,26 @@
       text-decoration: underline;
     }
     
+    /* Need to vote link */
+    .need-to-vote {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    .need-to-vote a {
+      color: var(--primary-600);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .need-to-vote a:hover {
+      color: var(--primary-500);
+      text-decoration: underline;
+    }
+    
     /* Divider */
     .divider {
       display: flex;
@@ -917,7 +938,12 @@
       
       <!-- Divider -->
       <div class="divider">
-        <span>or continue with</span>
+        <span>or</span>
+      </div>
+      
+      <!-- Need to vote link -->
+      <div class="need-to-vote">
+        <a href="../voter/login.html">Need to vote: voter/login</a>
       </div>
       
       <!-- Social Login -->

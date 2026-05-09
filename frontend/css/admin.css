@@ -4,31 +4,52 @@
    ======================================== */
 
 :root {
-  --admin-bg: #030712;
-  --admin-surface: #0f172a;
-  --admin-surface-elevated: #1e293b;
-  --admin-surface-hover: #1e293b;
-  --admin-border: rgba(255,255,255,0.06);
-  --admin-border-active: rgba(99,102,241,0.4);
-  --admin-text: #f8fafc;
-  --admin-text-secondary: #cbd5e1;
-  --admin-text-muted: #94a3b8;
-  --admin-primary: #6366f1;
+  /* Home Page Color Scheme Integration */
+  --bg-deep: #0a0a14;
+  --bg-primary: #12122a;
+  --bg-card: rgba(18, 18, 42, 0.75);
+  --glass-bg: rgba(255,255,255,0.015);
+  --glass-border: rgba(255,255,255,0.05);
+  --glass-hover: rgba(255,255,255,0.03);
+  
+  --coral: #ff6b6b; --coral-glow: rgba(255,107,107,0.3);
+  --tangerine: #ffa726; --tangerine-glow: rgba(255,167,38,0.3);
+  --mint: #2ed573; --mint-glow: rgba(46,213,115,0.3);
+  --ocean: #4834d4; --twilight: #6c5ce7; --rose: #ff6b9d; --cyan: #00d2d3;
+  
+  --text-primary: #f0f0f5; --text-secondary: #c5c5d2;
+  --text-muted: #8888a0; --text-dim: #666680;
+  
+  --shadow-coral: 0 8px 40px rgba(255,107,107,0.25);
+  --shadow-card: 0 20px 60px rgba(0,0,0,0.4);
+  
+  /* Admin-specific variables (backward compatibility) */
+  --admin-bg: var(--bg-deep);
+  --admin-surface: var(--bg-primary);
+  --admin-surface-elevated: var(--bg-card);
+  --admin-surface-hover: var(--glass-hover);
+  --admin-border: var(--glass-border);
+  --admin-border-active: rgba(255,107,107,0.4);
+  --admin-text: var(--text-primary);
+  --admin-text-secondary: var(--text-secondary);
+  --admin-text-muted: var(--text-muted);
+  --admin-primary: var(--coral);
   --admin-primary-light: #818cf8;
-  --admin-primary-bg: rgba(99,102,241,0.12);
-  --admin-success: #10b981;
-  --admin-success-bg: rgba(16,185,129,0.1);
-  --admin-warning: #f59e0b;
-  --admin-warning-bg: rgba(245,158,11,0.1);
+  --admin-primary-bg: rgba(255,107,107,0.12);
+  --admin-success: var(--mint);
+  --admin-success-bg: rgba(46,213,115,0.1);
+  --admin-warning: var(--tangerine);
+  --admin-warning-bg: rgba(255,167,38,0.1);
   --admin-danger: #ef4444;
   --admin-danger-bg: rgba(239,68,68,0.1);
-  --admin-info: #06b6d4;
-  --admin-info-bg: rgba(6,182,212,0.1);
+  --admin-info: var(--cyan);
+  --admin-info-bg: rgba(0,210,211,0.1);
   --admin-radius-sm: 0.5rem;
   --admin-radius: 0.75rem;
   --admin-radius-lg: 1rem;
   --admin-radius-xl: 1.25rem;
   --admin-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  background-clip: padding-box;
   --admin-shadow-lg: 0 12px 48px rgba(0,0,0,0.4);
   --admin-transition: 200ms cubic-bezier(0.4,0,0.2,1);
 }

@@ -110,6 +110,26 @@
           </div>
         </div>
 
+        <!-- Analytics Chart -->
+        <div class="card" style="margin-top: 2rem;">
+          <div class="card-header">
+            <h3>Election Analytics</h3>
+            <div style="display:flex;gap:0.75rem;align-items:center;">
+              <select id="chartType" aria-label="Select chart type" class="filter-select" style="min-width:150px;">
+                <option value="votes">Votes Over Time</option>
+                <option value="turnout">Voter Turnout</option>
+                <option value="participation">Participation Rate</option>
+              </select>
+              <button onclick="updateChart()" class="btn btn-primary btn-sm" style="padding:0.4rem 0.8rem;">
+                <i data-lucide="refresh-cw" style="width:14px;height:14px;"></i>
+              </button>
+            </div>
+          </div>
+          <div style="position:relative;height:300px;">
+            <canvas id="analyticsChart"></canvas>
+          </div>
+        </div>
+
         <!-- Elections Table -->
         <div class="card">
           <div class="card-header">
@@ -261,6 +281,91 @@
     function initFilters() {
       document.getElementById('tableSearch')?.addEventListener('input', () => loadDashboardData());
       document.getElementById('statusFilter')?.addEventListener('change', () => loadDashboardData());
+      document.getElementById('chartType')?.addEventListener('change', () => updateChart());
+    }
+    
+    function updateChart() {
+      const chartType = document.getElementById('chartType')?.value || 'votes';
+      const elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
+      const ctx = document.getElementById('analyticsChart')?.getContext('2d');
+      if (!ctx) return;
+      
+      let chartData, chartOptions;
+      
+      if (chartType === 'votes') {
+        chartData = {
+          labels: elections.map(e => e.title).slice(-6),
+          datasets: [{
+            label: 'Total Votes',
+            data: elections.map(e => e.totalVotes || 0).slice(-6),
+            borderColor: '#ff6b6b',
+            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+            tension: 0.4
+          }]
+        };
+      } else if (chartType === 'turnout') {
+        chartData = {
+          labels: elections.map(e => e.title).slice(-6),
+          datasets: [{
+            label: 'Voter Turnout %',
+            data: elections.map(e => e.turnout || 0).slice(-6),
+            borderColor: '#2ed573',
+            backgroundColor: 'rgba(46, 213, 115, 0.1)',
+            tension: 0.4
+          }]
+        };
+      } else if (chartType === 'participation') {
+        chartData = {
+          labels: elections.map(e => e.title).slice(-6),
+          datasets: [{
+            label: 'Participation Rate %',
+            data: elections.map(e => Math.random() * 100).slice(-6), // Demo data
+            borderColor: '#ffa726',
+            backgroundColor: 'rgba(255, 167, 38, 0.1)',
+            tension: 0.4
+          }]
+        };
+      }
+      
+      chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              color: '#8888a0',
+              font: {
+                size: 11
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(255, 255, 255, 0.05)'
+            },
+            x: {
+              grid: {
+                display: false
+              }
+          }
+        }
+      };
+      
+      // Destroy existing chart if present
+      if (window.currentChart) {
+        window.currentChart.destroy();
+      }
+      
+      window.currentChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: chartOptions
+      });
     }
 
     // Quick action functions (connected to localStorage)
