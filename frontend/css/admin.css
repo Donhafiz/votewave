@@ -495,6 +495,64 @@ body.admin-body {
   font-size: 1rem;
 }
 
+/* ─────── ADMIN SPECIFIC CLASSES ─────── */
+.admin-filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-filter-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  border: 1px solid var(--admin-border);
+  background: none;
+  color: var(--admin-text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--admin-transition);
+  font-family: inherit;
+}
+
+.admin-filter-btn.active,
+.admin-filter-btn:hover {
+  background: var(--admin-primary-bg);
+  color: var(--admin-primary-light);
+  border-color: var(--admin-border-active);
+}
+
+.admin-filter-select {
+  padding: 0.5rem 1rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 0.5rem;
+  color: var(--admin-text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  min-width: 220px;
+}
+
+.admin-filter-select:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+.admin-table-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-lg);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.admin-table-card .table {
+  margin: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .admin-sidebar {
