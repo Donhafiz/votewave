@@ -1,1329 +1,676 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In - VoteWave</title>
-  <meta name="description" content="Sign in to VoteWave - Secure E-Voting Platform">
-  <meta name="theme-color" content="#6366f1">
-  
-  <!-- Fonts -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoteWave — Secure Login</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3Cpath d='M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7z'/%3E%3Cpath d='M22 19H2'/%3E%3C/svg%3E" type="image/svg+xml">
-  
-  <!-- GSAP -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="../css/styles.css">
-  
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
-    /* ========================================
-       AUTH PAGE - PREMIUM DESIGN
-       ======================================== */
-    
+    :root {
+      --bg: #070b14;
+      --card: rgba(12, 18, 34, 0.78);
+      --card-border: rgba(255,255,255,0.08);
+      --input: rgba(255,255,255,0.04);
+      --primary: #7c5cff;
+      --secondary: #00d4ff;
+      --accent: #ff4d8d;
+      --text: #f3f5ff;
+      --muted: #9ea7c4;
+      --danger: #ff5d73;
+      --success: #2ed573;
+      --shadow: 0 30px 60px rgba(0,0,0,0.45);
+      --radius: 24px;
+      --transition: 0.35s cubic-bezier(.4,0,.2,1);
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0a0a14;
-      min-height: 100vh;
+      height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      color: #f0f0f5;
-    }
-    
-    /* Animated Background */
-    .auth-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
+      position: relative;
       overflow: hidden;
+      margin: 0;
     }
-    
-    .auth-bg-orb {
+
+    /* Animated Gradient Mesh */
+    .mesh {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .blob {
       position: absolute;
       border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.15;
-      animation: orbDrift 20s ease-in-out infinite;
+      filter: blur(120px);
+      opacity: 0.4;
+      animation: float 15s infinite ease-in-out alternate;
     }
-    
-    .auth-bg-orb:nth-child(1) {
-      width: 600px;
-      height: 600px;
-      background: #6366f1;
-      top: -200px;
-      right: -200px;
-      animation-delay: 0s;
-    }
-    
-    .auth-bg-orb:nth-child(2) {
+
+    .blob:nth-child(1) {
       width: 500px;
       height: 500px;
-      background: #8b5cf6;
-      bottom: -150px;
-      left: -150px;
-      animation-delay: -7s;
+      background: var(--primary);
+      top: -150px;
+      left: -100px;
     }
-    
-    .auth-bg-orb:nth-child(3) {
+
+    .blob:nth-child(2) {
+      width: 450px;
+      height: 450px;
+      background: var(--secondary);
+      bottom: -180px;
+      right: -120px;
+      animation-delay: 4s;
+    }
+
+    .blob:nth-child(3) {
       width: 300px;
       height: 300px;
-      background: #06b6d4;
-      top: 50%;
+      background: var(--accent);
+      top: 40%;
       left: 50%;
       transform: translate(-50%, -50%);
-      animation-delay: -14s;
+      animation-delay: 8s;
     }
-    
-    @keyframes orbDrift {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(100px, -80px) scale(1.1); }
-      50% { transform: translate(-60px, 120px) scale(0.9); }
-      75% { transform: translate(-120px, -60px) scale(1.05); }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px) translateX(0px) scale(1);
+      }
+      100% {
+        transform: translateY(60px) translateX(-40px) scale(1.1);
+      }
     }
-    
-    /* Grid Pattern Overlay */
-    .auth-bg-grid {
+
+    /* Grid Overlay */
+    .grid-overlay {
       position: absolute;
       inset: 0;
-      background-image: 
-        linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-      animation: gridShift 20s linear infinite;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: radial-gradient(circle at center, black 35%, transparent 90%);
+      z-index: 0;
     }
-    
-    @keyframes gridShift {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(60px, 60px); }
-    }
-    
-    /* Main Container */
-    .auth-container {
-      position: relative;
-      z-index: 1;
+
+    .container {
       width: 100%;
-      max-width: 1000px;
-      min-height: 600px;
+      max-width: 1100px;
+      height: 85vh;
+      max-height: 650px;
+      position: relative;
+      z-index: 2;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      background: rgba(255, 255, 255, 0.02);
-      backdrop-filter: blur(40px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 2rem;
+      border-radius: var(--radius);
       overflow: hidden;
-      box-shadow: 
-        0 25px 80px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-      margin: 1rem;
+      backdrop-filter: blur(30px);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
     }
-    
-    /* Left Panel - Visual Side */
-    .auth-visual {
+
+    /* LEFT SIDE */
+    .hero {
       position: relative;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.08));
-      padding: 3rem;
+      padding: 70px;
+      background:
+        linear-gradient(135deg, rgba(124,92,255,0.18), rgba(0,212,255,0.08));
       display: flex;
       flex-direction: column;
       justify-content: center;
       overflow: hidden;
     }
-    
-    .visual-overlay {
+
+    .hero::before {
+      content: "";
       position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.2), transparent 70%);
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+      top: -120px;
+      left: -100px;
     }
-    
-    .visual-content {
-      position: relative;
-      z-index: 1;
-    }
-    
-    .auth-logo {
+
+    .brand {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 2.5rem;
+      gap: 14px;
+      margin-bottom: 60px;
+      position: relative;
+      z-index: 2;
     }
-    
-    .auth-logo-icon {
-      width: 3rem;
-      height: 3rem;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      border-radius: 1rem;
+
+    .brand-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
-      animation: logoGlow 3s ease-in-out infinite;
+      box-shadow: 0 15px 30px rgba(124,92,255,0.4);
     }
-    
-    @keyframes logoGlow {
-      0%, 100% { box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3); }
-      50% { box-shadow: 0 8px 48px rgba(99, 102, 241, 0.5); }
-    }
-    
-    .auth-logo-icon svg {
-      width: 1.5rem;
-      height: 1.5rem;
+
+    .brand-logo i {
+      width: 28px;
+      height: 28px;
       color: white;
     }
-    
-    .auth-logo-text {
-      font-size: 1.5rem;
+
+    .brand h2 {
+      font-size: 1.6rem;
       font-weight: 800;
-      color: white;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
     }
-    
-    .auth-logo-text span {
-      background: linear-gradient(135deg, #818cf8, #c084fc);
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 28px;
+      font-size: 0.85rem;
+      color: #d9e2ff;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      margin-bottom: 28px;
+      font-weight: 900;
+      max-width: 520px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, #ffffff, #8ec5ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
-    
-    .visual-title {
-      font-size: 2.25rem;
-      font-weight: 800;
-      color: white;
-      margin-bottom: 1rem;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
+
+    .hero p {
+      max-width: 520px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 1rem;
+      margin-bottom: 38px;
     }
-    
-    .visual-subtitle {
-      font-size: 1.05rem;
-      color: #94a3b8;
-      line-height: 1.7;
-      margin-bottom: 2.5rem;
-    }
-    
-    .visual-features {
+
+    .stats {
       display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      gap: 24px;
+      flex-wrap: wrap;
     }
-    
-    .visual-feature {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 0.75rem;
-      transition: all 0.3s ease;
+
+    .stat-card {
+      flex: 1;
+      min-width: 140px;
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
     }
-    
-    .visual-feature:hover {
-      background: rgba(99, 102, 241, 0.08);
-      border-color: rgba(99, 102, 241, 0.2);
-      transform: translateX(5px);
-    }
-    
-    .visual-feature-icon {
-      width: 2rem;
-      height: 2rem;
-      background: rgba(99, 102, 241, 0.15);
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    
-    .visual-feature-icon svg {
-      width: 1rem;
-      height: 1rem;
-      color: #818cf8;
-    }
-    
-    .visual-feature span {
-      font-size: 0.9rem;
-      color: #cbd5e1;
-      font-weight: 500;
-    }
-    
-    /* Floating Cards */
-    .visual-cards {
-      position: absolute;
-      right: -30px;
-      bottom: 2rem;
-      z-index: 0;
-      opacity: 0.6;
-    }
-    
-    .floating-mini-card {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 1rem;
-      padding: 1rem;
-      position: absolute;
-      animation: miniFloat 6s ease-in-out infinite;
-    }
-    
-    .floating-mini-card:nth-child(1) {
-      width: 180px;
-      top: -80px;
-      right: 40px;
-      animation-delay: 0s;
-    }
-    
-    .floating-mini-card:nth-child(2) {
-      width: 140px;
-      top: 20px;
-      right: -20px;
-      animation-delay: -2s;
-    }
-    
-    @keyframes miniFloat {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-15px) rotate(2deg); }
-    }
-    
-    .mini-card-dots {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 0.75rem;
-    }
-    
-    .mini-card-dots span {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #64748b;
-    }
-    
-    .mini-card-bar {
-      height: 4px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 2px;
+
+    .stat-card h3 {
+      font-size: 2rem;
       margin-bottom: 6px;
     }
-    
-    .mini-card-bar.fill {
-      background: linear-gradient(90deg, #6366f1, #8b5cf6);
-      width: 70%;
+
+    .stat-card p {
+      margin: 0;
+      font-size: 0.9rem;
     }
-    
-    /* Right Panel - Form Side */
-    .auth-form-side {
-      padding: 3rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.5);
-    }
-    
-    .form-header {
-      margin-bottom: 2rem;
-    }
-    
-    .form-header h2 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
-    }
-    
-    .form-header p {
-      font-size: 0.95rem;
-      color: #94a3b8;
-    }
-    
-    /* Form Styles */
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-    
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-    
-    .form-group label {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #cbd5e1;
-      letter-spacing: 0.01em;
-    }
-    
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    
-    .input-wrapper .input-icon {
-      position: absolute;
-      left: 1rem;
-      width: 1.25rem;
-      height: 1.25rem;
-      color: #64748b;
-      z-index: 1;
-      pointer-events: none;
-      transition: color 0.3s ease;
-    }
-    
-    .input-wrapper:focus-within .input-icon {
-      color: #818cf8;
-    }
-    
-    .input-wrapper input {
-      width: 100%;
-      padding: 0.875rem 1rem 0.875rem 3rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 0.75rem;
-      color: white;
-      font-size: 0.95rem;
-      font-family: inherit;
-      transition: all 0.3s ease;
-      outline: none;
-    }
-    
-    .input-wrapper input::placeholder {
-      color: #475569;
-    }
-    
-    .input-wrapper input:focus {
-      border-color: #6366f1;
-      background: rgba(99, 102, 241, 0.05);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-    
-    .input-wrapper input.error {
-      border-color: #ef4444;
-      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-    }
-    
-    .toggle-password {
-      position: absolute;
-      right: 0.75rem;
-      background: none;
-      border: none;
-      color: #64748b;
-      cursor: pointer;
-      padding: 0.5rem;
+
+    /* RIGHT SIDE */
+    .auth-side {
+      background: rgba(7,11,20,0.72);
+      backdrop-filter: blur(40px);
+      padding: 35px 25px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.3s ease;
-      z-index: 1;
-    }
-    
-    .toggle-password:hover {
-      color: #94a3b8;
-    }
-    
-    .toggle-password svg {
-      width: 1.25rem;
-      height: 1.25rem;
-    }
-    
-    .error-message {
-      font-size: 0.75rem;
-      color: #ef4444;
-      min-height: 1rem;
-      transition: all 0.3s ease;
-    }
-    
-    /* Form Options */
-    .form-options {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 0.25rem;
-    }
-    
-    .checkbox-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-    }
-    
-    .checkbox-wrapper input[type="checkbox"] {
-      display: none;
-    }
-    
-    .checkbox-custom {
-      width: 1.25rem;
-      height: 1.25rem;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 0.35rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      flex-shrink: 0;
-    }
-    
-    .checkbox-wrapper input:checked + .checkbox-custom {
-      background: #6366f1;
-      border-color: #6366f1;
-    }
-    
-    .checkbox-custom svg {
-      width: 0.75rem;
-      height: 0.75rem;
-      color: white;
-      opacity: 0;
-      transform: scale(0);
-      transition: all 0.2s ease;
-    }
-    
-    .checkbox-wrapper input:checked + .checkbox-custom svg {
-      opacity: 1;
-      transform: scale(1);
-    }
-    
-    .checkbox-wrapper span {
-      font-size: 0.85rem;
-      color: #94a3b8;
-    }
-    
-    .forgot-link {
-      font-size: 0.85rem;
-      color: #818cf8;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-    
-    .forgot-link:hover {
-      color: #a5b4fc;
-      text-decoration: underline;
-    }
-    
-    /* Submit Button */
-    .btn-submit {
-      width: 100%;
-      padding: 0.9rem;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      opacity: 1; /* Ensure visible by default */
-      border: none;
-      border-radius: 0.75rem;
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
-      margin-top: 0.5rem;
     }
-    
-    .btn-submit::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, #818cf8, #a78bfa);
-      opacity: 0;
-      transition: opacity 0.3s ease;
+
+    .auth-box {
+      width: 100%;
+      max-width: 400px;
     }
-    
-    .btn-submit:hover::before {
-      opacity: 1;
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 15px;
     }
-    
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+
+    .theme-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
     }
-    
-    .btn-submit:active {
-      transform: translateY(0);
+
+    .theme-btn:hover {
+      transform: translateY(-3px);
+      background: rgba(255,255,255,0.09);
     }
-    
-    .btn-submit span,
-    .btn-submit svg {
-      position: relative;
-      z-index: 1;
+
+    .auth-title h2 {
+      font-size: 1.8rem;
+      letter-spacing: -0.05em;
+      margin-bottom: 8px;
     }
-    
-    .btn-submit svg {
-      width: 1.25rem;
-      height: 1.25rem;
-      transition: transform 0.3s ease;
+
+    .auth-title p {
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.5;
+      font-size: 0.85rem;
     }
-    
-    .btn-submit:hover svg {
-      transform: translateX(3px);
+
+    .social-login {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
     }
-    
-    .btn-submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-    
-    /* Loading Spinner */
-    .btn-submit .spinner {
-      width: 1.25rem;
-      height: 1.25rem;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    /* Form Footer */
-    .form-footer {
-      text-align: center;
-      margin-top: 1.5rem;
-    }
-    
-    .form-footer p {
-      font-size: 0.9rem;
-      color: #94a3b8;
-    }
-    
-    .form-footer a {
-      color: #818cf8;
-      text-decoration: none;
+
+    .social-btn {
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       font-weight: 600;
-      transition: color 0.3s ease;
+      font-size: 0.85rem;
+      transition: var(--transition);
     }
-    
-    .form-footer a:hover {
-      color: #a5b4fc;
-      text-decoration: underline;
+
+    .social-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.08);
     }
-    
-    /* Need to vote link */
-    .need-to-vote {
-      text-align: center;
-      margin-top: 1rem;
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-    
-    .need-to-vote a {
-      color: var(--primary-600);
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-    
-    .need-to-vote a:hover {
-      color: var(--primary-500);
-      text-decoration: underline;
-    }
-    
-    /* Divider */
+
     .divider {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      margin: 1.5rem 0;
+      gap: 14px;
+      margin: 30px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
     }
-    
+
     .divider::before,
     .divider::after {
-      content: '';
+      content: "";
       flex: 1;
       height: 1px;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255,255,255,0.08);
     }
-    
-    .divider span {
-      font-size: 0.8rem;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+
+    .form-group {
+      margin-bottom: 16px;
     }
-    
-    /* Social Login */
-    .social-login {
+
+    .label-row {
       display: flex;
-      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
     }
-    
-    .social-btn {
-      flex: 1;
-      padding: 0.75rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 0.75rem;
-      color: #94a3b8;
+
+    .label-row label {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .forgot {
+      color: var(--secondary);
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: #95a3d8;
+      width: 16px;
+      height: 16px;
+    }
+
+    .input {
+      width: 100%;
+      height: 46px;
+      padding: 0 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--input);
+      color: white;
+      outline: none;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .input::placeholder {
+      color: #7381b4;
+    }
+
+    .input:focus {
+      border-color: rgba(124,92,255,0.8);
+      box-shadow: 0 0 0 4px rgba(124,92,255,0.12);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .toggle-pass {
+      position: absolute;
+      top: 50%;
+      right: 18px;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: #95a3d8;
       cursor: pointer;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .remember input {
+      accent-color: var(--primary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 48px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-      font-family: inherit;
-      transition: all 0.3s ease;
+      gap: 10px;
+      box-shadow: 0 15px 30px rgba(124,92,255,0.35);
     }
-    
-    .social-btn:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.15);
+
+    .submit-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 25px 50px rgba(124,92,255,0.45);
+    }
+
+    .signup {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .signup a {
       color: white;
-      transform: translateY(-2px);
-    }
-    
-    .social-btn svg {
-      width: 1.25rem;
-      height: 1.25rem;
-    }
-    
-    /* Back Button */
-    .back-home {
-      position: fixed;
-      top: 1.5rem;
-      left: 1.5rem;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 0.75rem;
-      color: #94a3b8;
-      font-size: 0.85rem;
-      font-weight: 500;
       text-decoration: none;
-      transition: all 0.3s ease;
+      font-weight: 700;
     }
-    
-    .back-home:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: white;
-      transform: translateX(-3px);
+
+    .footer-note {
+      margin-top: 12px;
+      text-align: center;
+      color: #6673a3;
+      font-size: 0.75rem;
+      line-height: 1.3;
     }
-    
-    .back-home svg {
-      width: 1rem;
-      height: 1rem;
-    }
-    
-    /* Toast Container */
-    .toast-container {
-      position: fixed;
-      top: 1.5rem;
-      right: 1.5rem;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    
-    /* Enhanced Mobile Responsive Design */
-    @media (max-width: 1024px) {
-      .auth-container {
-        max-width: 900px;
-        margin: 1rem;
-      }
-      
-      .auth-visual {
-        padding: 2rem;
-      }
-      
-      .auth-form-side {
-        padding: 2.5rem;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      body {
-        padding: 0;
-      }
-      
-      .auth-container {
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      .container {
         grid-template-columns: 1fr;
         max-width: 500px;
-        width: 95%;
-        margin: 1rem auto;
-        min-height: auto;
-        border-radius: 1.5rem;
-        box-shadow: 
-          0 20px 60px rgba(0, 0, 0, 0.3),
-          0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        max-height: none;
       }
-      
-      .auth-visual {
+
+      .hero {
         display: none;
       }
-      
-      .auth-form-side {
-        padding: 2.5rem 2rem;
-        min-height: 600px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-      
-      .form-header {
-        text-align: center;
-        margin-bottom: 2rem;
-      }
-      
-      .form-header h2 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-      }
-      
-      .form-header p {
-        font-size: 0.95rem;
-        color: #8888a0;
-      }
-      
-      .form-group {
-        margin-bottom: 1.5rem;
-      }
-      
-      .form-group label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        color: #c5c5d2;
-      }
-      
-      .input-wrapper {
-        position: relative;
-      }
-      
-      .input-wrapper input {
-        width: 100%;
-        padding: 1rem 1rem 1rem 3rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 0.75rem;
-        color: #f0f0f5;
-        font-size: 1rem;
-        font-family: inherit;
-        outline: none;
-        transition: all 0.3s ease;
-      }
-      
-      .input-wrapper input:focus {
-        border-color: #ff6b6b;
-        background: rgba(255, 107, 107, 0.05);
-        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
-      }
-      
-      .input-wrapper input::placeholder {
-        color: #8888a0;
-      }
-      
-      .input-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 1.25rem;
-        height: 1.25rem;
-        color: #8888a0;
-        pointer-events: none;
-      }
-      
-      .toggle-password {
-        position: absolute;
-        right: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: #8888a0;
-        cursor: pointer;
-        padding: 0.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: color 0.3s ease;
-      }
-      
-      .toggle-password:hover {
-        color: #c5c5d2;
-      }
-      
-      .toggle-password svg {
-        width: 1.25rem;
-        height: 1.25rem;
-      }
-      
-      .form-options {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-      }
-      
-      .checkbox-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 0.875rem;
-        color: #c5c5d2;
-      }
-      
-      .checkbox-wrapper input[type="checkbox"] {
-        width: 1.25rem;
-        height: 1.25rem;
-        accent-color: #ff6b6b;
-        cursor: pointer;
-      }
-      
-      .forgot-link {
-        font-size: 0.875rem;
-        color: #ff6b6b;
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.3s ease;
-      }
-      
-      .forgot-link:hover {
-        color: #ff5252;
-        text-decoration: underline;
-      }
-      
-      .btn-submit {
-        width: 100%;
-        padding: 1rem;
-        background: linear-gradient(135deg, #ff6b6b, #ff5252);
-        border: none;
-        border-radius: 0.75rem;
-        color: white;
-        font-size: 1rem;
-        font-weight: 600;
-        font-family: inherit;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-      }
-      
-      .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-      }
-      
-      .btn-submit:active {
-        transform: translateY(0);
-      }
-      
-      .btn-submit svg {
-        width: 1.25rem;
-        height: 1.25rem;
-      }
-      
-      .divider {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin: 2rem 0;
-      }
-      
-      .divider::before,
-      .divider::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.1);
-      }
-      
-      .divider span {
-        font-size: 0.8rem;
-        color: #8888a0;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-      
-      .social-login {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
-      
-      .social-btn {
-        flex: 1;
-        padding: 0.75rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 0.75rem;
-        color: #c5c5d2;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-        text-decoration: none;
-      }
-      
-      .social-btn:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.15);
-        color: #f0f0f5;
-        transform: translateY(-1px);
-      }
-      
-      .social-btn svg {
-        width: 1.25rem;
-        height: 1.25rem;
-      }
-      
-      .need-to-vote {
-        text-align: center;
-        margin-top: 1.5rem;
-        font-size: 0.875rem;
-        color: #8888a0;
-      }
-      
-      .need-to-vote a {
-        color: #ff6b6b;
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.3s ease;
-      }
-      
-      .need-to-vote a:hover {
-        color: #ff5252;
-        text-decoration: underline;
-      }
-      
-      .back-home {
-        top: 1rem;
-        left: 1rem;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.8rem;
+
+      .auth-side {
+        padding: 40px 28px;
       }
     }
-    
-    @media (max-width: 480px) {
-      .auth-container {
-        width: 95%;
-        margin: 0.5rem auto;
-        border-radius: 1rem;
+
+    @media (max-width: 540px) {
+      body {
+        padding: 14px;
       }
-      
-      .auth-form-side {
-        padding: 2rem 1.5rem;
+
+      .container {
+        min-height: auto;
+        max-height: none;
       }
-      
-      .form-header h2 {
-        font-size: 1.5rem;
-      }
-      
-      .form-header p {
-        font-size: 0.875rem;
-      }
-      
-      .input-wrapper input {
-        padding: 0.875rem 0.875rem 0.875rem 2.5rem;
-        font-size: 0.95rem;
-      }
-      
-      .input-icon {
-        left: 0.875rem;
-        width: 1.125rem;
-        height: 1.125rem;
-      }
-      
-      .toggle-password {
-        right: 0.875rem;
-      }
-      
-      .toggle-password svg {
-        width: 1.125rem;
-        height: 1.125rem;
-      }
-      
-      .btn-submit {
-        padding: 0.875rem;
-        font-size: 0.95rem;
-      }
-      
-      .btn-submit svg {
-        width: 1.125rem;
-        height: 1.125rem;
-      }
-      
-      .form-options {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
-      
+
       .social-login {
-        flex-direction: column;
+        grid-template-columns: 1fr;
       }
-      
-      .social-btn {
-        padding: 0.875rem;
-        font-size: 0.8rem;
+
+      .auth-side {
+        padding: 28px 20px;
       }
-      
-      .back-home {
-        top: 0.75rem;
-        left: 0.75rem;
-        padding: 0.4rem 0.6rem;
-        font-size: 0.75rem;
-      }
-    }
-    
-    @media (max-width: 360px) {
-      .auth-form-side {
-        padding: 1.5rem 1rem;
-      }
-      
-      .form-header h2 {
-        font-size: 1.375rem;
-      }
-      
-      .input-wrapper input {
-        padding: 0.75rem 0.75rem 0.75rem 2.25rem;
-        font-size: 0.875rem;
-      }
-      
-      .input-icon {
-        left: 0.75rem;
-        width: 1rem;
-        height: 1rem;
-      }
-      
-      .btn-submit {
-        padding: 0.75rem;
-        font-size: 0.875rem;
+
+      .auth-title h2 {
+        font-size: 1.9rem;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Animated Background -->
-  <div class="auth-bg">
-    <div class="auth-bg-grid"></div>
-    <div class="auth-bg-orb"></div>
-    <div class="auth-bg-orb"></div>
-    <div class="auth-bg-orb"></div>
+
+  <div class="mesh">
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
   </div>
-  
-  <!-- Back to Home -->
-  <a href="../../index.html" class="back-home">
-    <i data-lucide="arrow-left"></i>
-    <span>Back to Home</span>
-  </a>
-  
-  <!-- Main Container -->
-  <div class="auth-container" role="main" aria-label="Sign in to VoteWave">
-    <!-- Left Panel - Visual -->
-    <div class="auth-visual">
-      <div class="visual-overlay"></div>
-      
-      <div class="visual-content">
-        <!-- Logo -->
-        <div class="auth-logo">
-          <div class="auth-logo-icon">
-            <i data-lucide="vote"></i>
-          </div>
-          <div class="auth-logo-text">Vote<span>Wave</span></div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="container">
+
+    <!-- LEFT -->
+    <section class="hero">
+      <div class="brand">
+        <div class="brand-logo">
+          <i data-lucide="vote"></i>
         </div>
-        
-        <!-- Title -->
-        <h1 class="visual-title">Welcome<br>Back!</h1>
-        <p class="visual-subtitle">
-          Sign in to access your dashboard, participate in active elections, and track your voting history.
+        <h2>VoteWave</h2>
+      </div>
+
+      <div class="hero-content">
+        <div class="hero-tag">
+          <i data-lucide="shield-check"></i>
+          Secure Digital Voting Platform
+        </div>
+
+        <h1>
+          Shape the future with
+          <span>transparent elections.</span>
+        </h1>
+
+        <p>
+          Experience modern digital democracy with military-grade security,
+          real-time analytics, and seamless election management tools built
+          for institutions, organizations, and communities.
         </p>
-        
-        <!-- Features -->
-        <div class="visual-features">
-          <div class="visual-feature">
-            <div class="visual-feature-icon">
-              <i data-lucide="shield-check"></i>
+
+        <div class="stats">
+          <div class="stat-card">
+            <h3>12M+</h3>
+            <p>Votes Processed</p>
+          </div>
+
+          <div class="stat-card">
+            <h3>99.99%</h3>
+            <p>System Uptime</p>
+          </div>
+
+          <div class="stat-card">
+            <h3>120+</h3>
+            <p>Countries Served</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT -->
+    <section class="auth-side">
+      <div class="auth-box">
+
+        <div class="topbar">
+          <button class="theme-btn">
+            <i data-lucide="moon-star"></i>
+          </button>
+        </div>
+
+        <div class="auth-title">
+          <h2>Welcome back</h2>
+          <p>
+            Enter your credentials to access your secure VoteWave dashboard.
+          </p>
+        </div>
+
+        <div class="social-login">
+          <button class="social-btn">
+            <i data-lucide="chrome"></i>
+            Google
+          </button>
+
+          <button class="social-btn">
+            <i data-lucide="github"></i>
+            GitHub
+          </button>
+        </div>
+
+        <div class="divider">or continue with email</div>
+
+        <form>
+          <div class="form-group">
+            <div class="label-row">
+              <label>Email Address</label>
             </div>
-            <span>End-to-end encrypted authentication</span>
-          </div>
-          <div class="visual-feature">
-            <div class="visual-feature-icon">
-              <i data-lucide="zap"></i>
+
+            <div class="input-wrap">
+              <i data-lucide="mail"></i>
+              <input type="email" class="input" placeholder="you@example.com">
             </div>
-            <span>Instant access to all elections</span>
           </div>
-          <div class="visual-feature">
-            <div class="visual-feature-icon">
-              <i data-lucide="bell"></i>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label>Password</label>
+              <a href="#" class="forgot">Forgot password?</a>
             </div>
-            <span>Real-time election notifications</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Floating Cards Decoration -->
-      <div class="visual-cards">
-        <div class="floating-mini-card">
-          <div class="mini-card-dots">
-            <span></span><span></span><span></span>
-          </div>
-          <div class="mini-card-bar"></div>
-          <div class="mini-card-bar fill"></div>
-          <div class="mini-card-bar" style="width: 50%;"></div>
-        </div>
-        <div class="floating-mini-card">
-          <div class="mini-card-dots">
-            <span></span><span></span><span></span>
-          </div>
-          <div class="mini-card-bar fill" style="width: 85%;"></div>
-          <div class="mini-card-bar" style="width: 40%;"></div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Right Panel - Form -->
-    <div class="auth-form-side">
-      <div class="form-header">
-        <h2>Sign In</h2>
-        <p>Enter your credentials to access your account</p>
-      </div>
-      
-      <form class="auth-form" id="loginForm" novalidate>
-        <div id="authStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-        <!-- Email -->
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <div class="input-wrapper">
-            <i data-lucide="mail" class="input-icon"></i>
-            <input 
-              type="email" 
-              id="email" 
-              name="email" 
-              placeholder="you@example.com"
-              required
-              autocomplete="email"
-              autofocus
-            >
-          </div>
-          <span class="error-message" id="emailError"></span>
-        </div>
-        
-        <!-- Password -->
-        <div class="form-group">
-          <label for="password">Password</label>
-          <div class="input-wrapper">
-            <i data-lucide="lock" class="input-icon"></i>
-            <input 
-              type="password" 
-              id="password" 
-              name="password" 
-              placeholder="Enter your password"
-              required
-              autocomplete="current-password"
-            >
-            <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
-              <i data-lucide="eye"></i>
-            </button>
-          </div>
-          <span class="error-message" id="passwordError"></span>
-        </div>
-        
-        <!-- Options -->
-        <div class="form-options">
-          <label class="checkbox-wrapper">
-            <input type="checkbox" name="remember" id="remember">
-            <div class="checkbox-custom">
-              <i data-lucide="check"></i>
+
+            <div class="input-wrap">
+              <i data-lucide="lock"></i>
+              <input type="password" class="input" id="password" placeholder="Enter your password">
+
+              <button type="button" class="toggle-pass" id="togglePassword">
+                <i data-lucide="eye"></i>
+              </button>
             </div>
-            <span>Remember me</span>
-          </label>
-          <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <div class="options">
+            <label class="remember">
+              <input type="checkbox">
+              Remember me
+            </label>
+
+            <span>Protected by SSL</span>
+          </div>
+
+          <button class="submit-btn">
+            <i data-lucide="log-in"></i>
+            Sign In Securely
+          </button>
+        </form>
+
+        <div class="signup">
+          Don't have an account?
+          <a href="#">Create account</a>
         </div>
-        
-        <!-- Submit -->
-        <button type="submit" class="btn-submit" id="submitBtn">
-          <span>Sign In</span>
-          <i data-lucide="log-in"></i>
-        </button>
-      </form>
-      
-      <!-- Register Link -->
-      <div class="form-footer" style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
-        <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.75rem;">
-          Don't have an account? <a href="register.html" style="color: #6366f1; font-weight: 600; text-decoration: none;">Create one free</a>
-        </p>
-        <p style="color: #94a3b8; font-size: 0.875rem;">
-          <a href="forgot-password.html" style="color: #94a3b8; text-decoration: none; font-size: 0.8rem;">Forgot your password?</a>
-        </p>
+
+        <div class="footer-note">
+          By continuing, you agree to VoteWave's Terms of Service
+          and Privacy Policy.
+        </div>
+
       </div>
-      
-      <!-- Divider -->
-      <div class="divider">
-        <span>or</span>
-      </div>
-      
-      <!-- Need to vote link -->
-      <div class="need-to-vote">
-        <a href="../voter/login.html">Need to vote: voter/login</a>
-      </div>
-      
-      <!-- Social Login -->
-      <div class="social-login">
-        <button id="googleLoginBtn" type="button" class="social-btn" aria-label="Sign in with Google">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          Google
-        </button>
-        <button id="githubLoginBtn" type="button" class="social-btn" aria-label="Sign in with GitHub">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 1C5.92 1 1 5.92 1 12c0 4.86 3.15 8.98 7.52 10.43.55.1.75-.24.75-.52v-1.83c-3.06.67-3.7-1.47-3.7-1.47-.5-1.27-1.22-1.6-1.22-1.6-1-.68.08-.66.08-.66 1.1.08 1.68 1.13 1.68 1.13.98 1.68 2.56 1.2 3.19.91.1-.71.38-1.2.7-1.47-2.44-.28-5-1.22-5-5.43 0-1.2.43-2.18 1.13-2.95-.11-.28-.49-1.4.11-2.92 0 0 .92-.3 3.02 1.13a10.5 10.5 0 0 1 5.5 0c2.1-1.43 3.02-1.13 3.02-1.13.6 1.52.22 2.64.11 2.92.7.77 1.13 1.75 1.13 2.95 0 4.22-2.56 5.15-5 5.43.39.34.73.1.73 1.47v2.17c0 .29.2.63.75.52A10.98 10.98 0 0 0 23 12c0-6.08-4.92-11-11-11z"/>
-          </svg>
-          GitHub
-        </button>
-      </div>
-    </div>
+    </section>
   </div>
-  
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
-  
-  <!-- Scripts -->
+
   <script src="../js/main.js"></script>
   <script src="../js/auth.js"></script>
   
@@ -1333,14 +680,60 @@
         lucide.createIcons();
       }
 
-      document.getElementById('googleLoginBtn')?.addEventListener('click', () => {
-        window.location.href = `${API_BASE_URL}/auth/google`;
+      const togglePassword = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('password');
+
+      togglePassword?.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        togglePassword.innerHTML = isPassword
+          ? '<i data-lucide="eye-off"></i>'
+          : '<i data-lucide="eye"></i>';
+        lucide.createIcons();
       });
 
-      document.getElementById('githubLoginBtn')?.addEventListener('click', () => {
-        window.location.href = `${API_BASE_URL}/auth/github`;
-      });
+      // Update signup link to point to register.html
+      const signupLink = document.querySelector('.signup a');
+      if (signupLink) {
+        signupLink.href = 'register.html';
+      }
+
+      // Initialize form
+      const loginForm = document.querySelector('form');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const email = document.querySelector('input[type="email"]').value;
+          const password = passwordInput.value;
+          
+          if (!email || !password) {
+            alert('Please fill in all fields');
+            return;
+          }
+          
+          try {
+            // Use existing auth.js login functionality
+            if (typeof loginUser === 'function') {
+              await loginUser(email, password);
+            } else {
+              // Fallback for demo
+              localStorage.setItem('votewave_user', JSON.stringify({
+                email: email,
+                firstName: 'Demo',
+                lastName: 'User'
+              }));
+              window.location.href = '../voter/dashboard.html';
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed. Please try again.');
+          }
+        });
+      }
     });
   </script>
+
 </body>
 </html>
+
