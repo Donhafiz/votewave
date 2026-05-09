@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 <body class="dashboard-body">
 
@@ -81,9 +82,86 @@
         <button class="create-btn">
           <i data-lucide="plus"></i>
           Create Election
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VoteWave Dashboard</title>
+
+  <!-- Unified CSS (ONLY ONE FILE) -->
+  <link rel="stylesheet" href="admin.css" />
+
+  <!-- Icons (optional but used in layout) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="admin-sidebar">
+
+    <div class="admin-sidebar-header">
+      <div class="admin-logo">VW</div>
+      <a href="#" class="admin-brand">Vote<span>Wave</span></a>
+    </div>
+
+    <nav class="admin-sidebar-nav">
+
+      <a class="admin-nav-item active" href="#">
+        <i class="fa-solid fa-gauge"></i> Dashboard
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-check-to-slot"></i> Elections
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-users"></i> Candidates
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-chart-column"></i> Results
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-user"></i> Users
+      </a>
+
+      <a class="admin-nav-item" href="#">
+        <i class="fa-solid fa-gear"></i> Settings
+      </a>
+
+    </nav>
+
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="admin-main">
+
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+
+      <div class="admin-topbar-left">
+        <h1>Dashboard</h1>
+      </div>
+
+      <div class="admin-topbar-right">
+        <button class="btn btn-secondary">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+
+        <button class="btn btn-primary">
+          New Election
+>>>>>>> 94d15d6591b0c671967b06572da71198fa58e5f1
         </button>
       </div>
+
     </header>
+<<<<<<< HEAD
 
     <!-- Hero Section -->
     <section class="hero-panel glass-panel">
@@ -315,4 +393,136 @@
     </section>
 
   </main>
+=======
+
+    <!-- CONTENT -->
+    <div class="admin-content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div>
+          <h1>Welcome Back</h1>
+          <p>Manage elections, candidates, and results</p>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <section class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Active Elections</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">48</div>
+          <div class="stat-label">Candidates</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">2,340</div>
+          <div class="stat-label">Total Votes</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value">8</div>
+          <div class="stat-label">Completed Elections</div>
+        </div>
+
+      </section>
+
+      <!-- FILTERS -->
+      <div class="filters">
+
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Active</button>
+        <button class="filter-btn">Upcoming</button>
+        <button class="filter-btn">Closed</button>
+
+      </div>
+
+      <!-- ELECTION GRID -->
+      <section class="elections-grid">
+
+        <!-- CARD 1 -->
+        <div class="card election-card">
+
+          <div class="card-image">
+            <i class="fa-solid fa-vote-yea"></i>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Student Council Election</h3>
+            <p class="card-description">
+              Vote for your next student leaders and representatives.
+            </p>
+
+            <div class="card-meta">
+              <span class="badge badge-success">Active</span>
+              <span class="card-date">
+                <i class="fa-regular fa-calendar"></i>
+                May 2026
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="card election-card">
+
+          <div class="card-image">
+            <i class="fa-solid fa-building"></i>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Department Head Vote</h3>
+            <p class="card-description">
+              Internal election for department leadership roles.
+            </p>
+
+            <div class="card-meta">
+              <span class="badge badge-warning">Upcoming</span>
+              <span class="card-date">
+                <i class="fa-regular fa-calendar"></i>
+                June 2026
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="card election-card">
+
+          <div class="card-image">
+            <i class="fa-solid fa-check"></i>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Campus Referendum</h3>
+            <p class="card-description">
+              Voting on campus infrastructure improvements.
+            </p>
+
+            <div class="card-meta">
+              <span class="badge badge-danger">Closed</span>
+              <span class="card-date">
+                <i class="fa-regular fa-calendar"></i>
+                April 2026
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
+
+>>>>>>> 94d15d6591b0c671967b06572da71198fa58e5f1
 </body>
