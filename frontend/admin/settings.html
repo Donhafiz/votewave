@@ -29,7 +29,8 @@
       </nav>
     </aside>
     
-    <main class="admin-main">
+    <main class="admin-main" role="main" aria-label="System settings">
+      <div id="adminStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
       <header class="admin-topbar">
         <div class="admin-topbar-left">
           <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
@@ -111,6 +112,7 @@
   
   <div class="admin-toast-container" id="toastContainer"></div>
   
+  <script src="../js/a11y.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/admin.js"></script>
   <script src="../js/admin-settings.js"></script>
@@ -118,40 +120,41 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      document.getElementById('menuToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('menuToggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar')?.classList.toggle('open');
       });
       loadSettings();
     });
     
     function loadSettings() {
       const settings = JSON.parse(localStorage.getItem('votewave_settings') || '{}');
-      document.getElementById('siteName').value = settings.siteName || 'VoteWave';
-      document.getElementById('timezone').value = settings.timezone || 'Africa/Accra';
-      document.getElementById('registrationEnabled').checked = settings.registrationEnabled !== false;
-      document.getElementById('emailVerification').checked = settings.emailVerification !== false;
-      document.getElementById('maintenanceMode').checked = settings.maintenanceMode || false;
-      document.getElementById('sessionTimeout').value = settings.sessionTimeout || 24;
-      document.getElementById('passwordMinLength').value = settings.passwordMinLength || 6;
-      document.getElementById('twoFactorAuth').checked = settings.twoFactorAuth || false;
-      document.getElementById('auditLogging').checked = settings.auditLogging !== false;
+      document.getElementById('siteName')?.value = settings.siteName || 'VoteWave';
+      document.getElementById('timezone')?.value = settings.timezone || 'Africa/Accra';
+      document.getElementById('registrationEnabled') ? document.getElementById('registrationEnabled').checked = (settings.registrationEnabled !== false) : null;
+      document.getElementById('emailVerification') ? document.getElementById('emailVerification').checked = (settings.emailVerification !== false) : null;
+      document.getElementById('maintenanceMode') ? document.getElementById('maintenanceMode').checked = (settings.maintenanceMode || false) : null;
+      document.getElementById('sessionTimeout') ? document.getElementById('sessionTimeout').value = settings.sessionTimeout || 24 : null;
+      document.getElementById('passwordMinLength') ? document.getElementById('passwordMinLength').value = settings.passwordMinLength || 6 : null;
+      document.getElementById('twoFactorAuth') ? document.getElementById('twoFactorAuth').checked = (settings.twoFactorAuth || false) : null;
+      document.getElementById('auditLogging') ? document.getElementById('auditLogging').checked = (settings.auditLogging !== false) : null;
     }
     
     function saveSettings() {
       const settings = {
-        siteName: document.getElementById('siteName').value,
-        timezone: document.getElementById('timezone').value,
-        registrationEnabled: document.getElementById('registrationEnabled').checked,
-        emailVerification: document.getElementById('emailVerification').checked,
-        maintenanceMode: document.getElementById('maintenanceMode').checked,
-        sessionTimeout: parseInt(document.getElementById('sessionTimeout').value),
-        passwordMinLength: parseInt(document.getElementById('passwordMinLength').value),
-        twoFactorAuth: document.getElementById('twoFactorAuth').checked,
-        auditLogging: document.getElementById('auditLogging').checked,
+        siteName: document.getElementById('siteName')?.value || 'VoteWave',
+        timezone: document.getElementById('timezone')?.value || 'Africa/Accra',
+        registrationEnabled: document.getElementById('registrationEnabled')?.checked || false,
+        emailVerification: document.getElementById('emailVerification')?.checked || false,
+        maintenanceMode: document.getElementById('maintenanceMode')?.checked || false,
+        sessionTimeout: parseInt(document.getElementById('sessionTimeout')?.value || '24'),
+        passwordMinLength: parseInt(document.getElementById('passwordMinLength')?.value || '6'),
+        twoFactorAuth: document.getElementById('twoFactorAuth')?.checked || false,
+        auditLogging: document.getElementById('auditLogging')?.checked || false,
       };
       
       localStorage.setItem('votewave_settings', JSON.stringify(settings));
       showAdminToast('Settings saved successfully!', 'success');
+      if (window.announce) window.announce('Settings saved successfully', 'polite');
     }
     
     function resetSettings() {
@@ -159,6 +162,7 @@
       localStorage.removeItem('votewave_settings');
       loadSettings();
       showAdminToast('Settings reset to defaults', 'success');
+      if (window.announce) window.announce('Settings reset to defaults', 'polite');
     }
   </script>
 </body>

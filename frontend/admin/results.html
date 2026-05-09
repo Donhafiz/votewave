@@ -27,7 +27,8 @@
         <a href="settings.html" class="nav-item"><i data-lucide="settings"></i> Settings</a>
       </nav>
     </aside>
-    <main class="admin-main">
+    <main class="admin-main" role="main" aria-label="Election results">
+      <div id="adminStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
       <header class="admin-topbar">
         <div class="topbar-left"><button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button><h2>Results</h2></div>
         <div class="topbar-right">
@@ -36,7 +37,7 @@
       </header>
       <div class="admin-content">
         <div class="filters">
-          <select id="electionSelect" class="filter-select" style="min-width:300px;" onchange="loadResults(this.value)">
+          <select id="electionSelect" aria-label="Select election" class="filter-select" style="min-width:300px;" onchange="loadResults(this.value)">
             <option value="">Select an election...</option>
           </select>
         </div>
@@ -61,32 +62,34 @@
     </main>
   </div>
   <div class="toast-container" id="toastContainer"></div>
+  <script src="../js/a11y.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/admin.js"></script>
   <script>
     let chart;
     document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      document.getElementById('menuToggle')?.addEventListener('click', () => document.getElementById('sidebar')?.classList.toggle('open'));
       loadElectionList();
     });
     function loadElectionList() {
       const elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
       const select = document.getElementById('electionSelect');
-      elections.forEach(e => { const o = document.createElement('option'); o.value = e._id; o.text = e.title; select.appendChild(o); });
+      elections.forEach(e => { const o = document.createElement('option'); o.value = e._id; o.text = e.title; if (select) select.appendChild(o); });
     }
     function loadResults(id) {
       if (!id) return;
-      document.getElementById('resultsStats').style.display = 'grid';
-      document.getElementById('resultsChartCard').style.display = 'block';
-      document.getElementById('resultsTableCard').style.display = 'block';
+      document.getElementById('resultsStats') && (document.getElementById('resultsStats').style.display = 'grid');
+      document.getElementById('resultsChartCard') && (document.getElementById('resultsChartCard').style.display = 'block');
+      document.getElementById('resultsTableCard') && (document.getElementById('resultsTableCard').style.display = 'block');
       const candidates = JSON.parse(localStorage.getItem('votewave_candidates') || '[]').filter(c => c.electionId === id);
       candidates.sort((a,b) => (b.votes||0) - (a.votes||0));
       const totalVotes = candidates.reduce((sum,c) => sum + (c.votes||0), 0);
-      document.getElementById('eligible').textContent = '1,500';
-      document.getElementById('votesCast').textContent = totalVotes;
-      document.getElementById('turnout').textContent = totalVotes ? Math.round((totalVotes/1500)*100) + '%' : '0%';
-      document.getElementById('resultsBody').innerHTML = candidates.map(c => `
+      document.getElementById('eligible') && (document.getElementById('eligible').textContent = '1,500');
+      document.getElementById('votesCast') && (document.getElementById('votesCast').textContent = totalVotes);
+      document.getElementById('turnout') && (document.getElementById('turnout').textContent = totalVotes ? Math.round((totalVotes/1500)*100) + '%' : '0%');
+      const resultsBody = document.getElementById('resultsBody');
+      if (resultsBody) resultsBody.innerHTML = candidates.map(c => `
         <tr><td><strong>${c.firstName} ${c.lastName}</strong></td><td>${c.position||'—'}</td>
         <td>${c.votes||0}</td><td>${totalVotes ? Math.round(((c.votes||0)/totalVotes)*100) : 0}%</td></tr>`).join('');
       if (chart) chart.destroy();
@@ -99,6 +102,7 @@
       const csv = rows.map(r=>r.join(',')).join('\n');
       const blob = new Blob([csv],{type:'text/csv'});
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'results.csv'; a.click();
+      if (window.announce) window.announce('Results exported as CSV', 'polite');
     }
   </script>
 </body>

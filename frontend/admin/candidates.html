@@ -41,13 +41,14 @@
     </aside>
 
     <!-- MAIN -->
-    <main class="admin-main">
+    <main class="admin-main" role="main" aria-label="Manage candidates">
+      <div id="adminStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
       <header class="admin-topbar">
         <div class="topbar-left">
           <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
           <div style="display:flex;align-items:center;gap:0.5rem;background:var(--admin-surface);border:1px solid var(--admin-border);border-radius:0.5rem;padding:0.4rem 0.85rem;">
             <i data-lucide="search" style="width:1rem;height:1rem;color:var(--admin-text-muted);"></i>
-            <input type="text" id="tableSearch" placeholder="Search candidates..." style="background:none;border:none;color:var(--admin-text);font-size:0.85rem;font-family:inherit;outline:none;width:200px;">
+            <input type="text" id="tableSearch" aria-label="Search candidates" placeholder="Search candidates..." style="background:none;border:none;color:var(--admin-text);font-size:0.85rem;font-family:inherit;outline:none;width:200px;">
           </div>
         </div>
         <div class="topbar-right">
@@ -66,13 +67,13 @@
 
         <!-- Filters -->
         <div class="filters">
-          <select id="electionFilter" class="filter-select" style="min-width:220px;">
+          <select id="electionFilter" aria-label="Filter by election" class="filter-select" style="min-width:220px;">
             <option value="">All Elections</option>
           </select>
           <button class="filter-btn active" data-status="all">All</button>
           <button class="filter-btn" data-status="approved">Approved</button>
           <button class="filter-btn" data-status="pending">Pending</button>
-          <select id="statusFilter" class="filter-select" style="margin-left:auto;">
+          <select id="statusFilter" aria-label="Filter by status" class="filter-select" style="margin-left:auto;">
             <option value="">All Status</option>
             <option value="approved">Approved</option>
             <option value="pending">Pending</option>
@@ -121,24 +122,26 @@
 
   <div class="toast-container" id="toastContainer"></div>
 
+  <script src="../js/a11y.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/admin.js"></script>
   <script>
     let editingId = null;
     document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
-      document.getElementById('refreshBtn').addEventListener('click', loadCandidates);
-      document.getElementById('addCandidateBtn').addEventListener('click', () => openModal());
-      document.getElementById('saveBtn').addEventListener('click', saveCandidate);
-      document.getElementById('candElection').addEventListener('change', loadPositions);
-      document.getElementById('tableSearch').addEventListener('input', loadCandidates);
-      document.getElementById('electionFilter').addEventListener('change', loadCandidates);
-      document.getElementById('statusFilter').addEventListener('change', loadCandidates);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      document.getElementById('menuToggle')?.addEventListener('click', () => document.getElementById('sidebar')?.classList.toggle('open'));
+      document.getElementById('refreshBtn')?.addEventListener('click', loadCandidates);
+      document.getElementById('addCandidateBtn')?.addEventListener('click', () => openModal());
+      document.getElementById('saveBtn')?.addEventListener('click', saveCandidate);
+      document.getElementById('candElection')?.addEventListener('change', loadPositions);
+      document.getElementById('tableSearch')?.addEventListener('input', loadCandidates);
+      document.getElementById('electionFilter')?.addEventListener('change', loadCandidates);
+      document.getElementById('statusFilter')?.addEventListener('change', loadCandidates);
       document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', function() {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
-        document.getElementById('statusFilter').value = this.dataset.status === 'all' ? '' : this.dataset.status;
+        const statusFilterEl = document.getElementById('statusFilter');
+        if (statusFilterEl) statusFilterEl.value = this.dataset.status === 'all' ? '' : this.dataset.status;
         loadCandidates();
       }));
       loadElectionFilter();
@@ -151,19 +154,22 @@
       const candSelect = document.getElementById('candElection');
       elections.forEach(e => {
         const opt = document.createElement('option'); opt.value = e._id; opt.text = e.title;
-        filter.appendChild(opt.cloneNode(true));
-        candSelect.appendChild(opt);
+        if (filter) filter.appendChild(opt.cloneNode(true));
+        if (candSelect) candSelect.appendChild(opt);
       });
     }
 
     function loadPositions() {
-      const electionId = document.getElementById('candElection').value;
+      const candElectionEl = document.getElementById('candElection');
+      const electionId = candElectionEl ? candElectionEl.value : '';
       const elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
       const election = elections.find(e => e._id === electionId);
       const posSelect = document.getElementById('candPosition');
-      posSelect.innerHTML = '<option value="">Select position</option>';
-      if (election?.positions) {
-        election.positions.forEach(p => posSelect.innerHTML += `<option value="${p}">${p}</option>`);
+      if (posSelect) {
+        posSelect.innerHTML = '<option value="">Select position</option>';
+        if (election?.positions) {
+          election.positions.forEach(p => posSelect.innerHTML += `<option value="${p}">${p}</option>`);
+        }
       }
     }
 
@@ -176,7 +182,8 @@
       if (status) candidates = candidates.filter(c => c.status === status);
       if (search) candidates = candidates.filter(c => (c.firstName + ' ' + c.lastName).toLowerCase().includes(search));
       const tbody = document.getElementById('candidatesTableBody');
-      tbody.innerHTML = candidates.map(c => `
+      if (tbody) {
+        tbody.innerHTML = candidates.map(c => `
         <tr>
           <td><strong>${c.firstName} ${c.lastName}</strong><br><small>${c.email||''}</small></td>
           <td>${c.electionName||'—'}</td>
@@ -190,7 +197,8 @@
             </div>
           </td>
         </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:2rem;">No candidates</td></tr>';
-      lucide.createIcons();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }
     }
 
     function openModal(c = null) {
@@ -227,6 +235,7 @@
       localStorage.setItem('votewave_candidates', JSON.stringify(candidates));
       closeModal();
       showToast(editingId ? 'Updated' : 'Added', 'success');
+      if (window.announce) window.announce(editingId ? 'Candidate updated' : 'Candidate added', 'polite');
       loadCandidates();
     }
 

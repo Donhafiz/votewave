@@ -41,13 +41,14 @@
     </aside>
 
     <!-- MAIN -->
-    <main class="admin-main">
+    <main class="admin-main" role="main" aria-label="Manage users">
+      <div id="adminStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
       <header class="admin-topbar">
         <div class="topbar-left">
           <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
           <div style="display:flex;align-items:center;gap:0.5rem;background:var(--admin-surface);border:1px solid var(--admin-border);border-radius:0.5rem;padding:0.4rem 0.85rem;">
             <i data-lucide="search" style="width:1rem;height:1rem;color:var(--admin-text-muted);"></i>
-            <input type="text" id="tableSearch" placeholder="Search users..." style="background:none;border:none;color:var(--admin-text);font-size:0.85rem;font-family:inherit;outline:none;width:220px;">
+            <input type="text" id="tableSearch" aria-label="Search users" placeholder="Search users..." style="background:none;border:none;color:var(--admin-text);font-size:0.85rem;font-family:inherit;outline:none;width:220px;">
           </div>
         </div>
         <div class="topbar-right">
@@ -62,7 +63,7 @@
             <h1>Users</h1>
             <p class="greeting">Manage voter accounts, admins, and roles.</p>
           </div>
-          <button class="btn btn-primary btn-lg" id="addUserBtn"><i data-lucide="user-plus"></i> Add User</button>
+          <button class="btn btn-primary btn-lg" id="addUserBtn" aria-label="Add user"><i data-lucide="user-plus"></i> Add User</button>
         </div>
 
         <!-- Filters -->
@@ -145,20 +146,20 @@
     let editingUserId = null,
         banningUserId = null;
     document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
-      document.getElementById('refreshBtn').addEventListener('click', loadUsers);
-      document.getElementById('addUserBtn').addEventListener('click', () => openUserModal());
-      document.getElementById('saveBtn').addEventListener('click', saveUser);
-      document.getElementById('confirmBan').addEventListener('click', banUser);
-      document.getElementById('tableSearch').addEventListener('input', loadUsers);
-      document.getElementById('statusFilter').addEventListener('change', loadUsers);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      document.getElementById('menuToggle')?.addEventListener('click', () => document.getElementById('sidebar')?.classList.toggle('open'));
+      document.getElementById('refreshBtn')?.addEventListener('click', loadUsers);
+      document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
+      document.getElementById('saveBtn')?.addEventListener('click', saveUser);
+      document.getElementById('confirmBan')?.addEventListener('click', banUser);
+      document.getElementById('tableSearch')?.addEventListener('input', loadUsers);
+      document.getElementById('statusFilter')?.addEventListener('change', loadUsers);
       document.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', function() {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         loadUsers();
       }));
-      document.getElementById('inviteBtn').addEventListener('click', () => {
+      document.getElementById('inviteBtn')?.addEventListener('click', () => {
         const email = prompt('Enter email to invite:');
         if (email && email.includes('@')) showToast(`Invitation sent to ${email}`, 'success');
       });
@@ -182,7 +183,8 @@
       if (roleFilter !== 'all') filtered = filtered.filter(u => u.role === roleFilter);
       if (status) filtered = filtered.filter(u => u.status === status);
       if (search) filtered = filtered.filter(u => (u.firstName+' '+u.lastName+' '+u.email).toLowerCase().includes(search));
-      document.getElementById('usersTableBody').innerHTML = filtered.map(u => `
+      const usersTable = document.getElementById('usersTableBody');
+      if (usersTable) usersTable.innerHTML = filtered.map(u => `
         <tr class="${u.status==='banned'?'banned':''}">
           <td><strong>${u.firstName} ${u.lastName}</strong><br><small>${u.email}</small></td>
           <td><span class="badge badge-${u.role==='voter'?'draft':u.role==='admin'?'active':'error'}">${u.role}</span></td>
@@ -200,7 +202,7 @@
             </div>
           </td>
         </tr>`).join('');
-      lucide.createIcons();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function openUserModal(user = null) {
@@ -282,6 +284,7 @@
     }
     function showToast(msg, type) {
       const c = document.getElementById('toastContainer');
+      if (!c) return;
       const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg;
       c.appendChild(t);
       setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='0.3s'; setTimeout(()=>t.remove(),300); }, 3500);

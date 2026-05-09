@@ -49,7 +49,8 @@
   </style>
 </head>
 <body>
-  <div class="verify-card">
+  <div class="verify-card" role="main" aria-label="Verify email">
+    <div id="verifyStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div class="verify-icon"><i data-lucide="mail-check"></i></div>
     <h1>Verify Your Email</h1>
     <p>We sent a 6-digit code to<br><strong id="userEmail">your@email.com</strong></p>
@@ -70,7 +71,7 @@
     </form>
     
     <p class="resend">
-      Didn't receive the code? <button type="button" id="resendBtn" style="background:none;border:none;padding:0;color:var(--primary);cursor:pointer;font:inherit;">Resend Code</button>
+      Didn't receive the code? <button type="button" id="resendBtn" aria-label="Resend code" style="background:none;border:none;padding:0;color:var(--primary);cursor:pointer;font:inherit;">Resend Code</button>
     </p>
     
     <a href="register.html" class="back-link"><i data-lucide="arrow-left"></i> Back to Register</a>
@@ -83,6 +84,7 @@
     @keyframes spin { to { transform:rotate(360deg); } }
     @keyframes slideIn { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
   </style>
+  <script src="../js/a11y.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/auth.js"></script>
 </body>

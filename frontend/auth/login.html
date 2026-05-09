@@ -776,7 +776,7 @@
   </a>
   
   <!-- Main Container -->
-  <div class="auth-container">
+  <div class="auth-container" role="main" aria-label="Sign in to VoteWave">
     <!-- Left Panel - Visual -->
     <div class="auth-visual">
       <div class="visual-overlay"></div>
@@ -847,6 +847,7 @@
       </div>
       
       <form class="auth-form" id="loginForm" novalidate>
+        <div id="authStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
         <!-- Email -->
         <div class="form-group">
           <label for="email">Email Address</label>

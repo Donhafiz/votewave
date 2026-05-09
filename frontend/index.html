@@ -3,400 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoteWave — Advanced E-Voting Platform</title>
-  <meta name="description" content="VoteWave — Secure, transparent, and AI-powered e-voting for schools, clubs, and organizations. Enterprise-grade security with real-time analytics.">
-  <meta name="theme-color" content="#6366f1">
+  <title>VoteWave — The Future of Digital Democracy</title>
+  <meta name="description" content="VoteWave — A uniquely designed, secure e-voting platform with live analytics, AI assistance, and enterprise-grade security.">
+  <meta name="theme-color" content="#ff6b6b">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/landing.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/landing.css">
 
   <style>
-    /* ========================================
-       VOTEWAVE — ADVANCED PREMIUM DESIGN SYSTEM
-       ======================================== */
-    
     :root {
-      --bg-deep: #020617;
-      --bg-primary: #0f172a;
-      --bg-card: rgba(15, 23, 42, 0.7);
-      --glass-bg: rgba(255, 255, 255, 0.02);
-      --glass-border: rgba(255, 255, 255, 0.06);
-      --glass-hover: rgba(255, 255, 255, 0.04);
-      
-      --brand-indigo: #6366f1;
-      --brand-violet: #8b5cf6;
-      --brand-purple: #a855f7;
-      --brand-cyan: #06b6d4;
-      --brand-teal: #14b8a6;
-      --brand-emerald: #10b981;
-      --brand-amber: #f59e0b;
-      --brand-rose: #f43f5e;
-      
-      --text-primary: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      
-      --shadow-glow-indigo: 0 0 40px rgba(99, 102, 241, 0.3);
-      --shadow-glow-violet: 0 0 40px rgba(139, 92, 246, 0.3);
-      --shadow-card: 0 25px 80px rgba(0, 0, 0, 0.5);
-      --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.3);
-      
-      --radius-sm: 0.5rem;
-      --radius-md: 0.75rem;
-      --radius-lg: 1rem;
-      --radius-xl: 1.25rem;
-      --radius-2xl: 1.5rem;
-      --radius-full: 9999px;
-      
-      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+      --bg-deep: #0a0a14; --bg-primary: #12122a;
+      --bg-card: rgba(18, 18, 42, 0.75); --glass-bg: rgba(255,255,255,0.015);
+      --glass-border: rgba(255,255,255,0.05); --glass-hover: rgba(255,255,255,0.03);
+      --coral: #ff6b6b; --coral-glow: rgba(255,107,107,0.3);
+      --tangerine: #ffa726; --tangerine-glow: rgba(255,167,38,0.3);
+      --mint: #2ed573; --mint-glow: rgba(46,213,115,0.3);
+      --ocean: #4834d4; --twilight: #6c5ce7; --rose: #ff6b9d; --cyan: #00d2d3;
+      --text-primary: #f0f0f5; --text-secondary: #c5c5d2;
+      --text-muted: #8888a0; --text-dim: #666680;
+      --shadow-coral: 0 8px 40px rgba(255,107,107,0.25);
+      --shadow-card: 0 20px 60px rgba(0,0,0,0.4);
+      --radius-sm: 0.5rem; --radius-md: 0.75rem; --radius-lg: 1rem;
+      --radius-xl: 1.25rem; --radius-2xl: 1.5rem; --radius-full: 9999px;
+      --transition-fast: 180ms ease; --transition-smooth: 350ms ease; --transition-spring: 600ms cubic-bezier(0.34,1.56,0.64,1);
     }
     
     [data-theme="light"] {
-      --bg-deep: #f8fafc;
-      --bg-primary: #ffffff;
-      --bg-card: rgba(255, 255, 255, 0.8);
-      --glass-bg: rgba(0, 0, 0, 0.02);
-      --glass-border: rgba(0, 0, 0, 0.06);
-      --glass-hover: rgba(0, 0, 0, 0.03);
-      --text-primary: #0f172a;
-      --text-secondary: #334155;
-      --text-muted: #64748b;
-      --text-dim: #94a3b8;
-      --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
+      --bg-deep: #fafaff; --bg-primary: #ffffff;
+      --bg-card: rgba(255,255,255,0.85); --glass-bg: rgba(0,0,0,0.015);
+      --glass-border: rgba(0,0,0,0.06); --text-primary: #12122a;
+      --text-secondary: #44445a; --text-muted: #777790; --text-dim: #9999b0;
+      --shadow-card: 0 4px 20px rgba(0,0,0,0.06);
     }
     
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-    
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-deep);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      line-height: 1.7;
-      transition: background 0.4s ease, color 0.4s ease;
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--bg-deep); color:var(--text-primary); overflow-x:hidden; line-height:1.7;
+      transition:background 0.5s,color 0.5s;
     }
+    ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#2a2a45; border-radius:3px; }
+    ::selection { background:rgba(255,107,107,0.25); color:white; }
+    .container { width:100%; max-width:1280px; margin:0 auto; padding:0 1.5rem; }
     
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-    ::selection { background: rgba(99, 102, 241, 0.3); color: white; }
+    /* Aurora BG */
+    .aurora-bg { position:fixed; inset:0; z-index:-2; pointer-events:none; }
+    .aurora-layer { position:absolute; border-radius:50%; filter:blur(150px); opacity:0.08; animation:auroraShift 20s ease-in-out infinite; }
+    .aurora-layer:nth-child(1) { width:800px; height:800px; background:var(--coral); top:-300px; left:-200px; }
+    .aurora-layer:nth-child(2) { width:600px; height:600px; background:var(--twilight); top:30%; right:-200px; animation-delay:-5s; }
+    .aurora-layer:nth-child(3) { width:500px; height:500px; background:var(--cyan); bottom:-200px; left:30%; animation-delay:-10s; }
+    .aurora-layer:nth-child(4) { width:400px; height:400px; background:var(--tangerine); top:50%; left:-100px; animation-delay:-15s; }
+    @keyframes auroraShift { 0%,100%{transform:translate(0,0) scale(1) rotate(0deg)} 25%{transform:translate(100px,-50px) scale(1.2) rotate(5deg)} 50%{transform:translate(-50px,80px) scale(0.85) rotate(-3deg)} 75%{transform:translate(-80px,-60px) scale(1.1) rotate(2deg)} }
     
-    .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+    /* NAV */
+    .navbar { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(10,10,20,0.82); backdrop-filter:blur(20px); border-bottom:1px solid var(--glass-border); }
+    .nav-inner { max-width:1280px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:4.25rem; padding:0 1.5rem; }
+    .nav-logo { display:flex; align-items:center; gap:0.65rem; font-size:1.3rem; font-weight:800; color:var(--text-primary); text-decoration:none; }
+    .logo-icon { width:2.5rem; height:2.5rem; background:linear-gradient(135deg,var(--coral),var(--tangerine)); border-radius:0.75rem; display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:1.1rem; box-shadow:var(--shadow-coral); animation:logoGlow 3s ease-in-out infinite; }
+    @keyframes logoGlow { 0%,100%{box-shadow:0 0 25px var(--coral-glow)} 50%{box-shadow:0 0 45px rgba(255,107,107,0.5)} }
+    .logo-highlight { background:linear-gradient(135deg,var(--coral),var(--tangerine),var(--rose)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .nav-links { display:flex; align-items:center; gap:1.75rem; list-style:none; }
+    .nav-link { font-size:0.875rem; font-weight:500; color:var(--text-muted); text-decoration:none; transition:color var(--transition-fast); position:relative; }
+    .nav-link::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--coral); transition:width var(--transition-smooth); }
+    .nav-link:hover::after,.nav-link.active::after { width:100%; }
+    .nav-link:hover,.nav-link.active { color:var(--text-primary); }
+    .nav-actions { display:flex; align-items:center; gap:0.75rem; }
     
-    /* ========================================
-       NAVIGATION
-       ======================================== */
-    .navbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--glass-border); transition: all 0.3s;
-    }
-    .nav-inner {
-      max-width: 1280px; margin: 0 auto; display: flex;
-      align-items: center; justify-content: space-between; height: 4.5rem; padding: 0 1.5rem;
-    }
-    .nav-logo {
-      display: flex; align-items: center; gap: 0.75rem;
-      font-size: 1.3rem; font-weight: 800; color: var(--text-primary); text-decoration: none;
-    }
-    .logo-icon {
-      width: 2.5rem; height: 2.5rem;
-      background: linear-gradient(135deg, var(--brand-indigo), var(--brand-violet));
-      border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;
-      color: white; box-shadow: var(--shadow-glow-indigo);
-    }
-    .logo-highlight {
-      background: linear-gradient(135deg, #818cf8, #c084fc);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .nav-links { display: flex; align-items: center; gap: 1.5rem; list-style: none; }
-    .nav-link {
-      font-size: 0.9rem; font-weight: 500; color: var(--text-muted);
-      text-decoration: none; transition: color var(--transition-fast);
-    }
-    .nav-link:hover, .nav-link.active { color: var(--text-primary); }
-    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    /* LIVE CLOCK */
+    .live-clock { font-family:'JetBrains Mono',monospace; font-size:0.85rem; font-weight:600; color:var(--cyan); padding:0.35rem 0.85rem; background:rgba(0,210,211,0.06); border:1px solid rgba(0,210,211,0.15); border-radius:var(--radius-full); display:flex; align-items:center; gap:0.4rem; white-space:nowrap; }
     
-    .btn {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.6rem 1.35rem; font-size: 0.875rem; font-weight: 600;
-      font-family: inherit; border: none; border-radius: var(--radius-md);
-      cursor: pointer; transition: all var(--transition-smooth); text-decoration: none; white-space: nowrap;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--brand-indigo), var(--brand-violet));
-      color: white; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45); color: white; }
-    .btn-ghost { background: transparent; color: var(--text-muted); }
-    .btn-ghost:hover { background: var(--glass-hover); color: var(--text-primary); }
-    .btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.15); color: var(--text-primary); }
-    .btn-outline:hover { background: var(--glass-hover); border-color: rgba(99,102,241,0.4); }
-    .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; }
-    .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
+    /* BUTTONS */
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.6rem 1.35rem; font-size:0.875rem; font-weight:600; font-family:inherit; border:none; border-radius:var(--radius-md); cursor:pointer; transition:all var(--transition-spring); text-decoration:none; white-space:nowrap; }
+    .btn-primary { background:linear-gradient(135deg,var(--coral),var(--tangerine)); color:white; box-shadow:0 6px 25px var(--coral-glow); }
+    .btn-primary:hover { transform:translateY(-3px) scale(1.02); box-shadow:0 12px 35px rgba(255,107,107,0.45); color:white; }
+    .btn-ghost { background:transparent; color:var(--text-muted); } .btn-ghost:hover { background:var(--glass-hover); color:var(--text-primary); }
+    .btn-outline { background:transparent; border:1.5px solid rgba(255,255,255,0.12); color:var(--text-primary); } .btn-outline:hover { border-color:var(--coral); background:rgba(255,107,107,0.04); }
+    .btn-lg { padding:0.85rem 2rem; font-size:1rem; } .btn-sm { padding:0.4rem 1rem; font-size:0.8rem; } .btn-full { width:100%; justify-content:center; }
+    .theme-toggle { background:none; border:none; color:var(--text-muted); cursor:pointer; padding:0.5rem; border-radius:var(--radius-sm); font-size:1.1rem; transition:all var(--transition-fast); } .theme-toggle:hover { color:var(--text-primary); background:var(--glass-hover); }
     
-    .theme-toggle {
-      background: none; border: none; color: var(--text-muted); cursor: pointer;
-      padding: 0.5rem; border-radius: var(--radius-sm); transition: all var(--transition-fast);
-    }
-    .theme-toggle:hover { color: var(--text-primary); background: var(--glass-hover); }
-    
-    /* ========================================
-       HERO SECTION
-       ======================================== */
-    .hero {
-      min-height: 100vh; display: flex; align-items: center;
-      padding-top: 5rem; position: relative; overflow: hidden;
-      background: linear-gradient(160deg, #020617 0%, #0f172a 30%, #1e1b4b 60%, #0f172a 100%);
-    }
-    .hero-bg-orbs { position: absolute; inset: 0; pointer-events: none; }
-    .hero-orb {
-      position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12;
-      animation: orbFloat 18s ease-in-out infinite;
-    }
-    .hero-orb:nth-child(1) { width: 700px; height: 700px; background: var(--brand-indigo); top: -300px; right: -200px; }
-    .hero-orb:nth-child(2) { width: 500px; height: 500px; background: var(--brand-violet); bottom: -200px; left: -150px; animation-delay: -6s; }
-    .hero-orb:nth-child(3) { width: 400px; height: 400px; background: var(--brand-cyan); top: 50%; right: 20%; animation-delay: -12s; }
-    @keyframes orbFloat {
-      0%,100% { transform: translate(0,0) scale(1); }
-      25% { transform: translate(80px,-60px) scale(1.1); }
-      50% { transform: translate(-40px,100px) scale(0.9); }
-      75% { transform: translate(-100px,-40px) scale(1.05); }
-    }
-    
-    .hero .container {
-      position: relative; z-index: 2; display: grid;
-      grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
-    }
-    .hero-content { max-width: 600px; }
-    
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.45rem 1.25rem; background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.2); border-radius: var(--radius-full);
-      font-size: 0.85rem; font-weight: 600; color: var(--brand-indigo); margin-bottom: 2rem;
-    }
-    .live-dot {
-      width: 8px; height: 8px; background: var(--brand-emerald);
-      border-radius: 50%; animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-    
-    .hero-title {
-      font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 900;
-      line-height: 1.08; letter-spacing: -0.04em; margin-bottom: 1.5rem; color: white;
-    }
-    .hero-title .gradient {
-      background: linear-gradient(135deg, #818cf8, #c084fc, #22d3ee);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .hero-subtitle {
-      font-size: 1.15rem; color: var(--text-muted); line-height: 1.7;
-      margin-bottom: 2.5rem; max-width: 500px;
-    }
-    
-    .hero-actions { display: flex; gap: 1rem; margin-bottom: 3rem; flex-wrap: wrap; }
-    
-    .hero-stats {
-      display: flex; gap: 2.5rem; padding-top: 2rem;
-      border-top: 1px solid var(--glass-border);
-    }
-    .hero-stat-value { font-size: 1.8rem; font-weight: 800; color: white; }
-    .hero-stat-label { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+    /* HERO */
+    .hero { min-height:100vh; display:flex; align-items:center; padding-top:5rem; position:relative; overflow:hidden; }
+    .hero .container { position:relative; z-index:2; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+    .hero-content { max-width:580px; }
+    .hero-badge { display:inline-flex; align-items:center; gap:0.6rem; padding:0.45rem 1.25rem; background:rgba(46,213,115,0.08); border:1px solid rgba(46,213,115,0.2); border-radius:var(--radius-full); font-size:0.8rem; font-weight:600; color:var(--mint); margin-bottom:2rem; }
+    .live-dot { width:8px; height:8px; background:var(--mint); border-radius:50%; animation:pulse 2s ease-in-out infinite; box-shadow:0 0 12px var(--mint-glow); }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.6)} }
+    .hero-title { font-size:clamp(2.5rem,5vw,4.5rem); font-weight:900; line-height:1.06; letter-spacing:-0.04em; margin-bottom:1.5rem; color:white; }
+    .gradient-text { background:linear-gradient(135deg,var(--coral),var(--tangerine),var(--rose)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:inline; }
+    .hero-subtitle { font-size:1.1rem; color:var(--text-muted); line-height:1.7; margin-bottom:2.5rem; max-width:480px; }
+    .hero-actions { display:flex; gap:1rem; margin-bottom:3rem; flex-wrap:wrap; }
+    .hero-stats { display:flex; gap:2.5rem; padding-top:2rem; border-top:1px solid var(--glass-border); }
+    .hero-stat-value { font-size:1.8rem; font-weight:800; background:linear-gradient(135deg,var(--coral),var(--tangerine)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-stat-label { font-size:0.78rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; }
     
     /* Hero Mockup */
-    .hero-mockup {
-      background: var(--bg-card); backdrop-filter: blur(40px);
-      border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
-      padding: 1.5rem; box-shadow: var(--shadow-card);
-      animation: float 6s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-    .mockup-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
-    }
-    .mockup-dots { display: flex; gap: 6px; }
-    .mockup-dots span { width: 10px; height: 10px; border-radius: 50%; background: #475569; }
-    .mockup-badge {
-      padding: 0.2rem 0.75rem; background: rgba(16, 185, 129, 0.1);
-      color: var(--brand-emerald); border-radius: var(--radius-full);
-      font-size: 0.7rem; font-weight: 700;
-    }
-    .mockup-stats {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem;
-    }
-    .mockup-stat {
-      background: rgba(255,255,255,0.03); border-radius: var(--radius-md);
-      padding: 0.75rem; text-align: center;
-    }
-    .mockup-stat-val { font-size: 1.25rem; font-weight: 800; color: white; }
-    .mockup-stat-lbl { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
-    .mockup-chart { margin-bottom: 1rem; }
-    .mockup-bars { display: flex; flex-direction: column; gap: 0.5rem; }
-    .mockup-bar-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; color: var(--text-muted); }
-    .mockup-bar {
-      flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;
-    }
-    .mockup-bar-fill {
-      height: 100%; border-radius: 4px; transition: width 1s ease;
-    }
+    .hero-mockup { background:var(--bg-card); backdrop-filter:blur(40px); border:1px solid var(--glass-border); border-radius:var(--radius-2xl); padding:1.75rem; box-shadow:var(--shadow-card); animation:float 6s ease-in-out infinite; position:relative; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
+    .mockup-glow { position:absolute; inset:-2px; border-radius:var(--radius-2xl); background:linear-gradient(135deg,var(--coral),var(--twilight),var(--cyan)); z-index:-1; opacity:0.3; filter:blur(20px); }
+    .mockup-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+    .mockup-dots { display:flex; gap:6px; } .mockup-dots span { width:10px; height:10px; border-radius:50%; }
+    .mockup-dots span:nth-child(1){background:var(--coral)} .mockup-dots span:nth-child(2){background:var(--tangerine)} .mockup-dots span:nth-child(3){background:var(--mint)}
+    .mockup-badge { padding:0.25rem 0.85rem; background:rgba(46,213,115,0.08); color:var(--mint); border-radius:var(--radius-full); font-size:0.7rem; font-weight:700; display:flex; align-items:center; gap:0.35rem; }
+    .mockup-badge::before { content:''; width:6px; height:6px; background:var(--mint); border-radius:50%; animation:pulse 2s infinite; }
+    .mockup-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:1rem; }
+    .mockup-stat { background:rgba(255,255,255,0.02); border-radius:var(--radius-md); padding:0.85rem; text-align:center; }
+    .mockup-stat-val { font-size:1.2rem; font-weight:800; color:white; } .mockup-stat-lbl { font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; }
+    .mockup-chart { margin-bottom:1rem; }
+    .mockup-bars { display:flex; flex-direction:column; gap:0.5rem; }
+    .mockup-bar-row { display:flex; align-items:center; gap:0.75rem; font-size:0.78rem; color:var(--text-muted); }
+    .mockup-bar { flex:1; height:8px; background:rgba(255,255,255,0.04); border-radius:4px; overflow:hidden; }
+    .mockup-bar-fill { height:100%; border-radius:4px; }
     
-    /* ========================================
-       SECTIONS
-       ======================================== */
-    section { padding: 6rem 0; }
+    /* SECTIONS */
+    section { padding:6rem 0; }
+    .section-header { text-align:center; margin-bottom:4rem; }
+    .section-badge { display:inline-block; padding:0.35rem 1.25rem; background:rgba(255,107,107,0.06); border:1px solid rgba(255,107,107,0.15); border-radius:var(--radius-full); font-size:0.8rem; font-weight:600; color:var(--coral); margin-bottom:1.25rem; }
+    .section-title { font-size:clamp(2rem,4vw,3.5rem); font-weight:800; margin-bottom:1rem; letter-spacing:-0.03em; }
+    .section-subtitle { font-size:1.1rem; color:var(--text-muted); max-width:600px; margin:0 auto; }
     
-    .section-header { text-align: center; margin-bottom: 4rem; }
-    .section-badge {
-      display: inline-block; padding: 0.35rem 1.25rem;
-      background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600;
-      color: var(--brand-indigo); margin-bottom: 1.25rem;
-    }
-    .section-title {
-      font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800;
-      margin-bottom: 1rem; letter-spacing: -0.03em;
-    }
-    .section-subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+    /* FEATURES */
+    .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:1.75rem; }
+    .feature-card { background:var(--bg-card); backdrop-filter:blur(20px); border:1px solid var(--glass-border); border-radius:var(--radius-xl); padding:2.25rem; transition:all var(--transition-spring); position:relative; overflow:hidden; cursor:pointer; }
+    .feature-card::before { content:''; position:absolute; top:-50%; right:-50%; width:150px; height:150px; background:radial-gradient(circle,var(--coral-glow),transparent); opacity:0; transition:opacity 0.5s; }
+    .feature-card:hover::before { opacity:1; }
+    .feature-card:hover { transform:translateY(-8px) scale(1.02); border-color:rgba(255,107,107,0.25); box-shadow:0 12px 40px rgba(0,0,0,0.3); }
+    .feature-icon { width:3.25rem; height:3.25rem; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; margin-bottom:1.5rem; }
+    .feature-icon svg { width:1.4rem; height:1.4rem; color:white; }
+    .feature-icon.coral { background:linear-gradient(135deg,#ff6b6b,#ff8787); }
+    .feature-icon.tangerine { background:linear-gradient(135deg,#ffa726,#ff9800); }
+    .feature-icon.mint { background:linear-gradient(135deg,#2ed573,#7bed9f); }
+    .feature-icon.ocean { background:linear-gradient(135deg,#4834d4,#6c5ce7); }
+    .feature-icon.rose { background:linear-gradient(135deg,#ff6b9d,#ff85b3); }
+    .feature-icon.cyan { background:linear-gradient(135deg,#00d2d3,#00bcd4); }
+    .feature-card h3 { font-size:1.15rem; margin-bottom:0.65rem; font-weight:700; }
+    .feature-card p { font-size:0.88rem; color:var(--text-muted); line-height:1.6; }
+    .feature-list { list-style:none; margin-top:1rem; }
+    .feature-list li { display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.4rem; }
+    .feature-list li svg { width:1rem; height:1rem; color:var(--mint); flex-shrink:0; }
     
-    /* Features Grid */
-    .features-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.75rem;
-    }
-    .feature-card {
-      background: var(--bg-card); backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
-      padding: 2.25rem; transition: all var(--transition-smooth);
-      position: relative; overflow: hidden; cursor: pointer;
-    }
-    .feature-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--brand-indigo), transparent);
-      opacity: 0; transition: opacity 0.4s;
-    }
-    .feature-card:hover { transform: translateY(-6px); border-color: rgba(99,102,241,0.3); box-shadow: var(--shadow-elevated); }
-    .feature-card:hover::before { opacity: 1; }
-    .feature-icon {
-      width: 3.5rem; height: 3.5rem; border-radius: var(--radius-md);
-      display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
-    }
-    .feature-icon svg { width: 1.5rem; height: 1.5rem; color: white; }
-    .feature-icon.indigo { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
-    .feature-icon.cyan { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
-    .feature-icon.emerald { background: linear-gradient(135deg, #10b981, #06b6d4); }
-    .feature-icon.amber { background: linear-gradient(135deg, #f59e0b, #f97316); }
-    .feature-icon.rose { background: linear-gradient(135deg, #f43f5e, #ec4899); }
-    .feature-icon.purple { background: linear-gradient(135deg, #a855f7, #8b5cf6); }
-    .feature-card h3 { font-size: 1.2rem; margin-bottom: 0.75rem; font-weight: 700; }
-    .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+    /* WHY CHOOSE US */
+    .why-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:2rem; text-align:center; }
+    .why-card { background:var(--bg-card); backdrop-filter:blur(20px); border:1px solid var(--glass-border); border-radius:var(--radius-xl); padding:2.5rem 2rem; transition:all var(--transition-spring); }
+    .why-card:hover { transform:translateY(-6px); border-color:rgba(255,107,107,0.25); }
+    .why-icon { font-size:3rem; margin-bottom:1rem; }
+    .why-card h3 { font-size:1.1rem; margin-bottom:0.5rem; font-weight:700; }
+    .why-card p { font-size:0.9rem; color:var(--text-muted); line-height:1.6; }
     
-    /* Trust Bar */
-    .trust-section { padding: 2rem 0; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
-    .trust-marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent); }
-    .trust-track { display: flex; gap: 4rem; animation: scroll 25s linear infinite; width: max-content; }
-    @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    .trust-item { font-size: 1.1rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    /* PRICING */
+    .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.75rem; align-items:start; }
+    .pricing-card { background:var(--bg-card); backdrop-filter:blur(20px); border:1px solid var(--glass-border); border-radius:var(--radius-xl); padding:2.5rem; transition:all var(--transition-spring); position:relative; }
+    .pricing-card.popular { border-color:rgba(255,107,107,0.3); transform:scale(1.03); }
+    .popular-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); padding:0.3rem 1.25rem; background:linear-gradient(135deg,var(--coral),var(--tangerine)); border-radius:var(--radius-full); font-size:0.75rem; font-weight:700; color:white; }
+    .pricing-price { font-size:3rem; font-weight:900; margin:1rem 0; } .pricing-price span { font-size:1rem; font-weight:400; color:var(--text-muted); }
+    .pricing-features { list-style:none; margin-bottom:2rem; }
+    .pricing-features li { display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0; font-size:0.9rem; color:var(--text-secondary); }
+    .pricing-features li svg { width:1rem; height:1rem; color:var(--mint); flex-shrink:0; }
     
-    /* Pricing */
-    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.75rem; align-items: start; }
-    .pricing-card {
-      background: var(--bg-card); backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
-      padding: 2.5rem; transition: all var(--transition-smooth); position: relative;
-    }
-    .pricing-card.popular { border-color: rgba(99,102,241,0.3); transform: scale(1.03); }
-    .popular-badge {
-      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-      padding: 0.3rem 1.25rem; background: linear-gradient(135deg, var(--brand-indigo), var(--brand-violet));
-      border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; color: white;
-    }
-    .pricing-price { font-size: 3rem; font-weight: 900; margin: 1rem 0; }
-    .pricing-price span { font-size: 1rem; font-weight: 400; color: var(--text-muted); }
-    .pricing-features { list-style: none; margin-bottom: 2rem; }
-    .pricing-features li {
-      display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;
-      font-size: 0.9rem; color: var(--text-secondary);
-    }
-    .pricing-features li svg { width: 1rem; height: 1rem; color: var(--brand-emerald); }
+    /* TESTIMONIALS */
+    .testimonials-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.75rem; }
+    .testimonial-card { background:var(--bg-card); backdrop-filter:blur(20px); border:1px solid var(--glass-border); border-radius:var(--radius-xl); padding:2rem; transition:all var(--transition-spring); }
+    .testimonial-card:hover { border-color:rgba(255,107,107,0.25); }
+    .testimonial-stars { font-size:1.2rem; margin-bottom:1rem; letter-spacing:0.1em; }
+    .testimonial-text { font-size:0.95rem; font-style:italic; color:var(--text-secondary); margin-bottom:1.5rem; line-height:1.7; }
+    .testimonial-author { display:flex; align-items:center; gap:0.75rem; }
+    .author-avatar { width:2.75rem; height:2.75rem; border-radius:0.75rem; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:white; }
+    .author-name { font-size:0.9rem; font-weight:600; } .author-role { font-size:0.78rem; color:var(--text-dim); }
     
     /* CTA */
-    .cta-section { text-align: center; }
-    .cta-card {
-      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.04));
-      border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius-2xl);
-      padding: 4rem 2rem; position: relative; overflow: hidden;
-    }
-    .cta-glow {
-      position: absolute; inset: 0;
-      background: radial-gradient(circle at center, rgba(99,102,241,0.1), transparent 70%);
-      animation: spin 20s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .cta-card { background:linear-gradient(135deg,rgba(255,107,107,0.06),rgba(108,92,231,0.04)); border:1px solid rgba(255,107,107,0.15); border-radius:var(--radius-2xl); padding:4rem 2rem; text-align:center; position:relative; overflow:hidden; }
+    .cta-glow { position:absolute; inset:0; background:radial-gradient(circle at center,rgba(255,107,107,0.08),transparent 70%); animation:spin 20s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
     
-    /* Footer */
-    .footer {
-      background: rgba(0,0,0,0.3); border-top: 1px solid var(--glass-border); padding: 4rem 0 2rem;
-    }
-    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; }
-    .footer h5 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; color: var(--text-primary); }
-    .footer a { display: block; font-size: 0.85rem; color: var(--text-muted); text-decoration: none; margin-bottom: 0.5rem; transition: color var(--transition-fast); }
-    .footer a:hover { color: var(--brand-indigo); }
-    .footer-social { display: flex; gap: 0.75rem; margin-top: 1rem; }
-    .footer-social a {
-      width: 2.5rem; height: 2.5rem; background: var(--glass-bg); border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center; color: var(--text-muted);
-      transition: all var(--transition-fast);
-    }
-    .footer-social a:hover { background: rgba(99,102,241,0.1); color: var(--brand-indigo); transform: translateY(-3px); }
-    .footer-bottom { text-align: center; padding-top: 2rem; margin-top: 2rem; border-top: 1px solid var(--glass-border); font-size: 0.85rem; color: var(--text-dim); }
+    /* FOOTER */
+    .footer { background:rgba(0,0,0,0.25); border-top:1px solid var(--glass-border); padding:4rem 0 2rem; }
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; }
+    .footer h5 { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem; color:var(--text-primary); }
+    .footer a { display:block; font-size:0.85rem; color:var(--text-muted); text-decoration:none; margin-bottom:0.5rem; transition:color var(--transition-fast); }
+    .footer a:hover { color:var(--coral); }
+    .footer-social { display:flex; gap:0.75rem; margin-top:1rem; }
+    .footer-social a { width:2.5rem; height:2.5rem; background:var(--glass-bg); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:1.1rem; transition:all var(--transition-fast); text-decoration:none; }
+    .footer-social a:hover { background:rgba(255,107,107,0.1); color:var(--coral); transform:translateY(-3px); }
+    .footer-bottom { text-align:center; padding-top:2rem; margin-top:2rem; border-top:1px solid var(--glass-border); font-size:0.85rem; color:var(--text-dim); }
     
-    /* ========================================
-       RESPONSIVE
-       ======================================== */
-    @media (max-width: 1024px) {
-      .hero .container { grid-template-columns: 1fr; text-align: center; }
-      .hero-content { max-width: 100%; margin: 0 auto; }
-      .hero-stats, .hero-actions { justify-content: center; }
-      .hero-mockup { display: none; }
-      .footer-grid { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .footer-grid { grid-template-columns: 1fr; }
-      .pricing-card.popular { transform: scale(1); }
-    }
+    /* CHAT */
+    .chat-fab { position:fixed; bottom:1.5rem; right:1.5rem; z-index:200; width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--coral),var(--tangerine)); border:none; color:white; cursor:pointer; box-shadow:0 8px 30px var(--coral-glow); font-size:1.5rem; transition:all 0.3s; display:flex; align-items:center; justify-content:center; }
+    .chat-fab:hover { transform:scale(1.1); }
+    .chat-window { display:none; position:fixed; bottom:80px; right:1.5rem; z-index:199; width:380px; height:500px; background:var(--bg-card); backdrop-filter:blur(40px); border:1px solid var(--glass-border); border-radius:var(--radius-xl); overflow:hidden; flex-direction:column; box-shadow:var(--shadow-card); }
+    .chat-window.active { display:flex; } .chat-header { padding:1rem; background:rgba(255,107,107,0.08); border-bottom:1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center; }
+    .chat-body { flex:1; padding:1rem; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem; }
+    .chat-footer { padding:1rem; border-top:1px solid var(--glass-border); display:flex; gap:0.5rem; }
+    .chat-footer input { flex:1; padding:0.65rem; background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:0.5rem; color:var(--text-primary); font-family:inherit; outline:none; }
+    .chat-footer button { padding:0.65rem 1rem; background:var(--coral); color:white; border:none; border-radius:0.5rem; cursor:pointer; font-weight:600; }
+    
+    @media (max-width:1024px) { .hero .container { grid-template-columns:1fr; text-align:center; } .hero-mockup { display:none; } .footer-grid { grid-template-columns:1fr 1fr; } }
+    @media (max-width:768px) { .nav-links { display:none; } .footer-grid { grid-template-columns:1fr; } .pricing-card.popular { transform:scale(1); } .chat-window { width:calc(100vw - 2rem); right:1rem; } }
   </style>
 </head>
 <body>
+  <!-- AURORA BACKGROUND -->
+  <div class="aurora-bg"><div class="aurora-layer"></div><div class="aurora-layer"></div><div class="aurora-layer"></div><div class="aurora-layer"></div></div>
+  <div id="particles-js" style="position:fixed;inset:0;z-index:-1;pointer-events:none;"></div>
+
   <!-- NAVIGATION -->
   <nav class="navbar">
     <div class="nav-inner">
-      <a href="index.html" class="nav-logo">
-        <div class="logo-icon">V</div>
-        <span>Vote<span class="logo-highlight">Wave</span></span>
-      </a>
+      <a href="index.html" class="nav-logo"><div class="logo-icon">V</div><span>Vote<span class="logo-highlight">Wave</span></span></a>
+      <div class="live-clock" id="liveClock"><span id="clockTime">00:00:00</span> <span id="clockDate">Mon, Jan 1</span></div>
       <ul class="nav-links">
         <li><a href="index.html" class="nav-link active">Home</a></li>
         <li><a href="voter/elections.html" class="nav-link">Elections</a></li>
@@ -414,62 +239,34 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-bg-orbs">
-      <div class="hero-orb"></div><div class="hero-orb"></div><div class="hero-orb"></div>
-    </div>
     <div class="container">
       <div class="hero-content">
-        <div class="hero-badge"><span class="live-dot"></span> LIVE — Trusted by 10,000+ Organizations</div>
-        <h1 class="hero-title">Modern Voting<br><span class="gradient">Reimagined</span></h1>
-        <p class="hero-subtitle">The most advanced AI-powered e-voting platform. Enterprise-grade security, real-time analytics, and stunningly simple — launch an election in under 10 minutes.</p>
+        <div class="hero-badge"><span class="live-dot"></span> LIVE — 10,000+ Organizations Trust Us</div>
+        <h1 class="hero-title">The Future of<br><span class="gradient-text">Digital Democracy</span></h1>
+        <p class="hero-subtitle">A uniquely designed e‑voting platform with aurora‑grade aesthetics, military‑grade security, real‑time analytics, and AI‑powered assistance — launch an election in under 5 minutes.</p>
         <div class="hero-actions">
           <a href="auth/register.html" class="btn btn-primary btn-lg">Start Free Trial →</a>
           <a href="voter/elections.html" class="btn btn-outline btn-lg">View Live Demo</a>
         </div>
         <div class="hero-stats">
-          <div><div class="hero-stat-value">2,847</div><div class="hero-stat-label">Votes Cast Today</div></div>
-          <div><div class="hero-stat-value">73%</div><div class="hero-stat-label">Avg Turnout</div></div>
-          <div><div class="hero-stat-value">99.9%</div><div class="hero-stat-label">Uptime SLA</div></div>
+          <div><div class="hero-stat-value">2,847</div><div class="hero-stat-label">Votes Today</div></div>
+          <div><div class="hero-stat-value">73%</div><div class="hero-stat-label">Turnout</div></div>
+          <div><div class="hero-stat-value">2h 14m</div><div class="hero-stat-label">Remaining</div></div>
         </div>
       </div>
       <div class="hero-mockup">
-        <div class="mockup-header">
-          <div class="mockup-dots"><span></span><span></span><span></span></div>
-          <span class="mockup-badge">● LIVE</span>
-        </div>
+        <div class="mockup-glow"></div>
+        <div class="mockup-header"><div class="mockup-dots"><span></span><span></span><span></span></div><span class="mockup-badge">LIVE</span></div>
         <div class="mockup-stats">
           <div class="mockup-stat"><div class="mockup-stat-val">2,847</div><div class="mockup-stat-lbl">Votes</div></div>
           <div class="mockup-stat"><div class="mockup-stat-val">73%</div><div class="mockup-stat-lbl">Turnout</div></div>
-          <div class="mockup-stat"><div class="mockup-stat-val">2h 14m</div><div class="mockup-stat-lbl">Remaining</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-val">2h 14m</div><div class="mockup-stat-lbl">Left</div></div>
         </div>
-        <div class="mockup-chart"><canvas id="heroChart" height="120"></canvas></div>
+        <div class="mockup-chart"><canvas id="heroChart" height="110"></canvas></div>
         <div class="mockup-bars">
-          <div class="mockup-bar-row"><span>Alex Johnson</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:44%;background:#6366f1;"></div></div><strong>44%</strong></div>
-          <div class="mockup-bar-row"><span>Maria Garcia</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:35%;background:#8b5cf6;"></div></div><strong>35%</strong></div>
-          <div class="mockup-bar-row"><span>Chris Lee</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:21%;background:#06b6d4;"></div></div><strong>21%</strong></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TRUST BAR -->
-  <section class="trust-section">
-    <div class="container">
-      <p style="text-align:center;color:var(--text-dim);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.5rem;">Trusted by leading institutions worldwide</p>
-      <div class="trust-marquee">
-        <div class="trust-track">
-          <span class="trust-item">🏛️ Harvard University</span>
-          <span class="trust-item">🎓 MIT</span>
-          <span class="trust-item">🏫 Stanford</span>
-          <span class="trust-item">📚 Oxford</span>
-          <span class="trust-item">💼 Google Education</span>
-          <span class="trust-item">🎯 Microsoft Learn</span>
-          <span class="trust-item">🏥 Mayo Clinic</span>
-          <span class="trust-item">🎨 RISD</span>
-          <span class="trust-item">🏛️ Harvard University</span>
-          <span class="trust-item">🎓 MIT</span>
-          <span class="trust-item">🏫 Stanford</span>
-          <span class="trust-item">📚 Oxford</span>
+          <div class="mockup-bar-row"><span>Alex J.</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:44%;background:linear-gradient(90deg,var(--coral),var(--rose));"></div></div><strong>44%</strong></div>
+          <div class="mockup-bar-row"><span>Maria G.</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:35%;background:linear-gradient(90deg,var(--twilight),var(--ocean));"></div></div><strong>35%</strong></div>
+          <div class="mockup-bar-row"><span>Chris L.</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:21%;background:linear-gradient(90deg,var(--cyan),var(--mint));"></div></div><strong>21%</strong></div>
         </div>
       </div>
     </div>
@@ -478,42 +275,59 @@
   <!-- FEATURES -->
   <section id="features">
     <div class="container">
-      <div class="section-header">
-        <span class="section-badge">✨ Features</span>
-        <h2 class="section-title">Everything You Need to Run<br><span class="gradient" style="background:linear-gradient(135deg,#818cf8,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Perfect Elections</span></h2>
-        <p class="section-subtitle">Secure, transparent, and scalable — built for organizations that take democracy seriously.</p>
-      </div>
+      <div class="section-header"><span class="section-badge">✨ Features</span><h2 class="section-title">Everything You Need<br>for <span class="gradient-text">Perfect Elections</span></h2><p class="section-subtitle">Secure, transparent, and scalable — built for organizations that take democracy seriously.</p></div>
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon indigo"><i data-lucide="shield-check"></i></div>
+          <div class="feature-icon coral"><i data-lucide="shield-check"></i></div>
           <h3>Enterprise Security</h3>
-          <p>End-to-end encryption, cryptographic vote hashing, and immutable audit trails keep every election tamper-proof.</p>
+          <p>AES‑256 encryption, cryptographic vote hashing, and immutable audit trails keep every election completely tamper‑proof.</p>
+          <ul class="feature-list"><li><i data-lucide="check"></i> AES-256 vote encryption</li><li><i data-lucide="check"></i> Immutable audit ledger</li><li><i data-lucide="check"></i> DDoS protection</li></ul>
         </div>
         <div class="feature-card">
           <div class="feature-icon cyan"><i data-lucide="activity"></i></div>
-          <h3>Real-Time Analytics</h3>
-          <p>Watch votes come in live with instant dashboards, custom reports, and exportable data.</p>
+          <h3>Real‑Time Analytics</h3>
+          <p>Watch votes come in live with instant dashboards, custom reports, and exportable data all in one place.</p>
+          <ul class="feature-list"><li><i data-lucide="check"></i> Live vote tracking</li><li><i data-lucide="check"></i> Custom dashboards</li><li><i data-lucide="check"></i> CSV / JSON export</li></ul>
         </div>
         <div class="feature-card">
-          <div class="feature-icon emerald"><i data-lucide="layers"></i></div>
-          <h3>Multi-Tenant Platform</h3>
-          <p>Full data isolation per organization with custom branding and granular role-based access.</p>
+          <div class="feature-icon mint"><i data-lucide="layers"></i></div>
+          <h3>Multi‑Tenant Platform</h3>
+          <p>Full data isolation per organization with custom branding and granular role‑based access controls.</p>
+          <ul class="feature-list"><li><i data-lucide="check"></i> Complete data isolation</li><li><i data-lucide="check"></i> Custom branding</li><li><i data-lucide="check"></i> Role‑based access</li></ul>
         </div>
         <div class="feature-card">
-          <div class="feature-icon amber"><i data-lucide="file-check"></i></div>
+          <div class="feature-icon tangerine"><i data-lucide="file-check"></i></div>
           <h3>Full Transparency</h3>
-          <p>Blockchain-like audit trail and public vote verification so every stakeholder can trust the outcome.</p>
+          <p>Blockchain‑like audit trail and public vote verification so every stakeholder can trust the outcome.</p>
+          <ul class="feature-list"><li><i data-lucide="check"></i> Public audit ledger</li><li><i data-lucide="check"></i> Vote verification codes</li><li><i data-lucide="check"></i> Open results pages</li></ul>
         </div>
         <div class="feature-card">
           <div class="feature-icon rose"><i data-lucide="zap"></i></div>
           <h3>Up in Minutes</h3>
-          <p>Quick-start wizard, bulk CSV voter import, and pre-built templates get your election live fast.</p>
+          <p>Quick‑start wizard, bulk CSV voter import, and pre‑built templates get your election live in under 10 minutes.</p>
+          <ul class="feature-list"><li><i data-lucide="check"></i> Quick‑start wizard</li><li><i data-lucide="check"></i> Bulk CSV import</li><li><i data-lucide="check"></i> Election templates</li></ul>
         </div>
         <div class="feature-card">
-          <div class="feature-icon purple"><i data-lucide="clock"></i></div>
+          <div class="feature-icon ocean"><i data-lucide="clock"></i></div>
           <h3>Automated Lifecycle</h3>
-          <p>Schedule your election, auto-close at deadline, and receive complete results instantly.</p>
+          <p>Schedule your election, auto‑close at the deadline, and receive complete results the moment polls close.</p>
+          <ul class="feature-list"><li><i data-lucide="check"></i> Scheduled start/end</li><li><i data-lucide="check"></i> Auto status updates</li><li><i data-lucide="check"></i> Email/SMS alerts</li></ul>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE US -->
+  <section id="why-us">
+    <div class="container">
+      <div class="section-header"><span class="section-badge">🏆 Why Choose Us</span><h2 class="section-title">What Makes VoteWave<br><span class="gradient-text">Different</span></h2><p class="section-subtitle">We don't just run elections — we redefine the voting experience.</p></div>
+      <div class="why-grid">
+        <div class="why-card"><div class="why-icon">⚡</div><h3>10× Faster Setup</h3><p>Launch a fully‑functional election in under 5 minutes — no IT team required.</p></div>
+        <div class="why-card"><div class="why-icon">🔐</div><h3>Bank‑Level Security</h3><p>Your data is protected with the same encryption standards used by financial institutions.</p></div>
+        <div class="why-card"><div class="why-icon">📊</div><h3>Live Insights</h3><p>Watch voter turnout and results update in real time with stunning visualizations.</p></div>
+        <div class="why-card"><div class="why-icon">🌍</div><h3>Global Reach</h3><p>Voters can participate from any device, anywhere — web, mobile, SMS, or QR code.</p></div>
+        <div class="why-card"><div class="why-icon">💬</div><h3>24/7 AI Support</h3><p>Our intelligent chatbot answers voter questions instantly, reducing support tickets by 80%.</p></div>
+        <div class="why-card"><div class="why-icon">🏆</div><h3>Proven Results</h3><p>Trusted by 10,000+ organizations with a 99.9% satisfaction rate and 73% average turnout.</p></div>
       </div>
     </div>
   </section>
@@ -521,62 +335,97 @@
   <!-- PRICING -->
   <section id="pricing">
     <div class="container">
-      <div class="section-header">
-        <span class="section-badge">💎 Pricing</span>
-        <h2 class="section-title">Simple, Transparent<br><span class="gradient" style="background:linear-gradient(135deg,#818cf8,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Pricing</span></h2>
-        <p class="section-subtitle">All plans include core features. No hidden fees. 14-day free trial.</p>
-      </div>
+      <div class="section-header"><span class="section-badge">💎 Pricing</span><h2 class="section-title">Simple, Transparent<br><span class="gradient-text">Pricing</span></h2><p class="section-subtitle">All plans include core features. No hidden fees. Cancel anytime.</p></div>
       <div class="pricing-grid">
         <div class="pricing-card">
-          <h3>Starter</h3>
-          <p style="color:var(--text-muted);">For small organizations</p>
-          <div class="pricing-price">$0<span>/month</span></div>
+          <h3>Starter</h3><p style="color:var(--text-muted);margin-bottom:1rem;">Perfect for small clubs & organizations</p>
+          <div class="pricing-price">Free<span>/forever</span></div>
           <ul class="pricing-features">
-            <li><i data-lucide="check"></i> 500 voters</li>
-            <li><i data-lucide="check"></i> 3 elections</li>
-            <li><i data-lucide="check"></i> Real-time results</li>
+            <li><i data-lucide="check"></i> Up to 500 voters</li>
+            <li><i data-lucide="check"></i> 3 elections per year</li>
+            <li><i data-lucide="check"></i> Real‑time results</li>
+            <li><i data-lucide="check"></i> Basic analytics</li>
             <li><i data-lucide="check"></i> Email support</li>
+            <li><i data-lucide="check"></i> CSV voter import</li>
           </ul>
-          <a href="auth/register.html" class="btn btn-outline btn-lg" style="width:100%;justify-content:center;">Get Started</a>
+          <a href="auth/register.html" class="btn btn-outline btn-full">Get Started Free</a>
         </div>
         <div class="pricing-card popular">
           <div class="popular-badge">Most Popular</div>
-          <h3>Professional</h3>
-          <p style="color:var(--text-muted);">For growing organizations</p>
+          <h3>Professional</h3><p style="color:var(--text-muted);margin-bottom:1rem;">For schools & growing organizations</p>
           <div class="pricing-price">$49<span>/month</span></div>
           <ul class="pricing-features">
-            <li><i data-lucide="check"></i> 10,000 voters</li>
+            <li><i data-lucide="check"></i> Up to 10,000 voters</li>
             <li><i data-lucide="check"></i> Unlimited elections</li>
             <li><i data-lucide="check"></i> Advanced analytics</li>
-            <li><i data-lucide="check"></i> AI assistant</li>
-            <li><i data-lucide="check"></i> Priority support</li>
+            <li><i data-lucide="check"></i> AI‑powered assistant</li>
+            <li><i data-lucide="check"></i> Custom branding</li>
+            <li><i data-lucide="check"></i> Priority email & chat support</li>
+            <li><i data-lucide="check"></i> API access</li>
+            <li><i data-lucide="check"></i> SMS notifications</li>
           </ul>
-          <a href="auth/register.html" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Start Free Trial</a>
+          <a href="auth/register.html" class="btn btn-primary btn-full">Start Free Trial</a>
+          <p style="text-align:center;font-size:0.75rem;color:var(--text-dim);margin-top:0.75rem;">14‑day free trial · No credit card required</p>
         </div>
         <div class="pricing-card">
-          <h3>Enterprise</h3>
-          <p style="color:var(--text-muted);">For large institutions</p>
+          <h3>Enterprise</h3><p style="color:var(--text-muted);margin-bottom:1rem;">For large institutions & government</p>
           <div class="pricing-price">Custom</div>
           <ul class="pricing-features">
             <li><i data-lucide="check"></i> Unlimited voters</li>
+            <li><i data-lucide="check"></i> Unlimited elections</li>
+            <li><i data-lucide="check"></i> White‑label solution</li>
+            <li><i data-lucide="check"></i> Dedicated account manager</li>
+            <li><i data-lucide="check"></i> 24/7 phone support</li>
             <li><i data-lucide="check"></i> Custom integrations</li>
-            <li><i data-lucide="check"></i> Dedicated support</li>
-            <li><i data-lucide="check"></i> SLA guarantee</li>
-            <li><i data-lucide="check"></i> White-label</li>
+            <li><i data-lucide="check"></i> SLA guarantee (99.9% uptime)</li>
+            <li><i data-lucide="check"></i> Training & onboarding</li>
           </ul>
-          <a href="#" class="btn btn-outline btn-lg" style="width:100%;justify-content:center;">Contact Sales</a>
+          <a href="#" class="btn btn-outline btn-full">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="container">
+      <div class="section-header"><span class="section-badge">💬 Testimonials</span><h2 class="section-title">Loved by<br><span class="gradient-text">Organizations Worldwide</span></h2><p class="section-subtitle">See what our users say about VoteWave.</p></div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"VoteWave transformed how we run student elections. Voter turnout jumped 300% in the first semester — the transparency and ease of use made all the difference."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,var(--coral),var(--rose));">SD</div>
+            <div><div class="author-name">Dr. Sarah Martinez</div><div class="author-role">Dean of Student Affairs, State University</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"We processed 50,000+ shareholder votes without a single issue. The security features and audit trail gave our board complete confidence."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,var(--tangerine),var(--coral));">MR</div>
+            <div><div class="author-name">Michael Roberts</div><div class="author-role">CTO, TechCorp International</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"The AI assistant reduced our support tickets by 80% during election week. A complete game‑changer for our team!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,var(--mint),var(--cyan));">EL</div>
+            <div><div class="author-name">Emily Lawson</div><div class="author-role">Election Coordinator, City Council</div></div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- CTA -->
-  <section class="cta-section">
+  <section>
     <div class="container">
       <div class="cta-card">
         <div class="cta-glow"></div>
         <h2 style="font-size:2.5rem;font-weight:800;position:relative;z-index:1;">Ready to Transform Your Elections?</h2>
-        <p style="font-size:1.1rem;color:var(--text-muted);margin:1rem 0 2rem;position:relative;z-index:1;">Join 10,000+ organizations using VoteWave for secure, transparent voting.</p>
+        <p style="font-size:1.1rem;color:var(--text-muted);margin:1rem 0 2rem;position:relative;z-index:1;">Join 10,000+ organizations already using VoteWave for secure, transparent voting.</p>
         <div style="position:relative;z-index:1;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
           <a href="auth/register.html" class="btn btn-primary btn-lg">Get Started Free →</a>
           <a href="auth/login.html" class="btn btn-outline btn-lg">Sign In</a>
@@ -590,109 +439,43 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <a href="index.html" style="display:flex;align-items:center;gap:0.5rem;font-size:1.3rem;font-weight:800;color:var(--text-primary);text-decoration:none;margin-bottom:1rem;">
-            <div class="logo-icon" style="width:2rem;height:2rem;">V</div>
-            Vote<span class="logo-highlight">Wave</span>
-          </a>
-          <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">The most advanced e-voting platform for modern organizations.</p>
-          <div class="footer-social">
-            <a href="#">𝕏</a><a href="#">🐙</a><a href="#">🔗</a><a href="#">▶️</a>
-          </div>
+          <a href="index.html" style="display:flex;align-items:center;gap:0.5rem;font-size:1.3rem;font-weight:800;color:var(--text-primary);text-decoration:none;margin-bottom:1rem;"><div class="logo-icon" style="width:2rem;height:2rem;font-size:0.9rem;">V</div>Vote<span class="logo-highlight">Wave</span></a>
+          <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">The most uniquely designed e‑voting platform for modern organizations.</p>
+          <div class="footer-social"><a href="#" aria-label="Twitter">𝕏</a><a href="#" aria-label="GitHub">🐙</a><a href="#" aria-label="LinkedIn">🔗</a><a href="#" aria-label="YouTube">▶️</a></div>
         </div>
-        <div><h5>Solutions</h5><a href="voter/elections.html">Student Elections</a><a href="voter/nominations.html">Nominations</a><a href="voter/events.html">Event Voting</a></div>
-        <div><h5>Features</h5><a href="#features">Security</a><a href="#features">Analytics</a><a href="#features">AI Assistant</a></div>
-        <div><h5>Company</h5><a href="#">About</a><a href="#">Contact</a><a href="#">Privacy</a></div>
+        <div><h5>Solutions</h5><a href="voter/elections.html">Student Elections</a><a href="voter/nominations.html">Nominations</a><a href="voter/events.html">Event Voting</a><a href="voter/club-elections.html">Club Elections</a></div>
+        <div><h5>Features</h5><a href="#features">AI Assistant</a><a href="#features">Live Results</a><a href="#features">Security</a><a href="#features">Analytics</a></div>
+        <div><h5>Company</h5><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a><a href="#">Contact</a><a href="#">Privacy Policy</a></div>
       </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 VoteWave. Made with ❤️ by <strong style="color:var(--brand-indigo);">Star Media Tech</strong></p>
-      </div>
+      <div class="footer-bottom"><p>&copy; 2026 VoteWave. Made with ❤️ by <strong style="color:var(--coral);">Star Media Tech</strong></p></div>
     </div>
   </footer>
 
   <!-- CHAT WIDGET -->
-  <div style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;">
-    <button id="chatToggle" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;cursor:pointer;box-shadow:0 8px 30px rgba(99,102,241,0.4);font-size:1.5rem;transition:all 0.3s;" onclick="document.getElementById('chatWindow').classList.toggle('active')">💬</button>
-    <div id="chatWindow" style="display:none;position:absolute;bottom:70px;right:0;width:380px;height:500px;background:var(--bg-card);backdrop-filter:blur(40px);border:1px solid var(--glass-border);border-radius:1rem;overflow:hidden;flex-direction:column;">
-      <div style="padding:1rem;background:rgba(99,102,241,0.1);border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center;">
-        <strong>VoteWave AI</strong><span style="color:var(--brand-emerald);font-size:0.75rem;">● Online</span>
-        <button onclick="document.getElementById('chatWindow').classList.remove('active')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;">✕</button>
-      </div>
-      <div style="flex:1;padding:1rem;overflow-y:auto;" id="chatMessages">
-        <p style="background:rgba(255,255,255,0.03);padding:0.75rem;border-radius:0.75rem;font-size:0.85rem;">👋 Hi! I'm your VoteWave assistant. Ask me anything!</p>
-      </div>
-      <div style="padding:1rem;border-top:1px solid var(--glass-border);display:flex;gap:0.5rem;">
-        <input type="text" id="chatInput" placeholder="Type here..." style="flex:1;padding:0.65rem;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:0.5rem;color:var(--text-primary);font-family:inherit;outline:none;">
-        <button id="chatSend" style="padding:0.65rem 1rem;background:var(--brand-indigo);color:white;border:none;border-radius:0.5rem;cursor:pointer;">Send</button>
-      </div>
-    </div>
+  <button class="chat-fab" id="chatToggle" onclick="document.getElementById('chatWindow').classList.toggle('active')">💬</button>
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header"><strong>VoteWave AI</strong><span style="color:var(--mint);font-size:0.75rem;">● Online</span><button onclick="document.getElementById('chatWindow').classList.remove('active')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;margin-left:auto;">✕</button></div>
+    <div class="chat-body" id="chatMessages"><p style="background:rgba(255,255,255,0.03);padding:0.75rem;border-radius:0.75rem;font-size:0.85rem;">👋 Hi! I'm your VoteWave assistant. Ask me anything about elections, voting, or using the platform!</p></div>
+    <div class="chat-footer"><input type="text" id="chatInput" placeholder="Type here..."><button id="chatSend">Send</button></div>
   </div>
 
   <script src="js/main.js"></script>
-  <script src="js/chatbot.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-      
-      // Theme toggle
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      document.getElementById('themeToggle').addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme');
-        const newTheme = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-      });
-      
-      // Hero chart
-      const ctx = document.getElementById('heroChart');
-      if (ctx && typeof Chart !== 'undefined') {
-        new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-            datasets: [{
-              data: [120,280,450,680,900,1400,2100],
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99,102,241,0.1)',
-              fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0
-            }]
-          },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
-        });
-      }
-      
-      // Chat widget toggle
-      const chatToggle = document.getElementById('chatToggle');
-      const chatWindow = document.getElementById('chatWindow');
-      chatToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
-      });
-      document.getElementById('chatSend').addEventListener('click', () => {
-        const input = document.getElementById('chatInput');
-        const msg = input.value.trim();
-        if (!msg) return;
-        document.getElementById('chatMessages').innerHTML += `<p style="text-align:right;margin:0.5rem 0;"><span style="background:var(--brand-indigo);color:white;padding:0.5rem 0.75rem;border-radius:0.75rem;font-size:0.85rem;">${msg}</span></p>`;
-        input.value = '';
-        setTimeout(() => {
-          document.getElementById('chatMessages').innerHTML += `<p style="margin:0.5rem 0;"><span style="background:rgba(255,255,255,0.03);padding:0.5rem 0.75rem;border-radius:0.75rem;font-size:0.85rem;">Great question! Check our Elections page for active elections. 🗳️</span></p>`;
-        }, 800);
-      });
-      
-      // Particles
-      if (typeof particlesJS !== 'undefined') {
-        particlesJS('particles-js', {
-          particles: { number: { value: 40 }, color: { value: '#6366f1' }, opacity: { value: 0.2 }, size: { value: 2 }, line_linked: { enable: true, color: '#6366f1', opacity: 0.1 }, move: { enable: true, speed: 1 } }
-        });
-      }
-      
-      // GSAP animations
-      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-        gsap.registerPlugin(ScrollTrigger);
-        gsap.from('.feature-card', { scrollTrigger: { trigger: '.features-grid', start: 'top 80%' }, y: 50, opacity: 0, duration: 0.6, stagger: 0.1 });
-        gsap.from('.pricing-card', { scrollTrigger: { trigger: '.pricing-grid', start: 'top 80%' }, y: 50, opacity: 0, duration: 0.6, stagger: 0.1 });
-      }
-    });
+    // LIVE CLOCK
+    function updateClock(){const n=new Date();document.getElementById('clockTime').textContent=n.toLocaleTimeString('en-US',{hour12:!1,hour:'2-digit',minute:'2-digit',second:'2-digit'});document.getElementById('clockDate').textContent=n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}
+    updateClock();setInterval(updateClock,1e3);
+    // THEME
+    const s=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',s);document.getElementById('themeToggle').addEventListener('click',()=>{const e=document.documentElement.getAttribute('data-theme'),t='dark'===e?'light':'dark';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t)});
+    // HERO CHART
+    if(typeof Chart!=='undefined'){const e=document.getElementById('heroChart');e&&new Chart(e,{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{data:[120,280,450,680,900,1400,2100],borderColor:'#ff6b6b',backgroundColor:'rgba(255,107,107,0.08)',fill:!0,tension:.4,borderWidth:2,pointRadius:0}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1}},scales:{x:{display:!1},y:{display:!1}}}})}
+    // PARTICLES
+    if(typeof particlesJS!=='undefined')particlesJS('particles-js',{particles:{number:{value:35},color:{value:['#ff6b6b','#ffa726','#6c5ce7','#00d2d3']},shape:{type:'circle'},opacity:{value:.15,random:!0},size:{value:2.5,random:!0},move:{enable:!0,speed:.8}},interactivity:{events:{onhover:{enable:!0,mode:'repulse'}}}});
+    // GSAP
+    if(typeof gsap!=='undefined'&&typeof ScrollTrigger!=='undefined'){gsap.registerPlugin(ScrollTrigger);gsap.from('.feature-card',{scrollTrigger:{trigger:'.features-grid',start:'top 85%'},y:60,opacity:0,duration:.7,stagger:.08,ease:'power3.out'});gsap.from('.why-card',{scrollTrigger:{trigger:'.why-grid',start:'top 85%'},y:60,opacity:0,duration:.7,stagger:.08,ease:'power3.out'});gsap.from('.pricing-card',{scrollTrigger:{trigger:'.pricing-grid',start:'top 85%'},y:60,opacity:0,duration:.7,stagger:.1,ease:'power3.out'});gsap.from('.testimonial-card',{scrollTrigger:{trigger:'.testimonials-grid',start:'top 85%'},y:60,opacity:0,duration:.7,stagger:.1,ease:'power3.out'})}
+    // CHAT
+    document.getElementById('chatSend').addEventListener('click',()=>{const e=document.getElementById('chatInput'),t=e.value.trim();if(!t)return;document.getElementById('chatMessages').innerHTML+=`<p style="text-align:right;margin:0.25rem 0;"><span style="background:var(--coral);color:white;padding:0.5rem 0.75rem;border-radius:0.75rem;font-size:0.85rem;">${t}</span></p>`;e.value='';setTimeout(()=>{document.getElementById('chatMessages').innerHTML+='<p style="margin:0.25rem 0;"><span style="background:rgba(255,255,255,0.03);padding:0.5rem 0.75rem;border-radius:0.75rem;font-size:0.85rem;">Great question! 🗳️ Check our Elections page for active elections.</span></p>'},800)});document.getElementById('chatInput').addEventListener('keypress',e=>{'Enter'===e.key&&document.getElementById('chatSend').click()});
+    // ICONS
+    if(typeof lucide!=='undefined')lucide.createIcons();
   </script>
 </body>
 </html>

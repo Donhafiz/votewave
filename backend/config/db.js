@@ -11,6 +11,15 @@ const getMongoURI = () => {
     return process.env.MONGO_URL;
   }
 
+  // Also accept MONGO_URI (common naming) and fallback typo ONGO_URI if present
+  if (process.env.MONGO_URI) {
+    return process.env.MONGO_URI;
+  }
+
+  if (process.env.ONGO_URI) {
+    return process.env.ONGO_URI;
+  }
+
   // Fall back to constructing a URI from Railway's individual variables:
   // MONGOHOST, MONGOPORT, MONGOUSER, MONGOPASSWORD, MONGODATABASE
   const {

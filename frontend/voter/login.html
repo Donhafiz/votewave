@@ -669,7 +669,7 @@
   <div class="bg-grid"></div>
 
   <!-- Main Container -->
-  <div class="login-container">
+  <div class="login-container" role="main">
     <!-- Left - Branding Panel -->
     <div class="brand-panel">
       <div class="brand-overlay"></div>
@@ -752,6 +752,8 @@
               placeholder="Enter your Voter ID" 
               required
               autocomplete="off"
+              aria-label="Voter ID"
+              aria-describedby="voterIdError"
             >
           </div>
           <p class="form-hint">
@@ -779,6 +781,8 @@
               autocomplete="one-time-code"
               inputmode="numeric"
               pattern="[0-9]{6}"
+              aria-label="One-time password"
+              aria-describedby="otpError"
             >
           </div>
           <p class="form-hint">

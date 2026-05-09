@@ -30,7 +30,8 @@
       </nav>
     </aside>
     
-    <main class="admin-main">
+    <main class="admin-main" role="main" aria-label="Audit log">
+      <div id="adminStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
       <header class="admin-topbar">
         <div class="admin-topbar-left">
           <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
@@ -50,7 +51,7 @@
           <button class="admin-filter-btn" data-type="user">Users</button>
           <button class="admin-filter-btn" data-type="vote">Votes</button>
           <button class="admin-filter-btn" data-type="system">System</button>
-          <input type="text" class="admin-filter-select" id="searchAudit" placeholder="Search audit log..." style="margin-left:auto;min-width:200px;">
+          <input type="text" class="admin-filter-select" id="searchAudit" aria-label="Search audit log" placeholder="Search audit log..." style="margin-left:auto;min-width:200px;">
         </div>
         
         <!-- Audit Table -->
@@ -77,14 +78,15 @@
   
   <div class="admin-toast-container" id="toastContainer"></div>
   
+  <script src="../js/a11y.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/admin.js"></script>
   
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      document.getElementById('menuToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('menuToggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar')?.classList.toggle('open');
       });
       
       initAdminAuth();
@@ -100,7 +102,7 @@
       });
       
       // Search
-      document.getElementById('searchAudit').addEventListener('input', debounce(loadAuditLogs, 300));
+      document.getElementById('searchAudit')?.addEventListener('input', debounce(loadAuditLogs, 300));
     });
     
     async function loadAuditLogs() {
@@ -150,7 +152,8 @@
         return `<span style="display:inline-block;padding:0.15rem 0.6rem;border-radius:100px;font-size:0.7rem;font-weight:600;background:${colors[action] || '#64748b'}22;color:${colors[action] || '#94a3b8'};">${type.toUpperCase()}</span>`;
       };
       
-      document.getElementById('auditTableBody').innerHTML = logs.map(log => `
+      const auditBody = document.getElementById('auditTableBody');
+      if (auditBody) auditBody.innerHTML = logs.map(log => `
         <tr>
           <td style="white-space:nowrap;">${new Date(log.timestamp).toLocaleString()}</td>
           <td><strong>${escapeHtml(log.user?.firstName + ' ' + log.user?.lastName || 'System')}</strong></td>
@@ -181,12 +184,15 @@
       a.download = `audit-log-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
+      if (window.announce) window.announce('Audit log exported', 'polite');
     }
     
     function clearAuditLog() {
       if (!confirm('This will only clear logs from the current view. Database logs cannot be cleared.')) return;
-      document.getElementById('auditTableBody').innerHTML = '';
+      const auditBody2 = document.getElementById('auditTableBody');
+      if (auditBody2) auditBody2.innerHTML = '';
       showAdminToast('Audit log view cleared', 'success');
+      if (window.announce) window.announce('Audit log view cleared', 'polite');
     }
     
     function debounce(func, wait) {

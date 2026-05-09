@@ -779,7 +779,7 @@
   </a>
   
   <!-- Main Container -->
-  <div class="auth-container">
+  <div class="auth-container" role="main" aria-label="Create a VoteWave account">
     <!-- Left Panel - Visual -->
     <div class="auth-visual">
       <div class="visual-overlay"></div>
@@ -834,6 +834,7 @@
       </div>
       
       <form class="auth-form" id="registerForm" novalidate>
+        <div id="registerStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
         <!-- Name Row -->
         <div class="form-row">
           <div class="form-group">

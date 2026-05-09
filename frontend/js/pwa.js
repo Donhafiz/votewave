@@ -35,6 +35,17 @@ if ('serviceWorker' in navigator) {
     });
   } else {
     console.log('📱 Skipping service worker registration on localhost (development mode)');
+    // expose a dev-mode flag and show a small banner when DOM is ready
+    window.__VOTEWAVE_SW_SKIPPED = true;
+    window.addEventListener('DOMContentLoaded', () => {
+      if (document.getElementById('dev-mode-banner')) return;
+      const b = document.createElement('div');
+      b.id = 'dev-mode-banner';
+      b.textContent = 'Dev mode: service worker disabled (local)';
+      b.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:10000;padding:0.35rem 0.75rem;background:#f59e0b;color:#041124;border-radius:6px;font-weight:600;font-family:inherit;box-shadow:0 6px 20px rgba(0,0,0,0.08);';
+      document.body.appendChild(b);
+      setTimeout(() => { b.style.opacity = '0'; b.style.transform = 'translateX(-50%) translateY(-8px)'; setTimeout(()=>b.remove(),300); }, 6000);
+    });
   }
 }
 
@@ -157,7 +168,7 @@ function showUpdateNotification() {
   
   document.body.appendChild(banner);
   
-  document.getElementById('pwa-update-btn').addEventListener('click', () => {
+  document.getElementById('pwa-update-btn')?.addEventListener('click', () => {
     if (navigator.serviceWorker) {
       navigator.serviceWorker.getRegistration().then((reg) => {
         if (reg && reg.waiting) {

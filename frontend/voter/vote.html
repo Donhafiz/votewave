@@ -24,7 +24,8 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" role="main" aria-label="Cast vote">
+    <div id="voteStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <a href="elections.html" class="back">← Back</a>
     <h1 id="title"></h1>
     <div id="positions"></div>
@@ -37,8 +38,9 @@
       </div>
       <p style="margin-top:0.5rem;font-size:1.2rem;">Total: GHS <span id="total">1.00</span></p>
     </div>
-    <button class="btn" id="payBtn" disabled onclick="pay()">Pay & Vote</button>
+    <button class="btn" id="payBtn" disabled onclick="pay()" aria-label="Pay and cast vote">Pay & Vote</button>
   </div>
+  <script src="../js/a11y.js"></script>
   <script>
     const VOTE_PRICE = 1;
     let selectedCandidate = null;
@@ -81,9 +83,9 @@
           const idx = candidates.findIndex(c=>c._id===selectedCandidate);
           if (idx!==-1) candidates[idx].votes = (candidates[idx].votes||0) + qty;
           localStorage.setItem('votewave_candidates', JSON.stringify(candidates));
-          alert('✅ Vote recorded!');
+          if (window.announce) window.announce('Vote recorded successfully', 'polite');
         },
-        onClose: ()=> alert('Payment cancelled')
+        onClose: ()=> { if (window.announce) window.announce('Payment cancelled', 'polite'); }
       });
       handler.openIframe();
     }

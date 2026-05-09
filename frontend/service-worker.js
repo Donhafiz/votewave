@@ -78,49 +78,45 @@ self.addEventListener('activate', (event) => {
 // Fetch event - Serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
   // Skip API calls and non-GET requests
+  const req = event.request;
   if (
-    event.request.url.includes('/api/') ||
-    event.request.url.includes('paystack') ||
-    event.request.method !== 'GET'
+    req.method !== 'GET' ||
+    req.url.includes('/api/') ||
+    req.url.includes('paystack') ||
+    new URL(req.url).origin !== self.location.origin
   ) {
     return;
   }
 
+  const acceptHeader = req.headers.get('accept') || '';
+  const isNavigation = req.mode === 'navigate' || acceptHeader.includes('text/html');
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // Return cached response if available
+    caches.match(req).then((cachedResponse) => {
       if (cachedResponse) {
-        // Fetch update in background
-        fetch(event.request)
-          .then((response) => {
-            if (response.ok) {
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(event.request, response);
-              });
-            }
-          })
-          .catch(() => {});
+        // Update cache in background
+        fetch(req).then((response) => {
+          if (response && response.ok) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, response));
+          }
+        }).catch(() => {});
         return cachedResponse;
       }
 
-      // Network first, cache as fallback
-      return fetch(event.request)
-        .then((response) => {
-          if (!response || response.status !== 200) {
-            return response;
-          }
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Return offline fallback for HTML pages
-          if (event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('/frontend/index.html');
-          }
-        });
+      // Try network first for fresh content
+      return fetch(req).then((response) => {
+        if (!response || response.status !== 200) return response;
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, responseToCache));
+        return response;
+      }).catch(() => {
+        // Only serve app-shell fallback for top-level navigations
+        if (isNavigation) {
+          return caches.match('/frontend/index.html');
+        }
+        // For non-navigation requests, just fail silently
+        return new Response('', { status: 503, statusText: 'Service Unavailable' });
+      });
     })
   );
 });

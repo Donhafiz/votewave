@@ -28,8 +28,14 @@
   </style>
 </head>
 <body>
-  <nav class="navbar"><div class="nav-inner"><a href="../../index.html" class="nav-logo">🗳️ VoteWave</a><div class="nav-links"><a href="elections.html" class="active">Elections</a></div></div></nav>
-  <div class="container">
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo">🗳️ VoteWave</a>
+      <div class="nav-links"><a href="elections.html" class="active">Elections</a></div>
+    </div>
+  </nav>
+  <div class="container" role="main" aria-label="Active Elections">
+    <div id="electionsStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div class="page-header"><h1>Active Elections</h1></div>
     <div class="filters" id="filters"></div>
     <div class="grid" id="grid"></div>
