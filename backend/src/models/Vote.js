@@ -1,86 +1,54 @@
-const mongoose = require('mongoose');
-const crypto = require('crypto');
+const mongoose = require("mongoose");
 
-const voteSchema = new mongoose.Schema({
-  election: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Election',
-    required: true,
-  },
-  voter: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Election.categories',
-    required: true,
-  },
-  candidate: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Candidate',
-    required: true,
-  },
-  hashedSelection: {
-    type: String,
-    required: true,
-  },
-  ipAddress: {
-    type: String,
-    required: true,
-  },
-  userAgent: {
-    type: String,
-  },
-  votedAt: {
-    type: Date,
-    default: Date.now,
-  },
-  confirmationCode: {
-    type: String,
-    unique: true,
-  },
-  isAnonymous: {
-    type: Boolean,
-    default: true,
-  },
-  payment: {
-    amount: {
-      type: Number,
+const voteSchema = new mongoose.Schema(
+  {
+    tenantId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
-      default: 1.00, // 1.00GHC per vote
+      index: true,
     },
-    currency: {
-      type: String,
-      default: 'GHC',
+
+    electionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Election",
+      required: true,
+      index: true,
     },
-    paystackReference: {
+
+    candidateId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Candidate",
+      required: true,
+      index: true,
+    },
+
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+
+    // prevents duplicate voting at DB level
+    fingerprint: {
       type: String,
       required: true,
+      unique: true,
     },
-    status: {
-      type: String,
-      enum: ['pending', 'completed', 'failed', 'refunded'],
-      default: 'pending',
-    },
-    paidAt: {
-      type: Date,
+
+    metadata: {
+      ip: String,
+      userAgent: String,
+      deviceId: String,
     },
   },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-voteSchema.index({ election: 1, voter: 1, category: 1 }, { unique: true });
+/* =========================================================
+   CRITICAL INDEXES (SAAS SCALE)
+========================================================= */
+voteSchema.index({ tenantId: 1, electionId: 1 });
+voteSchema.index({ tenantId: 1, userId: 1, electionId: 1 }, { unique: true });
 
-voteSchema.pre('save', function(next) {
-  if (!this.confirmationCode) {
-    this.confirmationCode = crypto.randomBytes(16).toString('hex').toUpperCase();
-  }
-  if (!this.hashedSelection) {
-    const data = `${this.election}:${this.voter}:${this.candidate}:${Date.now()}`;
-    this.hashedSelection = crypto.createHash('sha256').update(data).digest('hex');
-  }
-  next();
-});
-
-module.exports = mongoose.model('Vote', voteSchema);
+module.exports = mongoose.model("Vote", voteSchema);

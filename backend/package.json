@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "worker:vote": "node src/workers/vote.worker.js",
+    "worker:email": "node src/workers/email.worker.js",
+    "worker:analytics": "node src/workers/analytics.worker.js"
+  },
+  "dependencies": {
+    "bullmq": "^5.76.6",
+    "ioredis": "^5.10.1"
+  }
+}

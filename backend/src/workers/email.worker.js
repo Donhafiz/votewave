@@ -1,5 +1,6 @@
 const { Worker } = require("bullmq");
 const connection = require("../queues/connection");
+const eventBus = require("../events/eventBus");
 
 new Worker(
   "email-queue",
