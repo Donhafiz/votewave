@@ -3,1227 +3,696 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoteWave - Secure E-Voting Platform</title>
-  <meta name="description" content="VoteWave - Modern, secure, AI-powered e-voting for schools, clubs, and organizations">
+  <title>VoteWave — Advanced E-Voting Platform</title>
+  <meta name="description" content="VoteWave — Secure, transparent, and AI-powered e-voting for schools, clubs, and organizations. Enterprise-grade security with real-time analytics.">
   <meta name="theme-color" content="#6366f1">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- 
-  <!-- PWA Meta Tags -->
-  <meta name="application-name" content="VoteWave">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="VoteWave">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#6366f1">
-
-  <!-- Apple Touch Icons -->
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/icon-192.png">
-
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json">
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3Cpath d='M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7z'/%3E%3Cpath d='M22 19H2'/%3E%3C/svg%3E">
   
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/landing.css">
   
-  <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  
-  <!-- Particles.js -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-  
-  <!-- Socket.io for Live Updates -->
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  
+
   <style>
     /* ========================================
-       CRITICAL INLINE STYLES
+       VOTEWAVE — ADVANCED PREMIUM DESIGN SYSTEM
        ======================================== */
+    
     :root {
-      --bg: #0f172a; --bg-secondary: #1e293b; --surface: rgba(255,255,255,0.03);
-      --text: #f1f5f9; --text-secondary: #cbd5e1; --text-muted: #94a3b8;
-      --primary: #6366f1; --primary-light: #818cf8; --secondary: #8b5cf6;
-      --accent: #06b6d4; --success: #10b981; --warning: #f59e0b; --error: #ef4444;
-      --border: rgba(255,255,255,0.06); --border-light: rgba(255,255,255,0.04);
-      --radius: 1rem; --radius-sm: 0.5rem;
+      --bg-deep: #020617;
+      --bg-primary: #0f172a;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --glass-bg: rgba(255, 255, 255, 0.02);
+      --glass-border: rgba(255, 255, 255, 0.06);
+      --glass-hover: rgba(255, 255, 255, 0.04);
+      
+      --brand-indigo: #6366f1;
+      --brand-violet: #8b5cf6;
+      --brand-purple: #a855f7;
+      --brand-cyan: #06b6d4;
+      --brand-teal: #14b8a6;
+      --brand-emerald: #10b981;
+      --brand-amber: #f59e0b;
+      --brand-rose: #f43f5e;
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --shadow-glow-indigo: 0 0 40px rgba(99, 102, 241, 0.3);
+      --shadow-glow-violet: 0 0 40px rgba(139, 92, 246, 0.3);
+      --shadow-card: 0 25px 80px rgba(0, 0, 0, 0.5);
+      --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.3);
+      
+      --radius-sm: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.25rem;
+      --radius-2xl: 1.5rem;
+      --radius-full: 9999px;
+      
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     
     [data-theme="light"] {
-      --bg: #f8fafc; --bg-secondary: #e2e8f0; --surface: rgba(0,0,0,0.02);
-      --text: #0f172a; --text-secondary: #334155; --text-muted: #64748b;
-      --border: rgba(0,0,0,0.08); --border-light: rgba(0,0,0,0.04);
+      --bg-deep: #f8fafc;
+      --bg-primary: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.8);
+      --glass-bg: rgba(0, 0, 0, 0.02);
+      --glass-border: rgba(0, 0, 0, 0.06);
+      --glass-hover: rgba(0, 0, 0, 0.03);
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.6;
-      transition: background 0.3s ease, color 0.3s ease;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.7;
+      transition: background 0.4s ease, color 0.4s ease;
     }
     
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
-    ::selection { background: rgba(99,102,241,0.3); color: white; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::selection { background: rgba(99, 102, 241, 0.3); color: white; }
     
-    /* Container */
     .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
-    
-    /* Gradient Text */
-    .gradient-text {
-      background: linear-gradient(135deg, #818cf8, #c084fc, #06b6d4);
-      background-size: 200% 200%;
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text; animation: gradientShift 4s ease infinite;
-    }
-    @keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-    
-    /* Glass Card */
-    .glass-card {
-      background: var(--surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border); border-radius: var(--radius); transition: all 0.3s ease;
-    }
-    .glass-card:hover { border-color: rgba(99,102,241,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-    
-    /* Buttons */
-    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.5rem; font-size: 0.875rem; font-weight: 600; font-family: inherit; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.3s ease; text-decoration: none; white-space: nowrap; }
-    .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(99,102,241,0.4); color: white; }
-    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text); }
-    .btn-outline:hover { background: var(--surface); border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
-    .btn-ghost { background: transparent; color: var(--text-secondary); }
-    .btn-ghost:hover { background: var(--surface); color: var(--text); }
-    .btn-white { background: white; color: #6366f1; }
-    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-    .btn-ghost-white { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); }
-    .btn-ghost-white:hover { background: rgba(255,255,255,0.1); }
-    .btn-sm { padding: 0.45rem 1rem; font-size: 0.8rem; }
-    .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; }
-    .btn-full { width: 100%; justify-content: center; }
-    
-    /* Section Header */
-    .section-header { text-align: center; margin-bottom: 4rem; }
-    .section-badge { display: inline-block; padding: 0.4rem 1.25rem; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 100px; font-size: 0.85rem; font-weight: 600; color: #818cf8; margin-bottom: 1.5rem; }
-    .section-title { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.03em; }
-    .section-subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
-    
-    /* Animations */
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .animate-fade-up { animation: fadeInUp 0.8s ease forwards; }
-    .delay-1 { animation-delay: 0.2s; } .delay-2 { animation-delay: 0.4s; } .delay-3 { animation-delay: 0.6s; } .delay-4 { animation-delay: 0.8s; }
-    
-    /* Preloader */
-    #preloader { position: fixed; inset: 0; z-index: 99999; background: #0a0f1e; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.6s ease, visibility 0.6s ease; }
-    #preloader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .loader-ring { width: 60px; height: 60px; border: 3px solid rgba(99,102,241,0.2); border-top-color: #6366f1; border-radius: 50%; animation: spin 1s linear infinite; }
-    .loader-text { margin-top: 1.5rem; font-size: 1.25rem; font-weight: 700; background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: pulse 2s ease-in-out infinite; }
-    
-    /* Back to Top */
-    .back-to-top { position: fixed; bottom: 2rem; right: 2rem; z-index: 99; width: 48px; height: 48px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(99,102,241,0.4); opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.3s ease; }
-    .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-    .back-to-top:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 20px 40px rgba(99,102,241,0.6); }
-    
-    /* Particles */
-    #particles-js { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
     
     /* ========================================
        NAVIGATION
        ======================================== */
-    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(15,23,42,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); transition: all 0.3s; }
-    .nav-container { display: flex; align-items: center; justify-content: space-between; height: 4.5rem; padding: 0 1.5rem; max-width: 1280px; margin: 0 auto; }
-    .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-size: 1.35rem; font-weight: 800; color: var(--text); text-decoration: none; }
-    .logo-icon-wrapper { position: relative; width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg,#6366f1,#8b5cf6); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
-    .logo-icon-wrapper svg { width: 1.25rem; height: 1.25rem; color: white; }
-    .logo-highlight { background: linear-gradient(135deg,#818cf8,#c084fc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .nav-menu { display: flex; list-style: none; gap: 0.5rem; }
-    .nav-link { padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 500; color: var(--text-muted); text-decoration: none; border-radius: 0.5rem; transition: all 0.2s; }
-    .nav-link:hover, .nav-link.active { color: var(--text); background: var(--surface); }
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border); transition: all 0.3s;
+    }
+    .nav-inner {
+      max-width: 1280px; margin: 0 auto; display: flex;
+      align-items: center; justify-content: space-between; height: 4.5rem; padding: 0 1.5rem;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-size: 1.3rem; font-weight: 800; color: var(--text-primary); text-decoration: none;
+    }
+    .logo-icon {
+      width: 2.5rem; height: 2.5rem;
+      background: linear-gradient(135deg, var(--brand-indigo), var(--brand-violet));
+      border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;
+      color: white; box-shadow: var(--shadow-glow-indigo);
+    }
+    .logo-highlight {
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; list-style: none; }
+    .nav-link {
+      font-size: 0.9rem; font-weight: 500; color: var(--text-muted);
+      text-decoration: none; transition: color var(--transition-fast);
+    }
+    .nav-link:hover, .nav-link.active { color: var(--text-primary); }
     .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
-    .nav-toggle { display: none; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 0.5rem; }
-    .nav-toggle span { width: 22px; height: 2px; background: var(--text); border-radius: 2px; }
-    .theme-toggle-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem; }
+    
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1.35rem; font-size: 0.875rem; font-weight: 600;
+      font-family: inherit; border: none; border-radius: var(--radius-md);
+      cursor: pointer; transition: all var(--transition-smooth); text-decoration: none; white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand-indigo), var(--brand-violet));
+      color: white; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45); color: white; }
+    .btn-ghost { background: transparent; color: var(--text-muted); }
+    .btn-ghost:hover { background: var(--glass-hover); color: var(--text-primary); }
+    .btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.15); color: var(--text-primary); }
+    .btn-outline:hover { background: var(--glass-hover); border-color: rgba(99,102,241,0.4); }
+    .btn-lg { padding: 0.85rem 2rem; font-size: 1rem; }
+    .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
+    
+    .theme-toggle {
+      background: none; border: none; color: var(--text-muted); cursor: pointer;
+      padding: 0.5rem; border-radius: var(--radius-sm); transition: all var(--transition-fast);
+    }
+    .theme-toggle:hover { color: var(--text-primary); background: var(--glass-hover); }
     
     /* ========================================
-       DYNAMIC ELECTIONS SECTION
+       HERO SECTION
        ======================================== */
-    .dynamic-elections-section { padding: 5rem 0; background: var(--bg); }
-    .tabs { display: flex; justify-content: center; gap: 0.5rem; margin: 2rem 0; flex-wrap: wrap; }
-    .tab { padding: 0.65rem 1.5rem; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-    .tab.active, .tab:hover { background: rgba(99,102,241,0.15); color: var(--primary-light); border-color: rgba(99,102,241,0.3); }
-    .election-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
-    .election-card { background: var(--surface); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; transition: all 0.3s; cursor: pointer; position: relative; overflow: hidden; }
-    .election-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-    .election-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4); opacity: 0; transition: opacity 0.3s; }
-    .election-card:hover::before { opacity: 1; }
-    .card-type-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.75rem; }
-    .card-type-badge.student { background: rgba(99,102,241,0.15); color: #818cf8; }
-    .card-type-badge.nomination { background: rgba(245,158,11,0.15); color: #f59e0b; }
-    .card-type-badge.event { background: rgba(6,182,212,0.15); color: #06b6d4; }
-    .card-type-badge.club { background: rgba(16,185,129,0.15); color: #10b981; }
-    .card-status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 100px; font-size: 0.65rem; font-weight: 600; margin-left: 0.5rem; }
-    .card-status.active { background: rgba(16,185,129,0.15); color: #10b981; }
-    .card-status.upcoming { background: rgba(245,158,11,0.15); color: #f59e0b; }
-    .card-status.completed { background: rgba(100,116,139,0.15); color: #94a3b8; }
-    .election-card h3 { font-size: 1.2rem; font-weight: 700; margin: 0.75rem 0 0.5rem; color: var(--text); }
-    .election-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
-    .card-meta { display: flex; gap: 1.5rem; padding: 1rem 0; border-top: 1px solid var(--border); margin-bottom: 1rem; }
-    .card-meta .meta-item span { font-size: 1rem; font-weight: 700; color: var(--text); display: block; }
-    .card-meta .meta-item small { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
-    .empty-state { text-align: center; padding: 3rem; grid-column: 1 / -1; color: var(--text-muted); }
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding-top: 5rem; position: relative; overflow: hidden;
+      background: linear-gradient(160deg, #020617 0%, #0f172a 30%, #1e1b4b 60%, #0f172a 100%);
+    }
+    .hero-bg-orbs { position: absolute; inset: 0; pointer-events: none; }
+    .hero-orb {
+      position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12;
+      animation: orbFloat 18s ease-in-out infinite;
+    }
+    .hero-orb:nth-child(1) { width: 700px; height: 700px; background: var(--brand-indigo); top: -300px; right: -200px; }
+    .hero-orb:nth-child(2) { width: 500px; height: 500px; background: var(--brand-violet); bottom: -200px; left: -150px; animation-delay: -6s; }
+    .hero-orb:nth-child(3) { width: 400px; height: 400px; background: var(--brand-cyan); top: 50%; right: 20%; animation-delay: -12s; }
+    @keyframes orbFloat {
+      0%,100% { transform: translate(0,0) scale(1); }
+      25% { transform: translate(80px,-60px) scale(1.1); }
+      50% { transform: translate(-40px,100px) scale(0.9); }
+      75% { transform: translate(-100px,-40px) scale(1.05); }
+    }
     
-    /* ========================================
-       FEATURES SECTION
-       ======================================== */
-    .features-section { padding: 5rem 0; }
-    .features-grid-advanced { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-    .feature-card-advanced { padding: 2rem; position: relative; overflow: hidden; cursor: pointer; }
-    .feature-card-glow { position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--primary), transparent); opacity: 0; transition: opacity 0.4s; }
-    .feature-card-advanced:hover .feature-card-glow { opacity: 1; }
-    .feature-card-advanced:hover { transform: translateY(-6px); border-color: rgba(99,102,241,0.3); }
-    .feature-icon-circle { width: 3.5rem; height: 3.5rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
-    .feature-icon-circle svg { width: 1.5rem; height: 1.5rem; color: white; }
-    .feature-icon-circle.purple { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
-    .feature-icon-circle.cyan { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
-    .feature-icon-circle.green { background: linear-gradient(135deg, #10b981, #06b6d4); }
-    .feature-icon-circle.orange { background: linear-gradient(135deg, #f97316, #f59e0b); }
-    .feature-icon-circle.pink { background: linear-gradient(135deg, #ec4899, #f472b6); }
-    .feature-icon-circle.indigo { background: linear-gradient(135deg, #4f46e5, #818cf8); }
-    .feature-card-advanced h3 { font-size: 1.25rem; margin-bottom: 0.75rem; font-weight: 700; }
-    .feature-card-advanced p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6; }
-    .feature-mini-list { list-style: none; }
-    .feature-mini-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
-    .feature-mini-list li svg { width: 1rem; height: 1rem; color: var(--success); }
-    .feature-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.15rem 0.6rem; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 100px; font-size: 0.65rem; font-weight: 700; color: white; }
+    .hero .container {
+      position: relative; z-index: 2; display: grid;
+      grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+    }
+    .hero-content { max-width: 600px; }
     
-    /* ========================================
-       SOLUTIONS SECTION
-       ======================================== */
-    .solutions-section { padding: 5rem 0; background: linear-gradient(180deg, var(--bg), rgba(30,27,75,0.5), var(--bg)); }
-    .solutions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-    .solution-card { padding: 2rem; text-align: center; position: relative; overflow: hidden; }
-    .solution-card:hover { transform: translateY(-6px); }
-    .solution-icon { font-size: 3rem; margin-bottom: 1rem; }
-    .solution-card h3 { margin-bottom: 0.75rem; font-weight: 700; }
-    .solution-card p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-    .solution-stats { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; padding: 0.75rem; background: rgba(255,255,255,0.03); border-radius: 0.5rem; }
-    .solution-stats span { font-size: 0.85rem; color: var(--text-secondary); }
-    .solution-stats strong { color: var(--text); }
-    .solution-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.2rem 0.75rem; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 100px; font-size: 0.65rem; font-weight: 700; color: white; }
-    
-    /* ========================================
-       HOW IT WORKS
-       ======================================== */
-    .how-it-works-section { padding: 5rem 0; }
-    .steps-visual { display: flex; align-items: flex-start; justify-content: center; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
-    .step-item { text-align: center; flex: 1; min-width: 200px; padding: 1rem; }
-    .step-number-large { font-size: 3rem; font-weight: 900; color: rgba(99,102,241,0.15); margin-bottom: 0.5rem; }
-    .step-icon-circle { width: 4rem; height: 4rem; background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.1)); border: 2px solid rgba(99,102,241,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
-    .step-icon-circle svg { width: 1.5rem; height: 1.5rem; color: var(--primary-light); }
-    .step-item h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-    .step-item p { font-size: 0.85rem; color: var(--text-muted); }
-    .step-connector-line { display: flex; align-items: center; padding-top: 5.5rem; flex-shrink: 0; }
-    .connector-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-    
-    /* ========================================
-       TESTIMONIALS
-       ======================================== */
-    .testimonials-section { padding: 5rem 0; background: linear-gradient(180deg, rgba(30,27,75,0.3), var(--bg)); }
-    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-    .testimonial-card { padding: 2rem; }
-    .testimonial-stars { font-size: 1.25rem; margin-bottom: 1rem; }
-    .testimonial-text { font-size: 1rem; font-style: italic; color: var(--text-secondary); margin-bottom: 1.5rem; }
-    .testimonial-author { display: flex; align-items: center; gap: 0.75rem; }
-    .author-avatar { width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: white; }
-    .testimonial-author strong { display: block; font-size: 0.9rem; }
-    .testimonial-author span { font-size: 0.8rem; color: var(--text-muted); }
-    
-    /* ========================================
-       PRICING
-       ======================================== */
-    .pricing-section { padding: 5rem 0; }
-    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; align-items: start; }
-    .pricing-card { padding: 2rem; position: relative; }
-    .pricing-card.popular { border-color: rgba(99,102,241,0.3); transform: scale(1.03); }
-    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 0.25rem 1.25rem; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 100px; font-size: 0.75rem; font-weight: 700; color: white; }
-    .pricing-header { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
-    .pricing-price { font-size: 3rem; font-weight: 900; color: var(--text); margin: 1rem 0; }
-    .pricing-price span { font-size: 1rem; font-weight: 400; color: var(--text-muted); }
-    .pricing-features { list-style: none; margin-bottom: 1.5rem; }
-    .pricing-features li { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary); }
-    .pricing-features li svg { width: 1.1rem; height: 1.1rem; color: var(--success); }
-    
-    /* ========================================
-       CTA
-       ======================================== */
-    .cta-section { padding: 5rem 0; }
-    .cta-card { position: relative; padding: 4rem 2rem; text-align: center; overflow: hidden; background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.05)); border-color: rgba(99,102,241,0.2); }
-    .cta-glow { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(99,102,241,0.1) 0%, transparent 50%); animation: spin 20s linear infinite; }
-    .cta-card h2 { position: relative; font-size: 2.5rem; margin-bottom: 1rem; }
-    .cta-card p { position: relative; font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem; }
-    .cta-buttons { position: relative; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-    
-    /* ========================================
-       FOOTER
-       ======================================== */
-    .footer-premium { background: rgba(0,0,0,0.3); border-top: 1px solid var(--border); }
-    .footer-newsletter-bar { padding: 3rem 0; border-bottom: 1px solid var(--border); }
-    .newsletter-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
-    .newsletter-inner h4 { margin-bottom: 0.25rem; }
-    .newsletter-inner p { color: var(--text-muted); margin: 0; }
-    .newsletter-form { display: flex; gap: 0.5rem; }
-    .newsletter-form input { padding: 0.65rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: inherit; outline: none; min-width: 250px; }
-    .newsletter-form input:focus { border-color: var(--primary); }
-    .footer-main-content { padding: 4rem 0; }
-    .footer-grid-premium { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; }
-    .footer-col h5 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; color: var(--text); }
-    .footer-col a { display: block; font-size: 0.85rem; color: var(--text-muted); text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
-    .footer-col a:hover { color: var(--primary-light); }
-    .footer-brand-logo { display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem; font-weight: 800; color: var(--text); text-decoration: none; margin-bottom: 1rem; }
-    .footer-brand-logo svg { width: 1.5rem; height: 1.5rem; color: var(--primary-light); }
-    .footer-social-links { display: flex; gap: 0.75rem; margin-top: 1rem; }
-    .footer-social-links a { width: 2.5rem; height: 2.5rem; background: var(--surface); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; text-decoration: none; font-size: 1.2rem; }
-    .footer-social-links a:hover { background: rgba(99,102,241,0.1); color: var(--primary-light); transform: translateY(-3px); }
-    .footer-bottom-bar { padding: 1.5rem 0; text-align: center; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted); }
-    .footer-bottom-bar strong { color: var(--primary-light); font-weight: 600; }
-    
-    /* ========================================
-       CHAT WIDGET
-       ======================================== */
-    .chat-widget-premium { position: fixed; bottom: 2rem; right: 2rem; z-index: 200; }
-    .chat-fab { width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 50%; color: white; cursor: pointer; box-shadow: 0 10px 30px rgba(99,102,241,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: all 0.3s; }
-    .chat-fab:hover { transform: scale(1.1); }
-    .chat-window { position: absolute; bottom: calc(100% + 1rem); right: 0; width: 380px; height: 500px; background: rgba(15,23,42,0.98); border: 1px solid var(--border); border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5); display: none; flex-direction: column; overflow: hidden; }
-    .chat-window.active { display: flex; }
-    .chat-window-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: rgba(99,102,241,0.15); border-bottom: 1px solid var(--border); }
-    .chat-agent-info { display: flex; align-items: center; gap: 0.75rem; }
-    .agent-avatar { width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg,#6366f1,#8b5cf6); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
-    .chat-window-body { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
-    .chat-message { max-width: 85%; padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 0.85rem; }
-    .chat-message.assistant { align-self: flex-start; background: var(--surface); color: var(--text-secondary); }
-    .chat-message.user { align-self: flex-end; background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; }
-    .chat-window-footer { display: flex; gap: 0.5rem; padding: 1rem; border-top: 1px solid var(--border); }
-    .chat-window-footer input { flex: 1; padding: 0.65rem; background: var(--surface); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text); font-family: inherit; outline: none; }
-    .chat-window-footer button { width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg,#6366f1,#8b5cf6); border: none; border-radius: 0.5rem; color: white; cursor: pointer; }
-    .chat-close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; }
-    
-    /* ========================================
-       LIVE BROADCASTING INDICATORS
-       ======================================== */
-    .live-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.25rem 0.75rem;
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: 100px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #ef4444;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.45rem 1.25rem; background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2); border-radius: var(--radius-full);
+      font-size: 0.85rem; font-weight: 600; color: var(--brand-indigo); margin-bottom: 2rem;
     }
     .live-dot {
-      width: 8px;
-      height: 8px;
-      background: #ef4444;
-      border-radius: 50%;
-      animation: livePulse 1.5s ease-in-out infinite;
+      width: 8px; height: 8px; background: var(--brand-emerald);
+      border-radius: 50%; animation: pulse 2s ease-in-out infinite;
     }
-    @keyframes livePulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.2); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 900;
+      line-height: 1.08; letter-spacing: -0.04em; margin-bottom: 1.5rem; color: white;
     }
-    .vote-update-flash {
-      animation: flashGreen 0.5s ease;
+    .hero-title .gradient {
+      background: linear-gradient(135deg, #818cf8, #c084fc, #22d3ee);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    @keyframes flashGreen {
-      0% { background: rgba(16, 185, 129, 0.3); }
-      100% { background: transparent; }
+    
+    .hero-subtitle {
+      font-size: 1.15rem; color: var(--text-muted); line-height: 1.7;
+      margin-bottom: 2.5rem; max-width: 500px;
     }
-    .broadcast-toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 0.75rem 1.5rem;
-      background: rgba(16, 185, 129, 0.9);
-      color: white;
-      border-radius: 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      z-index: 9999;
-      animation: slideUp 0.3s ease;
-      backdrop-filter: blur(10px);
+    
+    .hero-actions { display: flex; gap: 1rem; margin-bottom: 3rem; flex-wrap: wrap; }
+    
+    .hero-stats {
+      display: flex; gap: 2.5rem; padding-top: 2rem;
+      border-top: 1px solid var(--glass-border);
     }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translate(-50%, 20px); }
-      to { opacity: 1; transform: translate(-50%, 0); }
+    .hero-stat-value { font-size: 1.8rem; font-weight: 800; color: white; }
+    .hero-stat-label { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    /* Hero Mockup */
+    .hero-mockup {
+      background: var(--bg-card); backdrop-filter: blur(40px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
+      padding: 1.5rem; box-shadow: var(--shadow-card);
+      animation: float 6s ease-in-out infinite;
     }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    .mockup-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
+    }
+    .mockup-dots { display: flex; gap: 6px; }
+    .mockup-dots span { width: 10px; height: 10px; border-radius: 50%; background: #475569; }
+    .mockup-badge {
+      padding: 0.2rem 0.75rem; background: rgba(16, 185, 129, 0.1);
+      color: var(--brand-emerald); border-radius: var(--radius-full);
+      font-size: 0.7rem; font-weight: 700;
+    }
+    .mockup-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem;
+    }
+    .mockup-stat {
+      background: rgba(255,255,255,0.03); border-radius: var(--radius-md);
+      padding: 0.75rem; text-align: center;
+    }
+    .mockup-stat-val { font-size: 1.25rem; font-weight: 800; color: white; }
+    .mockup-stat-lbl { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
+    .mockup-chart { margin-bottom: 1rem; }
+    .mockup-bars { display: flex; flex-direction: column; gap: 0.5rem; }
+    .mockup-bar-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; color: var(--text-muted); }
+    .mockup-bar {
+      flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;
+    }
+    .mockup-bar-fill {
+      height: 100%; border-radius: 4px; transition: width 1s ease;
+    }
+    
+    /* ========================================
+       SECTIONS
+       ======================================== */
+    section { padding: 6rem 0; }
+    
+    .section-header { text-align: center; margin-bottom: 4rem; }
+    .section-badge {
+      display: inline-block; padding: 0.35rem 1.25rem;
+      background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600;
+      color: var(--brand-indigo); margin-bottom: 1.25rem;
+    }
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800;
+      margin-bottom: 1rem; letter-spacing: -0.03em;
+    }
+    .section-subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+    
+    /* Features Grid */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.75rem;
+    }
+    .feature-card {
+      background: var(--bg-card); backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
+      padding: 2.25rem; transition: all var(--transition-smooth);
+      position: relative; overflow: hidden; cursor: pointer;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--brand-indigo), transparent);
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .feature-card:hover { transform: translateY(-6px); border-color: rgba(99,102,241,0.3); box-shadow: var(--shadow-elevated); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 3.5rem; height: 3.5rem; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
+    }
+    .feature-icon svg { width: 1.5rem; height: 1.5rem; color: white; }
+    .feature-icon.indigo { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .feature-icon.cyan { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+    .feature-icon.emerald { background: linear-gradient(135deg, #10b981, #06b6d4); }
+    .feature-icon.amber { background: linear-gradient(135deg, #f59e0b, #f97316); }
+    .feature-icon.rose { background: linear-gradient(135deg, #f43f5e, #ec4899); }
+    .feature-icon.purple { background: linear-gradient(135deg, #a855f7, #8b5cf6); }
+    .feature-card h3 { font-size: 1.2rem; margin-bottom: 0.75rem; font-weight: 700; }
+    .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+    
+    /* Trust Bar */
+    .trust-section { padding: 2rem 0; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
+    .trust-marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent); }
+    .trust-track { display: flex; gap: 4rem; animation: scroll 25s linear infinite; width: max-content; }
+    @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .trust-item { font-size: 1.1rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    
+    /* Pricing */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.75rem; align-items: start; }
+    .pricing-card {
+      background: var(--bg-card); backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
+      padding: 2.5rem; transition: all var(--transition-smooth); position: relative;
+    }
+    .pricing-card.popular { border-color: rgba(99,102,241,0.3); transform: scale(1.03); }
+    .popular-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      padding: 0.3rem 1.25rem; background: linear-gradient(135deg, var(--brand-indigo), var(--brand-violet));
+      border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; color: white;
+    }
+    .pricing-price { font-size: 3rem; font-weight: 900; margin: 1rem 0; }
+    .pricing-price span { font-size: 1rem; font-weight: 400; color: var(--text-muted); }
+    .pricing-features { list-style: none; margin-bottom: 2rem; }
+    .pricing-features li {
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;
+      font-size: 0.9rem; color: var(--text-secondary);
+    }
+    .pricing-features li svg { width: 1rem; height: 1rem; color: var(--brand-emerald); }
+    
+    /* CTA */
+    .cta-section { text-align: center; }
+    .cta-card {
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.04));
+      border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius-2xl);
+      padding: 4rem 2rem; position: relative; overflow: hidden;
+    }
+    .cta-glow {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(99,102,241,0.1), transparent 70%);
+      animation: spin 20s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Footer */
+    .footer {
+      background: rgba(0,0,0,0.3); border-top: 1px solid var(--glass-border); padding: 4rem 0 2rem;
+    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; }
+    .footer h5 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; color: var(--text-primary); }
+    .footer a { display: block; font-size: 0.85rem; color: var(--text-muted); text-decoration: none; margin-bottom: 0.5rem; transition: color var(--transition-fast); }
+    .footer a:hover { color: var(--brand-indigo); }
+    .footer-social { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .footer-social a {
+      width: 2.5rem; height: 2.5rem; background: var(--glass-bg); border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center; color: var(--text-muted);
+      transition: all var(--transition-fast);
+    }
+    .footer-social a:hover { background: rgba(99,102,241,0.1); color: var(--brand-indigo); transform: translateY(-3px); }
+    .footer-bottom { text-align: center; padding-top: 2rem; margin-top: 2rem; border-top: 1px solid var(--glass-border); font-size: 0.85rem; color: var(--text-dim); }
     
     /* ========================================
        RESPONSIVE
        ======================================== */
     @media (max-width: 1024px) {
-      .footer-grid-premium { grid-template-columns: 1fr 1fr; }
+      .hero .container { grid-template-columns: 1fr; text-align: center; }
+      .hero-content { max-width: 100%; margin: 0 auto; }
+      .hero-stats, .hero-actions { justify-content: center; }
+      .hero-mockup { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 768px) {
-      .nav-menu { display: none; }
-      .nav-menu.open { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg); padding: 1rem; border-bottom: 1px solid var(--border); }
-      .nav-toggle { display: flex; }
-      .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-      .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-      .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
-      .nav-menu li { width: 100%; }
-      .nav-menu li a { display: block; width: 100%; padding: 0.9rem 1rem; }
-      .nav-actions { flex-wrap: wrap; gap: 0.75rem; }
-      .container { padding: 0 1rem; }
-      .hero { padding: 7rem 0 3rem; min-height: auto; }
-      .hero .container { grid-template-columns: 1fr !important; gap: 2rem !important; }
-      .hero h1 { font-size: clamp(2.5rem, 9vw, 3.4rem); line-height: 1.1; }
-      .hero p { max-width: 100%; font-size: 1rem; }
-      .hero .btn { width: 100%; justify-content: center; }
-      .hero .btn + .btn { margin-top: 1rem; }
-      .hero div[style*="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;"] { grid-template-columns: 1fr; }
-      .hero div[style*="display:flex;gap:1rem;margin-bottom:3rem;"] { flex-direction: column !important; align-items: stretch !important; }
-      .hero div[style*="display:flex;gap:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.08);"] { gap: 1rem !important; }
-      .hero div[style*="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:1rem;"] { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important; }
-      .hero div[style*="position:absolute;bottom:2rem;"] { position: static; transform: none; margin-top: 1.5rem; }
-      .hero .container { align-items: flex-start !important; }
-      .hero p { max-width: 100%; }
-      .nav-actions { justify-content: flex-end; width: 100%; padding-top: 0.5rem; }
-      .nav-menu.open { box-shadow: 0 18px 40px rgba(0,0,0,0.2); }
-      .nav-menu { gap: 0.25rem; }
-      .election-cards-grid { grid-template-columns: 1fr; }
-      .features-grid-advanced { grid-template-columns: 1fr; gap: 1rem; }
-      .feature-card-advanced,
-      .solution-card,
-      .testimonial-card { padding: 1.5rem; }
-      .feature-card-advanced h3,
-      .solution-card h3,
-      .testimonial-card h3 { font-size: 1.15rem; }
-      .feature-card-advanced p,
-      .solution-card p,
-      .testimonial-text { font-size: 0.95rem; }
-      .feature-mini-list li { font-size: 0.85rem; gap: 0.65rem; }
-      .solutions-grid { grid-template-columns: 1fr; gap: 1rem; }
-      .testimonials-grid { grid-template-columns: 1fr; gap: 1rem; }
-      .pricing-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
       .pricing-card.popular { transform: scale(1); }
-      .footer-grid-premium { grid-template-columns: 1fr; gap: 1.5rem; }
-      .footer-newsletter-bar { padding: 2rem 0; }
-      .newsletter-inner { flex-direction: column; text-align: left; gap: 1rem; }
-      .newsletter-form { flex-direction: column; width: 100%; }
-      .newsletter-form input { min-width: unset; width: 100%; }
-      .footer-col { width: 100%; }
-      .footer-col a { margin-bottom: 0.65rem; }
-      .footer-bottom-bar { font-size: 0.8rem; padding: 1rem 0; }
-      .chat-window { width: calc(100vw - 2rem); right: -0.5rem; }
-      .steps-visual { flex-direction: column; }
-      .step-connector-line { display: none; }
     }
   </style>
 </head>
 <body>
-  <!-- Preloader -->
-  <div id="preloader">
-    <div class="loader-ring"></div>
-    <div class="loader-text">VoteWave</div>
-  </div>
-  
-  <!-- Particles -->
-  <div id="particles-js"></div>
-  
-  <!-- Back to Top -->
-  <button class="back-to-top" id="backToTop">↑</button>
-
-  <!-- ========================================
-       NAVIGATION
-       ======================================== -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-container">
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <div class="nav-inner">
       <a href="index.html" class="nav-logo">
-        <div class="logo-icon-wrapper"><i data-lucide="vote"></i></div>
+        <div class="logo-icon">V</div>
         <span>Vote<span class="logo-highlight">Wave</span></span>
       </a>
-      <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-label="Open navigation menu">
-        <span></span><span></span><span></span>
-      </button>
-      <ul class="nav-menu" id="navMenu">
+      <ul class="nav-links">
         <li><a href="index.html" class="nav-link active">Home</a></li>
         <li><a href="voter/elections.html" class="nav-link">Elections</a></li>
         <li><a href="voter/nominations.html" class="nav-link">Nominations</a></li>
         <li><a href="voter/events.html" class="nav-link">Events</a></li>
-        <li><a href="voter/club-elections.html" class="nav-link">Clubs</a></li>
+        <li><a href="#pricing" class="nav-link">Pricing</a></li>
       </ul>
-      <div class="nav-actions" id="navActions">
-        <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
-          <i data-lucide="sun"></i>
-        </button>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌓</button>
         <a href="auth/login.html" class="btn btn-ghost btn-sm">Sign In</a>
         <a href="auth/register.html" class="btn btn-primary btn-sm">Get Started Free</a>
       </div>
     </div>
   </nav>
 
-  <!-- ========================================
-       HERO SECTION
-       ======================================== -->
-  <section class="hero" id="hero" style="min-height:100vh;display:flex;align-items:center;padding-top:5rem;background:linear-gradient(135deg,#0f172a,#1e1b4b,#0f172a);position:relative;overflow:hidden;">
-    <div style="position:absolute;inset:0;">
-      <div style="position:absolute;width:700px;height:700px;background:#6366f1;border-radius:50%;filter:blur(120px);opacity:0.12;top:-300px;right:-200px;"></div>
-      <div style="position:absolute;width:600px;height:600px;background:#8b5cf6;border-radius:50%;filter:blur(100px);opacity:0.1;bottom:-200px;left:-200px;"></div>
-      <div style="position:absolute;width:400px;height:400px;background:#06b6d4;border-radius:50%;filter:blur(100px);opacity:0.08;top:50%;right:30%;"></div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-orbs">
+      <div class="hero-orb"></div><div class="hero-orb"></div><div class="hero-orb"></div>
     </div>
-    <div class="container" style="position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
-      <div style="max-width:600px;">
-        <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1.25rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:100px;font-size:0.85rem;color:#a5b4fc;margin-bottom:2rem;">
-          <span style="width:8px;height:8px;background:#10b981;border-radius:50%;animation:pulse 2s ease-in-out infinite;"></span>
-          🚀 Trusted by 10,000+ Organizations Worldwide
-        </div>
-        <h1 style="font-size:4.5rem;font-weight:900;line-height:1.05;margin-bottom:1.5rem;color:white;">Modern Voting<br><span class="gradient-text">Made Simple</span></h1>
-        <p style="font-size:1.15rem;color:#94a3b8;margin-bottom:2.5rem;max-width:500px;">The most advanced AI-powered e-voting platform for schools, clubs, and organizations. Secure, transparent elections in minutes.</p>
-        <div style="display:flex;gap:1rem;margin-bottom:3rem;flex-wrap:wrap;">
-          <a href="auth/register.html" class="btn btn-primary btn-lg"><span>Start Free Trial</span><i data-lucide="arrow-right"></i></a>
-          <a href="voter/elections.html" class="btn btn-outline btn-lg"><span>View Elections</span></a>
-        </div>
-        <div style="display:flex;gap:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;">
-          <div><span style="font-size:2rem;font-weight:800;color:white;">50K+</span><br><span style="font-size:0.85rem;color:#64748b;">Votes Cast</span></div>
-          <div><span style="font-size:2rem;font-weight:800;color:white;">2,500+</span><br><span style="font-size:0.85rem;color:#64748b;">Elections</span></div>
-          <div><span style="font-size:2rem;font-weight:800;color:white;">15K+</span><br><span style="font-size:0.85rem;color:#64748b;">Active Users</span></div>
-        </div>
-      </div>
-      <div style="display:flex;justify-content:center;align-items:center;">
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:1.5rem;padding:2rem;text-align:center;backdrop-filter:blur(40px);">
-          <div style="font-size:4rem;margin-bottom:1rem;">🗳️</div>
-          <h3 style="color:white;margin-bottom:0.5rem;">Live Dashboard</h3>
-          <p style="color:#94a3b8;margin-bottom:1rem;">Real-time election monitoring</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
-            <div style="background:rgba(255,255,255,0.03);padding:0.75rem;border-radius:0.5rem;"><span style="display:block;font-size:1.25rem;font-weight:800;color:white;">1,247</span><span style="font-size:0.7rem;color:#64748b;">Votes</span></div>
-            <div style="background:rgba(255,255,255,0.03);padding:0.75rem;border-radius:0.5rem;"><span style="display:block;font-size:1.25rem;font-weight:800;color:white;">89%</span><span style="font-size:0.7rem;color:#64748b;">Turnout</span></div>
-            <div style="background:rgba(255,255,255,0.03);padding:0.75rem;border-radius:0.5rem;"><span style="display:block;font-size:1.25rem;font-weight:800;color:white;">3</span><span style="font-size:0.7rem;color:#64748b;">Active</span></div>
-          </div>
-          <a href="auth/register.html" class="btn btn-primary btn-sm">Start Voting →</a>
-        </div>
-      </div>
-    </div>
-    <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);text-align:center;color:#64748b;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;">
-      <div style="width:24px;height:38px;border:2px solid #64748b;border-radius:12px;margin:0 auto 0.5rem;display:flex;justify-content:center;padding-top:6px;">
-        <div style="width:3px;height:8px;background:#64748b;border-radius:2px;animation:scrollWheel 2s ease infinite;"></div>
-      </div>
-      Scroll to explore
-    </div>
-  </section>
-
-  <!-- ========================================
-       DYNAMIC ELECTIONS SECTION
-       ======================================== -->
-  <section class="dynamic-elections-section" id="dynamicElections">
     <div class="container">
-      <div class="section-header">
-        <span class="section-badge">🗳️ Live Now</span>
-        <h2 class="section-title">Active Elections, Nominations & Events</h2>
-        <p class="section-subtitle">Cast your vote, nominate excellence, or participate in live events happening right now.</p>
+      <div class="hero-content">
+        <div class="hero-badge"><span class="live-dot"></span> LIVE — Trusted by 10,000+ Organizations</div>
+        <h1 class="hero-title">Modern Voting<br><span class="gradient">Reimagined</span></h1>
+        <p class="hero-subtitle">The most advanced AI-powered e-voting platform. Enterprise-grade security, real-time analytics, and stunningly simple — launch an election in under 10 minutes.</p>
+        <div class="hero-actions">
+          <a href="auth/register.html" class="btn btn-primary btn-lg">Start Free Trial →</a>
+          <a href="voter/elections.html" class="btn btn-outline btn-lg">View Live Demo</a>
+        </div>
+        <div class="hero-stats">
+          <div><div class="hero-stat-value">2,847</div><div class="hero-stat-label">Votes Cast Today</div></div>
+          <div><div class="hero-stat-value">73%</div><div class="hero-stat-label">Avg Turnout</div></div>
+          <div><div class="hero-stat-value">99.9%</div><div class="hero-stat-label">Uptime SLA</div></div>
+        </div>
       </div>
-      
-      <div class="tabs" id="electionTabs">
-        <button class="tab active" data-tab="active">🟢 Ongoing</button>
-        <button class="tab" data-tab="upcoming">🟡 Upcoming</button>
-        <button class="tab" data-tab="completed">✅ Completed</button>
+      <div class="hero-mockup">
+        <div class="mockup-header">
+          <div class="mockup-dots"><span></span><span></span><span></span></div>
+          <span class="mockup-badge">● LIVE</span>
+        </div>
+        <div class="mockup-stats">
+          <div class="mockup-stat"><div class="mockup-stat-val">2,847</div><div class="mockup-stat-lbl">Votes</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-val">73%</div><div class="mockup-stat-lbl">Turnout</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-val">2h 14m</div><div class="mockup-stat-lbl">Remaining</div></div>
+        </div>
+        <div class="mockup-chart"><canvas id="heroChart" height="120"></canvas></div>
+        <div class="mockup-bars">
+          <div class="mockup-bar-row"><span>Alex Johnson</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:44%;background:#6366f1;"></div></div><strong>44%</strong></div>
+          <div class="mockup-bar-row"><span>Maria Garcia</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:35%;background:#8b5cf6;"></div></div><strong>35%</strong></div>
+          <div class="mockup-bar-row"><span>Chris Lee</span><div class="mockup-bar"><div class="mockup-bar-fill" style="width:21%;background:#06b6d4;"></div></div><strong>21%</strong></div>
+        </div>
       </div>
-      
-      <div class="election-cards-grid" id="electionCards"></div>
     </div>
   </section>
 
-  <!-- ========================================
-       FEATURES SECTION
-       ======================================== -->
-  <section class="features-section" id="features">
+  <!-- TRUST BAR -->
+  <section class="trust-section">
+    <div class="container">
+      <p style="text-align:center;color:var(--text-dim);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.5rem;">Trusted by leading institutions worldwide</p>
+      <div class="trust-marquee">
+        <div class="trust-track">
+          <span class="trust-item">🏛️ Harvard University</span>
+          <span class="trust-item">🎓 MIT</span>
+          <span class="trust-item">🏫 Stanford</span>
+          <span class="trust-item">📚 Oxford</span>
+          <span class="trust-item">💼 Google Education</span>
+          <span class="trust-item">🎯 Microsoft Learn</span>
+          <span class="trust-item">🏥 Mayo Clinic</span>
+          <span class="trust-item">🎨 RISD</span>
+          <span class="trust-item">🏛️ Harvard University</span>
+          <span class="trust-item">🎓 MIT</span>
+          <span class="trust-item">🏫 Stanford</span>
+          <span class="trust-item">📚 Oxford</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
     <div class="container">
       <div class="section-header">
         <span class="section-badge">✨ Features</span>
-        <h2 class="section-title">Everything You Need to Run<br><span class="gradient-text">Perfect Elections</span></h2>
-        <p class="section-subtitle">A complete platform with cutting-edge features designed for security, transparency, and engagement.</p>
+        <h2 class="section-title">Everything You Need to Run<br><span class="gradient" style="background:linear-gradient(135deg,#818cf8,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Perfect Elections</span></h2>
+        <p class="section-subtitle">Secure, transparent, and scalable — built for organizations that take democracy seriously.</p>
       </div>
-      
-      <div class="features-grid-advanced">
-        <div class="feature-card-advanced glass-card" onclick="window.location.href='auth/register.html'">
-          <div class="feature-card-glow"></div>
-          <div class="feature-icon-circle purple"><i data-lucide="shield-check"></i></div>
-          <h3>Military-Grade Security</h3>
-          <p>End-to-end encryption with AES-256, zero-knowledge proofs, and immutable audit trails ensure your elections are tamper-proof.</p>
-          <ul class="feature-mini-list">
-            <li><i data-lucide="check"></i> AES-256 Encryption</li>
-            <li><i data-lucide="check"></i> Zero-Knowledge Proofs</li>
-            <li><i data-lucide="check"></i> Immutable Audit Trail</li>
-          </ul>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon indigo"><i data-lucide="shield-check"></i></div>
+          <h3>Enterprise Security</h3>
+          <p>End-to-end encryption, cryptographic vote hashing, and immutable audit trails keep every election tamper-proof.</p>
         </div>
-        
-        <div class="feature-card-advanced glass-card" onclick="window.location.href='auth/register.html'">
-          <div class="feature-card-glow"></div>
-          <div class="feature-icon-circle cyan"><i data-lucide="bot"></i></div>
-          <h3>AI-Powered Assistant</h3>
-          <p>Intelligent chatbot helps voters find candidates, answers questions, and provides real-time election insights 24/7.</p>
-          <ul class="feature-mini-list">
-            <li><i data-lucide="check"></i> 24/7 Voter Support</li>
-            <li><i data-lucide="check"></i> Smart Recommendations</li>
-            <li><i data-lucide="check"></i> Fraud Detection Alerts</li>
-          </ul>
-          <span class="feature-badge">AI</span>
+        <div class="feature-card">
+          <div class="feature-icon cyan"><i data-lucide="activity"></i></div>
+          <h3>Real-Time Analytics</h3>
+          <p>Watch votes come in live with instant dashboards, custom reports, and exportable data.</p>
         </div>
-        
-        <div class="feature-card-advanced glass-card" onclick="window.location.href='auth/register.html'">
-          <div class="feature-card-glow"></div>
-          <div class="feature-icon-circle green"><i data-lucide="activity"></i></div>
-          <h3>Real-Time Live Results</h3>
-          <p>Watch election results unfold with stunning interactive charts, maps, and shareable public dashboards.</p>
-          <ul class="feature-mini-list">
-            <li><i data-lucide="check"></i> Interactive Charts</li>
-            <li><i data-lucide="check"></i> Public Share Links</li>
-            <li><i data-lucide="check"></i> Export to PDF/CSV</li>
-          </ul>
+        <div class="feature-card">
+          <div class="feature-icon emerald"><i data-lucide="layers"></i></div>
+          <h3>Multi-Tenant Platform</h3>
+          <p>Full data isolation per organization with custom branding and granular role-based access.</p>
         </div>
-        
-        <div class="feature-card-advanced glass-card" onclick="window.location.href='auth/register.html'">
-          <div class="feature-card-glow"></div>
-          <div class="feature-icon-circle orange"><i data-lucide="smartphone"></i></div>
-          <h3>Omnichannel Voting</h3>
-          <p>Voters can participate via web, mobile, SMS, or QR codes for hybrid and remote election scenarios.</p>
-          <ul class="feature-mini-list">
-            <li><i data-lucide="check"></i> Progressive Web App</li>
-            <li><i data-lucide="check"></i> QR Code Quick Access</li>
-            <li><i data-lucide="check"></i> SMS Notifications</li>
-          </ul>
+        <div class="feature-card">
+          <div class="feature-icon amber"><i data-lucide="file-check"></i></div>
+          <h3>Full Transparency</h3>
+          <p>Blockchain-like audit trail and public vote verification so every stakeholder can trust the outcome.</p>
         </div>
-        
-        <div class="feature-card-advanced glass-card" onclick="window.location.href='auth/register.html'">
-          <div class="feature-card-glow"></div>
-          <div class="feature-icon-circle pink"><i data-lucide="users"></i></div>
-          <h3>Multi-Tenant Architecture</h3>
-          <p>Run multiple independent elections simultaneously with department isolation and custom branding.</p>
-          <ul class="feature-mini-list">
-            <li><i data-lucide="check"></i> Department Isolation</li>
-            <li><i data-lucide="check"></i> Role-Based Access</li>
-            <li><i data-lucide="check"></i> Custom Branding</li>
-          </ul>
+        <div class="feature-card">
+          <div class="feature-icon rose"><i data-lucide="zap"></i></div>
+          <h3>Up in Minutes</h3>
+          <p>Quick-start wizard, bulk CSV voter import, and pre-built templates get your election live fast.</p>
         </div>
-        
-        <div class="feature-card-advanced glass-card" onclick="window.location.href='auth/register.html'">
-          <div class="feature-card-glow"></div>
-          <div class="feature-icon-circle indigo"><i data-lucide="bar-chart-3"></i></div>
-          <h3>Advanced Analytics Suite</h3>
-          <p>Deep insights into voter behavior, turnout patterns, and demographic analysis with AI-generated summaries.</p>
-          <ul class="feature-mini-list">
-            <li><i data-lucide="check"></i> Demographic Heatmaps</li>
-            <li><i data-lucide="check"></i> Turnout Predictions</li>
-            <li><i data-lucide="check"></i> Executive Reports</li>
-          </ul>
+        <div class="feature-card">
+          <div class="feature-icon purple"><i data-lucide="clock"></i></div>
+          <h3>Automated Lifecycle</h3>
+          <p>Schedule your election, auto-close at deadline, and receive complete results instantly.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ========================================
-       SOLUTIONS SECTION
-       ======================================== -->
-  <section class="solutions-section" id="solutions">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">🎯 Solutions</span>
-        <h2 class="section-title">Tailored for Every<br><span class="gradient-text">Voting Scenario</span></h2>
-        <p class="section-subtitle">From student councils to corporate boards, specialized tools for every use case.</p>
-      </div>
-      
-      <div class="solutions-grid">
-        <div class="solution-card glass-card">
-          <div class="solution-icon">🎓</div>
-          <h3>Student Elections</h3>
-          <p>Complete student government elections with candidate profiles and real-time results.</p>
-          <div class="solution-stats"><span><strong>1,200+</strong> Schools</span><span><strong>500K+</strong> Students</span></div>
-          <a href="voter/elections.html" class="btn btn-primary btn-sm">Learn More →</a>
-          <div class="solution-badge">Most Popular</div>
-        </div>
-        <div class="solution-card glass-card">
-          <div class="solution-icon">🏆</div>
-          <h3>Nominations</h3>
-          <p>Streamline award nominations with custom forms and weighted committee voting.</p>
-          <div class="solution-stats"><span><strong>800+</strong> Programs</span><span><strong>50K+</strong> Nominations</span></div>
-          <a href="voter/elections.html" class="btn btn-outline btn-sm">Learn More →</a>
-        </div>
-        <div class="solution-card glass-card">
-          <div class="solution-icon">🎪</div>
-          <h3>Event Voting</h3>
-          <p>Live polling and instant feedback with QR quick access and real-time display screens.</p>
-          <div class="solution-stats"><span><strong>3,000+</strong> Events</span><span><strong>1M+</strong> Responses</span></div>
-          <a href="voter/elections.html" class="btn btn-outline btn-sm">Learn More →</a>
-        </div>
-        <div class="solution-card glass-card">
-          <div class="solution-icon">🏢</div>
-          <h3>Corporate Voting</h3>
-          <p>Secure shareholder voting with proxy support and compliance reporting.</p>
-          <div class="solution-stats"><span><strong>350+</strong> Companies</span><span><strong>100K+</strong> Shareholders</span></div>
-          <a href="voter/elections.html" class="btn btn-outline btn-sm">Learn More →</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========================================
-       HOW IT WORKS
-       ======================================== -->
-  <section class="how-it-works-section" id="how-it-works">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">⚡ Process</span>
-        <h2 class="section-title">Setup in Minutes,<br><span class="gradient-text">Vote in Seconds</span></h2>
-      </div>
-      
-      <div class="steps-visual">
-        <div class="step-item"><div class="step-number-large">01</div><div class="step-icon-circle"><i data-lucide="user-plus"></i></div><h3>Create Account</h3><p>Sign up in under 2 minutes with email verification and secure OTP.</p></div>
-        <div class="step-connector-line"><div class="connector-dot"></div></div>
-        <div class="step-item"><div class="step-number-large">02</div><div class="step-icon-circle"><i data-lucide="settings"></i></div><h3>Configure Election</h3><p>Set up candidates, voting rules, dates, and customize branding.</p></div>
-        <div class="step-connector-line"><div class="connector-dot"></div></div>
-        <div class="step-item"><div class="step-number-large">03</div><div class="step-icon-circle"><i data-lucide="vote"></i></div><h3>Launch & Collect Votes</h3><p>Share the link or QR code. Voters cast ballots from any device.</p></div>
-        <div class="step-connector-line"><div class="connector-dot"></div></div>
-        <div class="step-item"><div class="step-number-large">04</div><div class="step-icon-circle"><i data-lucide="bar-chart-3"></i></div><h3>Analyze & Share Results</h3><p>View stunning analytics and share results with stakeholders.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========================================
-       TESTIMONIALS
-       ======================================== -->
-  <section class="testimonials-section" id="testimonials">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">💬 Testimonials</span>
-        <h2 class="section-title">Loved by<br><span class="gradient-text">Organizations Worldwide</span></h2>
-      </div>
-      
-      <div class="testimonials-grid">
-        <div class="testimonial-card glass-card"><div class="testimonial-stars">⭐⭐⭐⭐⭐</div><p class="testimonial-text">"VoteWave transformed our student council elections. The entire process was seamless, and the real-time results dashboard was a hit!"</p><div class="testimonial-author"><div class="author-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">SD</div><div><strong>Dr. Sarah Davis</strong><span>Harvard University</span></div></div></div>
-        <div class="testimonial-card glass-card"><div class="testimonial-stars">⭐⭐⭐⭐⭐</div><p class="testimonial-text">"Processed 50,000+ votes without a single issue. The security features gave our board complete confidence."</p><div class="testimonial-author"><div class="author-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">MR</div><div><strong>Michael Roberts</strong><span>TechCorp International</span></div></div></div>
-        <div class="testimonial-card glass-card"><div class="testimonial-stars">⭐⭐⭐⭐⭐</div><p class="testimonial-text">"The AI assistant reduced support tickets by 80% during election week. A complete game-changer!"</p><div class="testimonial-author"><div class="author-avatar" style="background:linear-gradient(135deg,#10b981,#06b6d4);">EL</div><div><strong>Emily Lawson</strong><span>State University</span></div></div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========================================
-       PRICING
-       ======================================== -->
-  <section class="pricing-section" id="pricing">
+  <!-- PRICING -->
+  <section id="pricing">
     <div class="container">
       <div class="section-header">
         <span class="section-badge">💎 Pricing</span>
-        <h2 class="section-title">Simple, Transparent<br><span class="gradient-text">Pricing</span></h2>
-        <p class="section-subtitle">Start for free. Upgrade as you grow. No hidden fees.</p>
+        <h2 class="section-title">Simple, Transparent<br><span class="gradient" style="background:linear-gradient(135deg,#818cf8,#c084fc,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Pricing</span></h2>
+        <p class="section-subtitle">All plans include core features. No hidden fees. 14-day free trial.</p>
       </div>
-      
       <div class="pricing-grid">
-        <div class="pricing-card glass-card"><div class="pricing-header"><h3>Starter</h3><div class="pricing-price">$0<span>/month</span></div><p style="color:var(--text-muted);">Perfect for small clubs</p></div><ul class="pricing-features"><li><i data-lucide="check"></i> Up to 500 voters</li><li><i data-lucide="check"></i> 3 elections/year</li><li><i data-lucide="check"></i> Basic analytics</li><li><i data-lucide="check"></i> Email support</li></ul><a href="auth/register.html" class="btn btn-outline btn-full">Get Started</a></div>
-        
-        <div class="pricing-card glass-card popular"><div class="popular-badge">Most Popular</div><div class="pricing-header"><h3>Professional</h3><div class="pricing-price">$49<span>/month</span></div><p style="color:var(--text-muted);">For growing organizations</p></div><ul class="pricing-features"><li><i data-lucide="check"></i> Up to 10,000 voters</li><li><i data-lucide="check"></i> Unlimited elections</li><li><i data-lucide="check"></i> Advanced analytics</li><li><i data-lucide="check"></i> AI assistant</li><li><i data-lucide="check"></i> Priority support</li></ul><a href="auth/register.html" class="btn btn-primary btn-full">Start Free Trial</a></div>
-        
-        <div class="pricing-card glass-card"><div class="pricing-header"><h3>Enterprise</h3><div class="pricing-price">Custom</div><p style="color:var(--text-muted);">For large institutions</p></div><ul class="pricing-features"><li><i data-lucide="check"></i> Unlimited voters</li><li><i data-lucide="check"></i> Custom integrations</li><li><i data-lucide="check"></i> Dedicated support</li><li><i data-lucide="check"></i> SLA guarantee</li><li><i data-lucide="check"></i> White-label option</li></ul><a href="#" class="btn btn-outline btn-full">Contact Sales</a></div>
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <p style="color:var(--text-muted);">For small organizations</p>
+          <div class="pricing-price">$0<span>/month</span></div>
+          <ul class="pricing-features">
+            <li><i data-lucide="check"></i> 500 voters</li>
+            <li><i data-lucide="check"></i> 3 elections</li>
+            <li><i data-lucide="check"></i> Real-time results</li>
+            <li><i data-lucide="check"></i> Email support</li>
+          </ul>
+          <a href="auth/register.html" class="btn btn-outline btn-lg" style="width:100%;justify-content:center;">Get Started</a>
+        </div>
+        <div class="pricing-card popular">
+          <div class="popular-badge">Most Popular</div>
+          <h3>Professional</h3>
+          <p style="color:var(--text-muted);">For growing organizations</p>
+          <div class="pricing-price">$49<span>/month</span></div>
+          <ul class="pricing-features">
+            <li><i data-lucide="check"></i> 10,000 voters</li>
+            <li><i data-lucide="check"></i> Unlimited elections</li>
+            <li><i data-lucide="check"></i> Advanced analytics</li>
+            <li><i data-lucide="check"></i> AI assistant</li>
+            <li><i data-lucide="check"></i> Priority support</li>
+          </ul>
+          <a href="auth/register.html" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Start Free Trial</a>
+        </div>
+        <div class="pricing-card">
+          <h3>Enterprise</h3>
+          <p style="color:var(--text-muted);">For large institutions</p>
+          <div class="pricing-price">Custom</div>
+          <ul class="pricing-features">
+            <li><i data-lucide="check"></i> Unlimited voters</li>
+            <li><i data-lucide="check"></i> Custom integrations</li>
+            <li><i data-lucide="check"></i> Dedicated support</li>
+            <li><i data-lucide="check"></i> SLA guarantee</li>
+            <li><i data-lucide="check"></i> White-label</li>
+          </ul>
+          <a href="#" class="btn btn-outline btn-lg" style="width:100%;justify-content:center;">Contact Sales</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ========================================
-       CTA SECTION
-       ======================================== -->
+  <!-- CTA -->
   <section class="cta-section">
     <div class="container">
-      <div class="cta-card glass-card">
+      <div class="cta-card">
         <div class="cta-glow"></div>
-        <h2>Ready to Transform Your Elections?</h2>
-        <p>Join 10,000+ organizations already using VoteWave for secure, transparent voting.</p>
-        <div class="cta-buttons">
-          <a href="auth/register.html" class="btn btn-white btn-lg"><span>Get Started Free</span><i data-lucide="arrow-right"></i></a>
-          <a href="auth/login.html" class="btn btn-ghost-white btn-lg"><span>Sign In</span></a>
+        <h2 style="font-size:2.5rem;font-weight:800;position:relative;z-index:1;">Ready to Transform Your Elections?</h2>
+        <p style="font-size:1.1rem;color:var(--text-muted);margin:1rem 0 2rem;position:relative;z-index:1;">Join 10,000+ organizations using VoteWave for secure, transparent voting.</p>
+        <div style="position:relative;z-index:1;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+          <a href="auth/register.html" class="btn btn-primary btn-lg">Get Started Free →</a>
+          <a href="auth/login.html" class="btn btn-outline btn-lg">Sign In</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ========================================
-       FOOTER
-       ======================================== -->
-  <footer class="footer-premium">
-    <div class="footer-newsletter-bar">
-      <div class="container">
-        <div class="newsletter-inner">
-          <div>
-            <h4>Stay in the Loop</h4>
-            <p>Get product updates, election tips, and exclusive offers.</p>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" style="display:flex;align-items:center;gap:0.5rem;font-size:1.3rem;font-weight:800;color:var(--text-primary);text-decoration:none;margin-bottom:1rem;">
+            <div class="logo-icon" style="width:2rem;height:2rem;">V</div>
+            Vote<span class="logo-highlight">Wave</span>
+          </a>
+          <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">The most advanced e-voting platform for modern organizations.</p>
+          <div class="footer-social">
+            <a href="#">𝕏</a><a href="#">🐙</a><a href="#">🔗</a><a href="#">▶️</a>
           </div>
-          <form class="newsletter-form" id="newsletterForm">
-            <input type="email" placeholder="your@email.com" required>
-            <button type="submit" class="btn btn-primary">Subscribe</button>
-          </form>
         </div>
+        <div><h5>Solutions</h5><a href="voter/elections.html">Student Elections</a><a href="voter/nominations.html">Nominations</a><a href="voter/events.html">Event Voting</a></div>
+        <div><h5>Features</h5><a href="#features">Security</a><a href="#features">Analytics</a><a href="#features">AI Assistant</a></div>
+        <div><h5>Company</h5><a href="#">About</a><a href="#">Contact</a><a href="#">Privacy</a></div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 VoteWave. Made with ❤️ by <strong style="color:var(--brand-indigo);">Star Media Tech</strong></p>
       </div>
     </div>
-    
-    <div class="footer-main-content">
-      <div class="container">
-        <div class="footer-grid-premium">
-          <div class="footer-col brand">
-            <a href="index.html" class="footer-brand-logo"><i data-lucide="vote"></i> Vote<span class="gradient-text">Wave</span></a>
-            <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">The most advanced e-voting platform for modern organizations.</p>
-            <div class="footer-social-links">
-              <a href="#" aria-label="Twitter">𝕏</a>
-              <a href="#" aria-label="GitHub">🐙</a>
-              <a href="#" aria-label="LinkedIn">🔗</a>
-              <a href="#" aria-label="YouTube">▶️</a>
-            </div>
-          </div>
-          <div class="footer-col"><h5>Solutions</h5><a href="voter/elections.html">Student Elections</a><a href="voter/nominations.html">Nominations</a><a href="voter/events.html">Event Voting</a><a href="voter/club-elections.html">Club Elections</a></div>
-          <div class="footer-col"><h5>Features</h5><a href="#features">AI Assistant</a><a href="#features">Live Results</a><a href="#features">Security</a><a href="#features">Analytics</a></div>
-          <div class="footer-col"><h5>Company</h5><a href="#">About</a><a href="#">Careers</a><a href="#">Blog</a><a href="#">Contact</a><a href="#">Privacy</a></div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="footer-bottom-bar"><p>&copy; 2026 VoteWave. Made with ❤️ by <strong>Star Media Tech</strong></p></div>
   </footer>
 
-  <!-- ========================================
-       CHAT WIDGET
-       ======================================== -->
-  <div class="chat-widget-premium" id="chatWidget">
-    <button class="chat-fab" id="chatToggle"><i data-lucide="bot"></i></button>
-    <div class="chat-window" id="chatWindow">
-      <div class="chat-window-header">
-        <div class="chat-agent-info"><div class="agent-avatar"><i data-lucide="bot"></i></div><div><strong>VoteWave AI</strong><br><small style="color:#10b981;">Online</small></div></div>
-        <button class="chat-close-btn" id="chatClose"><i data-lucide="x"></i></button>
+  <!-- CHAT WIDGET -->
+  <div style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;">
+    <button id="chatToggle" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;cursor:pointer;box-shadow:0 8px 30px rgba(99,102,241,0.4);font-size:1.5rem;transition:all 0.3s;" onclick="document.getElementById('chatWindow').classList.toggle('active')">💬</button>
+    <div id="chatWindow" style="display:none;position:absolute;bottom:70px;right:0;width:380px;height:500px;background:var(--bg-card);backdrop-filter:blur(40px);border:1px solid var(--glass-border);border-radius:1rem;overflow:hidden;flex-direction:column;">
+      <div style="padding:1rem;background:rgba(99,102,241,0.1);border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center;">
+        <strong>VoteWave AI</strong><span style="color:var(--brand-emerald);font-size:0.75rem;">● Online</span>
+        <button onclick="document.getElementById('chatWindow').classList.remove('active')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;">✕</button>
       </div>
-      <div class="chat-window-body" id="chatMessages">
-        <div class="chat-message assistant"><p>👋 Hi! I'm your VoteWave assistant. Ask me anything about elections, voting, or using the platform!</p></div>
+      <div style="flex:1;padding:1rem;overflow-y:auto;" id="chatMessages">
+        <p style="background:rgba(255,255,255,0.03);padding:0.75rem;border-radius:0.75rem;font-size:0.85rem;">👋 Hi! I'm your VoteWave assistant. Ask me anything!</p>
       </div>
-      <div class="chat-window-footer">
-        <input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off">
-        <button id="chatSend"><i data-lucide="send"></i></button>
+      <div style="padding:1rem;border-top:1px solid var(--glass-border);display:flex;gap:0.5rem;">
+        <input type="text" id="chatInput" placeholder="Type here..." style="flex:1;padding:0.65rem;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:0.5rem;color:var(--text-primary);font-family:inherit;outline:none;">
+        <button id="chatSend" style="padding:0.65rem 1rem;background:var(--brand-indigo);color:white;border:none;border-radius:0.5rem;cursor:pointer;">Send</button>
       </div>
     </div>
   </div>
 
   <script src="js/main.js"></script>
-  <script src="js/landing.js"></script>
   <script src="js/chatbot.js"></script>
-  
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof lucide !== 'undefined') lucide.createIcons();
       
-      // Preloader
-      setTimeout(() => {
-        const preloader = document.getElementById('preloader');
-        if (preloader) { preloader.classList.add('hidden'); setTimeout(() => preloader.remove(), 600); }
-      }, 2000);
-      
-      // Back to top
-      const backBtn = document.getElementById('backToTop');
-      window.addEventListener('scroll', () => backBtn?.classList.toggle('visible', window.scrollY > 500));
-      backBtn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-      
-      // Mobile menu
-      document.getElementById('navToggle')?.addEventListener('click', () => {
-        const navMenu = document.getElementById('navMenu');
-        const navToggle = document.getElementById('navToggle');
-        const isOpen = navMenu?.classList.toggle('open');
-        if (navToggle) {
-          navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-          navToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
-        }
-      });
-      document.querySelectorAll('#navMenu .nav-link').forEach((link) => {
-        link.addEventListener('click', () => {
-          const navMenu = document.getElementById('navMenu');
-          const navToggle = document.getElementById('navToggle');
-          navMenu?.classList.remove('open');
-          if (navToggle) {
-            navToggle.setAttribute('aria-expanded', 'false');
-            navToggle.setAttribute('aria-label', 'Open navigation menu');
-          }
-        });
-      });
-      
       // Theme toggle
       const savedTheme = localStorage.getItem('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
-      document.getElementById('themeToggle')?.addEventListener('click', () => {
+      document.getElementById('themeToggle').addEventListener('click', () => {
         const current = document.documentElement.getAttribute('data-theme');
         const newTheme = current === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
       });
       
+      // Hero chart
+      const ctx = document.getElementById('heroChart');
+      if (ctx && typeof Chart !== 'undefined') {
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+            datasets: [{
+              data: [120,280,450,680,900,1400,2100],
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99,102,241,0.1)',
+              fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+        });
+      }
+      
+      // Chat widget toggle
+      const chatToggle = document.getElementById('chatToggle');
+      const chatWindow = document.getElementById('chatWindow');
+      chatToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+      });
+      document.getElementById('chatSend').addEventListener('click', () => {
+        const input = document.getElementById('chatInput');
+        const msg = input.value.trim();
+        if (!msg) return;
+        document.getElementById('chatMessages').innerHTML += `<p style="text-align:right;margin:0.5rem 0;"><span style="background:var(--brand-indigo);color:white;padding:0.5rem 0.75rem;border-radius:0.75rem;font-size:0.85rem;">${msg}</span></p>`;
+        input.value = '';
+        setTimeout(() => {
+          document.getElementById('chatMessages').innerHTML += `<p style="margin:0.5rem 0;"><span style="background:rgba(255,255,255,0.03);padding:0.5rem 0.75rem;border-radius:0.75rem;font-size:0.85rem;">Great question! Check our Elections page for active elections. 🗳️</span></p>`;
+        }, 800);
+      });
+      
       // Particles
       if (typeof particlesJS !== 'undefined') {
         particlesJS('particles-js', {
-          particles: { number: { value: 50, density: { enable: true, value_area: 1000 } }, color: { value: '#6366f1' }, shape: { type: 'circle' }, opacity: { value: 0.3, random: true }, size: { value: 3, random: true }, line_linked: { enable: true, distance: 150, color: '#6366f1', opacity: 0.1, width: 1 }, move: { enable: true, speed: 1, direction: 'none', random: true, out_mode: 'out' } },
-          interactivity: { detect_on: 'canvas', events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' } }, modes: { grab: { distance: 140, line_linked: { opacity: 0.3 } }, push: { particles_nb: 3 } } },
-          retina_detect: true
+          particles: { number: { value: 40 }, color: { value: '#6366f1' }, opacity: { value: 0.2 }, size: { value: 2 }, line_linked: { enable: true, color: '#6366f1', opacity: 0.1 }, move: { enable: true, speed: 1 } }
         });
       }
       
-      // Load dynamic elections
-      loadDynamicElections();
-      
-      // Newsletter
-      document.getElementById('newsletterForm')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = this.querySelector('input').value;
-        if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          showToast('Thanks for subscribing! 🎉', 'success');
-          this.reset();
-        } else {
-          showToast('Please enter a valid email', 'error');
-        }
-      });
-      
-      // Smooth scroll
-      document.querySelectorAll('a[href^="#"]').forEach(a => {
-        a.addEventListener('click', function(e) {
-          const target = document.querySelector(this.getAttribute('href'));
-          if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-        });
-      });
-      
-      // Chat widget
-      initChatWidget();
+      // GSAP animations
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.feature-card', { scrollTrigger: { trigger: '.features-grid', start: 'top 80%' }, y: 50, opacity: 0, duration: 0.6, stagger: 0.1 });
+        gsap.from('.pricing-card', { scrollTrigger: { trigger: '.pricing-grid', start: 'top 80%' }, y: 50, opacity: 0, duration: 0.6, stagger: 0.1 });
+      }
     });
-    
-    // Fetch elections from API with fallback to localStorage
-    async function fetchElections() {
-      try {
-        const response = await fetch(`${API_BASE_URL}/elections?status=active,upcoming,completed&limit=20`);
-        const data = await response.json();
-        
-        if (data.success && data.data && data.data.length > 0) {
-          // Store in localStorage for offline access
-          localStorage.setItem('votewave_elections', JSON.stringify(data.data));
-          return data.data;
-        }
-      } catch (error) {
-        console.log('API fetch failed, using localStorage:', error);
-      }
-      
-      // Fallback to localStorage
-      return JSON.parse(localStorage.getItem('votewave_elections') || '[]');
-    }
-    
-    function loadDynamicElections() {
-      const now = new Date();
-      let elections = [];
-      
-      // Try to fetch from API first
-      fetchElections().then(data => {
-        elections = data;
-        
-        // Add demo data if empty
-        if (elections.length === 0) {
-          const futureDate = (days) => new Date(now.getTime() + days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-          elections = [
-            { _id:'1', title:'Student Council 2026', type:'student', status:'active', positions:['President','VP','Secretary'], totalVotes:1247, endDate:futureDate(10) },
-            { _id:'2', title:'Best Teacher Award', type:'nomination', status:'active', positions:['Best Lecturer','Most Supportive'], totalVotes:892, endDate:futureDate(7) },
-            { _id:'3', title:'Annual Fest Theme', type:'event', status:'completed', positions:['Theme Selection'], totalVotes:2150, endDate:futureDate(-5) },
-            { _id:'4', title:'Tech Club President', type:'club', status:'upcoming', positions:['President','Secretary'], totalVotes:0, startDate:futureDate(5), endDate:futureDate(12) },
-            { _id:'5', title:'Dept Representative', type:'student', status:'active', positions:['CS Rep','Eng Rep'], totalVotes:560, endDate:futureDate(4) },
-            { _id:'6', title:'Shareholder Resolution', type:'corporate', status:'upcoming', positions:['Budget','Dividends'], totalVotes:0, startDate:futureDate(15), endDate:futureDate(18) }
-          ];
-          localStorage.setItem('votewave_elections', JSON.stringify(elections));
-        }
-        
-        window.currentElections = elections;
-        renderCards('active');
-      });
-      
-      function renderCards(status) {
-        const filtered = elections.filter(e => (e.status || '').toLowerCase() === status.toLowerCase());
-        const grid = document.getElementById('electionCards');
-        if (!grid) return;
-        
-        if (filtered.length === 0) {
-          grid.innerHTML = '<div class="empty-state"><p style="color:var(--text-muted);">No ' + status + ' elections at the moment. Check back soon!</p></div>';
-          return;
-        }
-        
-        const typeIcons = { student:'🎓', nomination:'🏆', event:'🎪', club:'🏛️', corporate:'🏢', poll:'📊' };
-        
-        grid.innerHTML = filtered.map(e => {
-          const statusKey = (e.status || '').toLowerCase();
-          const endDate = e.endDate ? new Date(e.endDate) : null;
-          const daysLeft = endDate ? Math.ceil((endDate - now) / (1000*60*60*24)) : null;
-          const timeLabel = statusKey === 'active'
-            ? (daysLeft !== null && daysLeft >= 0 ? `${daysLeft}d` : 'Ended')
-            : statusKey === 'upcoming' ? 'Soon' : 'Ended';
-          const timeMeta = statusKey === 'active' && daysLeft !== null && daysLeft >= 0 ? 'Remaining' : '';
-          const badgeStatus = statusKey === 'active' && daysLeft !== null && daysLeft < 0 ? 'completed' : statusKey || 'completed';
-          
-          // Build positions text from categories if available
-          let positionsText = '';
-          if (e.categories && e.categories.length > 0) {
-            positionsText = e.categories.map(c => c.name).join(' · ');
-          } else if (e.positions && e.positions.length > 0) {
-            positionsText = e.positions.join(' · ');
-          } else {
-            positionsText = 'Open Voting';
-          }
-          
-          return `
-            <div class="election-card" onclick="window.location.href='voter/vote.html?id=${e._id}'">
-              <span class="card-type-badge ${e.type}">${typeIcons[e.type]||'🗳️'} ${e.type}</span>
-              <span class="card-status ${badgeStatus}">${badgeStatus.toUpperCase()}</span>
-              <h3>${e.title}</h3>
-              <p>${positionsText}</p>
-              <div class="card-meta">
-                <div class="meta-item"><span>${(e.totalVotes || 0).toLocaleString()}</span><small>Votes</small></div>
-                <div class="meta-item"><span>${timeLabel}</span><small>${timeMeta}</small></div>
-              </div>
-              <a href="voter/vote.html?id=${e._id}" class="btn btn-primary btn-sm">${statusKey === 'active' ? 'Vote Now →' : 'View →'}</a>
-            </div>
-          `;
-        }).join('');
-      }
-      
-      // Tab switching
-      document.querySelectorAll('#electionTabs .tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-          document.querySelectorAll('#electionTabs .tab').forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          renderCards(this.dataset.tab);
-        });
-      });
-      
-      // Auto-refresh every 30 seconds for live updates
-      setInterval(() => {
-        fetchElections().then(data => {
-          if (data.length > 0) {
-            elections = data;
-            window.currentElections = elections;
-            const activeTab = document.querySelector('#electionTabs .tab.active');
-            if (activeTab) renderCards(activeTab.dataset.tab);
-          }
-        });
-      }, 30000);
-    }
-    
-    function initChatWidget() {
-      const toggle = document.getElementById('chatToggle');
-      const window = document.getElementById('chatWindow');
-      const close = document.getElementById('chatClose');
-      const input = document.getElementById('chatInput');
-      const send = document.getElementById('chatSend');
-      const messages = document.getElementById('chatMessages');
-      
-      if (!toggle || !window) return;
-      toggle.addEventListener('click', () => { window.classList.toggle('active'); if (window.classList.contains('active')) input?.focus(); });
-      close?.addEventListener('click', () => window.classList.remove('active'));
-      
-      function sendMsg() {
-        const text = input?.value.trim();
-        if (!text || !messages) return;
-        messages.innerHTML += `<div class="chat-message user"><p>${text}</p></div>`;
-        input.value = ''; messages.scrollTop = messages.scrollHeight;
-        setTimeout(() => {
-          const replies = ["Great question! 🗳️", "Check our Elections page for active elections.", "Your vote is 100% secure! 🔒", "Results appear in real-time! 📊"];
-          messages.innerHTML += `<div class="chat-message assistant"><p>${replies[Math.floor(Math.random()*replies.length)]}</p></div>`;
-          messages.scrollTop = messages.scrollHeight;
-        }, 800);
-      }
-      
-      send?.addEventListener('click', sendMsg);
-      input?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
-    }
-    
-    function showToast(msg, type) {
-      const toast = document.createElement('div');
-      toast.style.cssText = `position:fixed;top:1.5rem;right:1.5rem;z-index:9999;padding:1rem 1.5rem;background:#1e293b;border-left:3px solid ${type==='success'?'#10b981':'#ef4444'};border-radius:0.5rem;color:white;font-size:0.875rem;box-shadow:0 10px 30px rgba(0,0,0,0.4);animation:slideIn 0.3s ease;`;
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(100%)'; toast.style.transition='all 0.3s'; setTimeout(()=>toast.remove(),300); }, 3000);
-    }
-    
-    // ========================================
-    // LIVE BROADCASTING - WebSocket/Socket.io
-    // ========================================
-    let socket = null;
-    let isLiveConnected = false;
-    
-    function initLiveBroadcasting() {
-      // Connect to Socket.io server
-      const socketUrl = window.location.origin.includes('localhost') 
-        ? 'http://localhost:5000' 
-        : window.location.origin;
-      
-      try {
-        socket = io(socketUrl, {
-          transports: ['websocket', 'polling'],
-          reconnection: true,
-          reconnectionAttempts: 5
-        });
-        
-        socket.on('connect', () => {
-          console.log('🔴 Live broadcasting connected');
-          isLiveConnected = true;
-          showLiveIndicator();
-        });
-        
-        socket.on('disconnect', () => {
-          console.log('⚪ Live broadcasting disconnected');
-          isLiveConnected = false;
-          hideLiveIndicator();
-        });
-        
-        // Listen for vote updates (backend emits 'vote-update')
-        socket.on('vote-update', (data) => {
-          console.log('📊 Live vote update:', data);
-          handleLiveVoteUpdate(data);
-        });
-        
-        // Listen for new elections (backend emits 'new-election')
-        socket.on('new-election', (data) => {
-          console.log('🗳️ New election created:', data);
-          showBroadcastToast(`New election: ${data.title || 'Untitled'}`);
-          // Refresh elections list
-          fetchElections().then(elections => {
-            if (elections.length > 0) {
-              window.currentElections = elections;
-              const activeTab = document.querySelector('#electionTabs .tab.active');
-              if (activeTab) renderCards(activeTab.dataset.tab);
-            }
-          });
-        });
-        
-        // Listen for election status changes (backend emits 'election-updated')
-        socket.on('election-updated', (data) => {
-          console.log('🔄 Election status changed:', data);
-          handleElectionStatusChange(data);
-        });
-        
-      } catch (error) {
-        console.log('Socket.io not available, using polling fallback');
-        // Fallback to polling already implemented in fetchElections
-      }
-    }
-    
-    function showLiveIndicator() {
-      // Add live indicator to section header
-      const sectionHeader = document.querySelector('#dynamicElections .section-header');
-      if (sectionHeader && !sectionHeader.querySelector('.live-indicator')) {
-        const liveBadge = document.createElement('div');
-        liveBadge.className = 'live-indicator';
-        liveBadge.innerHTML = '<span class="live-dot"></span> Live';
-        liveBadge.style.marginLeft = '1rem';
-        sectionHeader.querySelector('.section-badge')?.appendChild(liveBadge);
-      }
-    }
-    
-    function hideLiveIndicator() {
-      const indicator = document.querySelector('.live-indicator');
-      if (indicator) indicator.remove();
-    }
-    
-    function handleLiveVoteUpdate(data) {
-      // Update vote count in the UI
-      if (data.electionId && data.totalVotes !== undefined) {
-        // Find the election card and update it
-        const cards = document.querySelectorAll('.election-card');
-        cards.forEach(card => {
-          const link = card.querySelector('a[href^="voter/vote.html"]');
-          if (link) {
-            const url = new URL(link.href, window.location.origin);
-            const cardElectionId = url.searchParams.get('id');
-            if (cardElectionId === data.electionId) {
-              // Flash the card
-              card.classList.add('vote-update-flash');
-              setTimeout(() => card.classList.remove('vote-update-flash'), 500);
-              
-              // Update the vote count
-              const voteSpan = card.querySelector('.meta-item span');
-              if (voteSpan) {
-                voteSpan.textContent = data.totalVotes.toLocaleString();
-              }
-            }
-          }
-        });
-        
-        // Show toast for significant vote milestones
-        if (data.totalVotes % 100 === 0) {
-          showBroadcastToast(`🎉 ${data.totalVotes} votes cast!`);
-        }
-      }
-    }
-    
-    function handleElectionStatusChange(data) {
-      showBroadcastToast(`Election "${data.title}" is now ${data.status}!`);
-      // Refresh the elections list
-      fetchElections().then(elections => {
-        if (elections.length > 0) {
-          window.currentElections = elections;
-          const activeTab = document.querySelector('#electionTabs .tab.active');
-          if (activeTab) renderCards(activeTab.dataset.tab);
-        }
-      });
-    }
-    
-    function showBroadcastToast(message) {
-      // Remove existing toast
-      const existing = document.querySelector('.broadcast-toast');
-      if (existing) existing.remove();
-      
-      // Create new toast
-      const toast = document.createElement('div');
-      toast.className = 'broadcast-toast';
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      
-      // Remove after 3 seconds
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-    
-    // Initialize live broadcasting when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      initLiveBroadcasting();
-    });
-
-    
   </script>
-  
-  <style>
-    @keyframes scrollWheel { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(12px); } }
-    @keyframes slideIn { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
-  </style>
-    <!-- PWA Registration -->
-  <script src="js/pwa.js"></script>
 </body>
 </html>
