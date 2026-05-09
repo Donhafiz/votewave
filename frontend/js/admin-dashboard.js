@@ -1,381 +1,236 @@
-/**
- * VoteWave - Admin Dashboard JavaScript
- * Handles dashboard statistics, charts, and real-time updates
- */
+let activityChart;
+let statusChart;
 
-let activityChart = null;
-let statusChart = null;
-let autoRefreshInterval = null;
+// 🔴 SOCKET CONNECTION (REAL-TIME LAYER)
+const socket = io();
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   initDashboard();
+  initRealtime();
 });
 
+/* ================= INIT ================= */
 function initDashboard() {
-  loadDashboardStats();
+  loadStats();
   initCharts();
-  loadRecentElections();
-  loadActivityTimeline();
-  initPeriodButtons();
-  initAutoRefresh();
-  
-  // Refresh button
-  document.getElementById('refreshBtn')?.addEventListener('click', () => {
-    refreshDashboard();
+}
+
+/* ================= REAL-TIME ================= */
+function initRealtime() {
+  socket.on("connect", () => {
+    console.log("🟢 Dashboard connected to real-time server");
+  });
+
+  // 🔥 MAIN LIVE DASHBOARD UPDATE EVENT
+  socket.on("dashboard:update", (data) => {
+    console.log("Live update:", data);
+
+    if (data.totalVotes !== undefined) {
+      animateNumber("totalVotes", data.totalVotes);
+    }
+
+    if (data.activeElections !== undefined) {
+      animateNumber("activeElections", data.activeElections);
+    }
+
+    if (data.totalUsers !== undefined) {
+      animateNumber("totalUsers", data.totalUsers);
+    }
+
+    if (data.totalElections !== undefined) {
+      animateNumber("totalElections", data.totalElections);
+    }
+
+    if (data.activity) {
+      addActivityItem(data.activity);
+    }
+
+    showToast("Dashboard updated live", "success");
   });
 }
 
-async function loadDashboardStats() {
-  try {
-    const response = await adminApiRequest('/admin/dashboard');
-    
-    if (response.success) {
-      const stats = response.data.stats || response.data;
-      
-      updateStatElement('totalElections', stats.totalElections || 0);
-      updateStatElement('activeElections', stats.activeElections || 0);
-      updateStatElement('totalUsers', stats.totalUsers || 0);
-      updateStatElement('totalVotes', stats.totalVotes || 0);
-      
-      // Update badge
-      const badge = document.getElementById('activeElectionsBadge');
-      if (badge) badge.textContent = stats.activeElections || 0;
-      
-      // Update trends
-      updateTrend('electionsTrend', stats.electionGrowth || 12);
-      updateTrend('activeTrend', stats.activeGrowth || 8);
-      updateTrend('usersTrend', stats.userGrowth || 15);
-      updateTrend('votesTrend', stats.voteGrowth || 25);
-      
-      // Update charts if data available
-      if (stats.votingActivity && stats.votingActivity.length > 0) {
-        const activityData = {
-          labels: stats.votingActivity.map(item => {
-            const date = new Date(item.date);
-            return date.toLocaleDateString('en-US', { weekday: 'short' });
-          }),
-          values: stats.votingActivity.map(item => item.votes)
-        };
-        updateActivityChart(activityData);
-      }
-      
-      if (stats.electionStatus) {
-        const statusData = {
-          active: stats.electionStatus.active || 0,
-          completed: stats.electionStatus.completed || 0,
-          upcoming: stats.electionStatus.upcoming || 0,
-          draft: stats.electionStatus.draft || 0
-        };
-        updateStatusChart(statusData);
-      }
-    } else {
-      loadSampleData();
-    }
-  } catch (error) {
-    console.log('Loading sample dashboard data');
-    loadSampleData();
-  }
-}
+/* ================= ANIMATION ================= */
+function animateNumber(elementId, newValue, duration = 800) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
 
-function loadSampleData() {
-  updateStatElement('totalElections', 12);
-  updateStatElement('activeElections', 3);
-  updateStatElement('totalUsers', 2450);
-  updateStatElement('totalVotes', 5230);
-  
-  const badge = document.getElementById('activeElectionsBadge');
-  if (badge) badge.textContent = '3';
-  
-  updateTrend('electionsTrend', 12);
-  updateTrend('activeTrend', 8);
-  updateTrend('usersTrend', 15);
-  updateTrend('votesTrend', 25);
-}
-
-function updateStatElement(id, value) {
-  const el = document.getElementById(id);
-  if (el) {
-    animateValue(el, parseInt(el.textContent) || 0, value, 1000);
-  }
-}
-
-function animateValue(element, start, end, duration) {
+  const startValue = parseInt(el.textContent) || 0;
   const startTime = performance.now();
-  
+
   function update(currentTime) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const current = Math.floor(start + (end - start) * eased);
-    element.textContent = formatNumber(current);
+    const progress = Math.min((currentTime - startTime) / duration, 1);
+
+    const value = Math.floor(startValue + (newValue - startValue) * progress);
+    el.textContent = value.toLocaleString();
+
     if (progress < 1) {
       requestAnimationFrame(update);
     }
   }
-  
+
   requestAnimationFrame(update);
 }
 
-function updateTrend(id, value) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  
-  const isPositive = value >= 0;
-  el.innerHTML = `${isPositive ? '↑' : '↓'} ${Math.abs(value)}%`;
-  el.className = `admin-stat-trend ${isPositive ? 'up' : 'down'}`;
-}
+/* ================= TOAST ================= */
+function showToast(message, type = "info") {
+  let container = document.getElementById("toastContainer");
 
-function initCharts() {
-  // Activity Chart
-  const actCtx = document.getElementById('activityChart');
-  if (actCtx && typeof Chart !== 'undefined') {
-    activityChart = new Chart(actCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Votes',
-          data: [120, 250, 180, 400, 350, 520, 480],
-          backgroundColor: 'rgba(99,102,241,0.6)',
-          borderRadius: 6,
-          borderSkipped: false,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { 
-            grid: { display: false }, 
-            ticks: { color: '#64748b', font: { family: 'Inter' } } 
-          },
-          y: { 
-            grid: { color: 'rgba(255,255,255,0.05)' }, 
-            ticks: { color: '#64748b', font: { family: 'Inter' } },
-            beginAtZero: true
-          }
-        }
-      }
-    });
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toastContainer";
+    container.style.position = "fixed";
+    container.style.top = "20px";
+    container.style.right = "20px";
+    container.style.zIndex = "9999";
+    document.body.appendChild(container);
   }
-  
-  // Status Chart
-  const statusCtx = document.getElementById('statusChart');
-  if (statusCtx && typeof Chart !== 'undefined') {
-    statusChart = new Chart(statusCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Active', 'Completed', 'Upcoming', 'Draft'],
-        datasets: [{
-          data: [3, 7, 2, 1],
-          backgroundColor: ['#10b981', '#64748b', '#f59e0b', '#6366f1'],
-          borderWidth: 0,
-          hoverBorderWidth: 2,
-          hoverBorderColor: '#1e293b',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '65%',
-        plugins: {
-          legend: { 
-            position: 'bottom', 
-            labels: { 
-              color: '#94a3b8', 
-              padding: 20, 
-              usePointStyle: true,
-              pointStyleWidth: 8,
-              font: { family: 'Inter', size: 11 }
-            } 
-          }
-        }
-      }
-    });
-  }
+
+  const toast = document.createElement("div");
+
+  toast.textContent = message;
+  toast.style.padding = "12px 16px";
+  toast.style.marginTop = "10px";
+  toast.style.borderRadius = "8px";
+  toast.style.color = "#fff";
+  toast.style.fontSize = "14px";
+  toast.style.boxShadow = "0 10px 25px rgba(0,0,0,0.2)";
+  toast.style.opacity = "0";
+  toast.style.transform = "translateY(-10px)";
+  toast.style.transition = "0.3s ease";
+
+  if (type === "success") toast.style.background = "#2ed573";
+  else if (type === "error") toast.style.background = "#ff6b6b";
+  else toast.style.background = "#6366f1";
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  }, 50);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-10px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
-function updateActivityChart(data) {
-  if (!activityChart) return;
-  activityChart.data.labels = data.labels;
-  activityChart.data.datasets[0].data = data.values;
-  activityChart.update();
-}
-
-function updateStatusChart(data) {
-  if (!statusChart) return;
-  statusChart.data.datasets[0].data = [data.active, data.completed, data.upcoming, data.draft];
-  statusChart.update();
-}
-
-async function loadRecentElections() {
-  const tbody = document.getElementById('recentElectionsBody');
-  if (!tbody) return;
-  
+/* ================= LOAD STATS ================= */
+async function loadStats() {
   try {
-    const response = await adminApiRequest('/elections?limit=5');
-    if (response.success && response.data.length > 0) {
-      renderRecentElectionsTable(tbody, response.data);
-      return;
-    }
-    if (loadLocalRecentElections(tbody)) return;
-  } catch (error) {
-    if (loadLocalRecentElections(tbody)) return;
+    const res = await fetch("/api/admin/dashboard");
+    const data = await res.json();
+
+    const stats = data?.stats || fallbackStats();
+
+    setText("totalElections", stats.totalElections);
+    setText("activeElections", stats.activeElections);
+    setText("totalUsers", stats.totalUsers);
+    setText("totalVotes", stats.totalVotes);
+
+    updateCharts(stats);
+
+  } catch (err) {
+    console.log("Using fallback dashboard data");
+
+    const stats = fallbackStats();
+
+    setText("totalElections", stats.totalElections);
+    setText("activeElections", stats.activeElections);
+    setText("totalUsers", stats.totalUsers);
+    setText("totalVotes", stats.totalVotes);
+
+    updateCharts(stats);
   }
-  
-  // Sample data
-  const sampleElections = [
-    { _id: '1', title: 'Student Council 2026', status: 'active', totalVotes: 1247, turnout: 78 },
-    { _id: '2', title: 'Best Teacher Award', status: 'active', totalVotes: 892, turnout: 64 },
-    { _id: '3', title: 'Annual Fest Theme', status: 'completed', totalVotes: 2150, turnout: 92 },
-    { _id: '4', title: 'Club President Election', status: 'upcoming', totalVotes: 0, turnout: 0 },
-  ];
-  renderRecentElectionsTable(tbody, sampleElections);
 }
 
-function getLocalStoredElections() {
-  return JSON.parse(localStorage.getItem('votewave_elections') || '[]');
-}
+/* ================= CHARTS ================= */
+function initCharts() {
+  const ctx1 = document.getElementById("activityChart");
+  const ctx2 = document.getElementById("statusChart");
 
-function loadLocalRecentElections(tbody) {
-  const localElections = getLocalStoredElections();
-  if (!localElections || localElections.length === 0) return false;
-
-  const recentLocal = localElections
-    .slice()
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5);
-
-  renderRecentElectionsTable(tbody, recentLocal);
-  return true;
-}
-
-function renderRecentElectionsTable(tbody, elections) {
-  tbody.innerHTML = elections.map(e => `
-    <tr>
-      <td>
-        <div class="cell-election">
-          <div class="cell-avatar">${e.title.charAt(0)}</div>
-          <div class="cell-info">
-            <h4>${escapeHtml(e.title)}</h4>
-          </div>
-        </div>
-      </td>
-      <td><span class="admin-badge ${e.status}">${e.status}</span></td>
-      <td>${formatNumber(e.totalVotes)}</td>
-      <td>${e.turnout || 0}%</td>
-      <td>
-        <div class="admin-action-btns">
-          <button class="admin-action-btn edit-election-btn" data-election-id="${e._id}" title="Edit">
-            <i data-lucide="edit-2" style="width:14px;height:14px;"></i>
-          </button>
-          <button class="admin-action-btn view-results-btn" data-election-id="${e._id}" title="View Results">
-            <i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i>
-          </button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-  
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-  attachRecentElectionListeners();
-}
-
-function attachRecentElectionListeners() {
-  document.querySelectorAll('.edit-election-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const electionId = btn.dataset.electionId;
-      window.location.href = `elections.html?edit=${electionId}`;
+  if (ctx1) {
+    activityChart = new Chart(ctx1, {
+      type: "bar",
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        datasets: [{
+          data: [10, 30, 20, 40, 60, 50],
+          backgroundColor: "#ff6b6b"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } }
+      }
     });
-  });
-
-  document.querySelectorAll('.view-results-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const electionId = btn.dataset.electionId;
-      window.location.href = `results.html?id=${electionId}`;
-    });
-  });
-}
-
-function loadActivityTimeline() {
-  const container = document.getElementById('activityTimeline');
-  if (!container) return;
-  
-  const activities = [
-    { icon: 'vote', type: 'election', title: 'New election "Student Council 2026" created', time: '5 minutes ago' },
-    { icon: 'user-plus', type: 'user', title: '3 new voters registered', time: '15 minutes ago' },
-    { icon: 'check-circle', type: 'vote', title: '47 votes cast in Student Council election', time: '1 hour ago' },
-    { icon: 'user-plus', type: 'user', title: 'New admin account created', time: '2 hours ago' },
-    { icon: 'settings', type: 'system', title: 'System settings updated', time: '3 hours ago' },
-    { icon: 'user-plus', type: 'user', title: '5 new users invited by admin', time: '5 hours ago' },
-  ];
-  
-  container.innerHTML = activities.map(a => `
-    <div class="admin-timeline-item">
-      <div class="admin-timeline-icon ${a.type}">
-        <i data-lucide="${a.icon}"></i>
-      </div>
-      <div>
-        <div class="admin-timeline-title">${a.title}</div>
-        <div class="admin-timeline-meta">${a.time}</div>
-      </div>
-    </div>
-  `).join('');
-  
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-}
-
-function initPeriodButtons() {
-  document.querySelectorAll('.admin-period-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const parent = this.parentElement;
-      parent.querySelectorAll('.admin-period-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      
-      const period = this.dataset.period;
-      updateChartPeriod(period);
-    });
-  });
-}
-
-function updateChartPeriod(period) {
-  let data;
-  switch(period) {
-    case 'week':
-      data = { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], values: [120,250,180,400,350,520,480] };
-      break;
-    case 'month':
-      data = { labels: ['Week 1','Week 2','Week 3','Week 4'], values: [1200,1800,1500,2200] };
-      break;
-    case 'year':
-      data = { labels: ['Jan','Mar','May','Jul','Sep','Nov'], values: [3200,4500,3800,5200,4800,6000] };
-      break;
   }
-  if (data && activityChart) {
-    activityChart.data.labels = data.labels;
-    activityChart.data.datasets[0].data = data.values;
+
+  if (ctx2) {
+    statusChart = new Chart(ctx2, {
+      type: "doughnut",
+      data: {
+        labels: ["Active", "Completed", "Upcoming"],
+        datasets: [{
+          data: [3, 5, 2],
+          backgroundColor: ["#2ed573", "#64748b", "#ffa726"]
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+  }
+}
+
+function updateCharts(stats) {
+  if (activityChart && stats.activity) {
+    activityChart.data.datasets[0].data = stats.activity;
     activityChart.update();
   }
+
+  if (statusChart && stats.status) {
+    statusChart.data.datasets[0].data = stats.status;
+    statusChart.update();
+  }
 }
 
-function initAutoRefresh() {
-  // Auto-refresh every 60 seconds
-  autoRefreshInterval = setInterval(() => {
-    loadDashboardStats();
-    loadRecentElections();
-    loadActivityTimeline();
-  }, 60000);
+/* ================= HELPERS ================= */
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = value ?? 0;
+  }
 }
 
-function refreshDashboard() {
-  loadDashboardStats();
-  loadRecentElections();
-  loadActivityTimeline();
-  showAdminToast('Dashboard refreshed', 'success');
+function fallbackStats() {
+  return {
+    totalElections: 12,
+    activeElections: 3,
+    totalUsers: 2450,
+    totalVotes: 5230,
+    activity: [10, 20, 30, 40, 50, 60],
+    status: [3, 5, 2]
+  };
 }
 
-// Clean up on page leave
-window.addEventListener('beforeunload', () => {
-  if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-});
+/* ================= LIVE FEED ================= */
+function addActivityItem(activity) {
+  const container = document.getElementById("activityFeed");
+  if (!container) return;
+
+  const item = document.createElement("div");
+
+  item.style.padding = "10px";
+  item.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+  item.style.color = "#cbd5e1";
+  item.style.fontSize = "13px";
+
+  item.innerHTML = `
+    <strong>${activity.title}</strong><br/>
+    <small>${new Date(activity.time).toLocaleTimeString()}</small>
+  `;
+
+  container.prepend(item);
+}

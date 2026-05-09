@@ -68,8 +68,42 @@ const createAdminUser = async () => {
 // Connect to Database
 connectDB().then(() => createAdminUser());
 
-// Initialize Socket.io
-initializeSocket(io);
+// ========================================
+// SOCKET.IO INITIALIZATION (UPGRADED)
+// ========================================
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+// Make io globally accessible everywhere
+app.set('io', io);
+
+// Attach socket helpers to requests
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+io.on('connection', (socket) => {
+  console.log(`⚡ Client connected: ${socket.id}`);
+
+  // Join admin room
+  socket.on('joinAdmin', () => {
+    socket.join('admins');
+    console.log('👮 Admin joined real-time channel');
+  });
+
+  // Optional: voter tracking room
+  socket.on('joinVoter', (userId) => {
+    socket.join(`voter_${userId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`❌ Client disconnected: ${socket.id}`);
+  });
+});
 
 // Security Middleware - Disabled CSP for development
 app.use(helmet({
@@ -259,5 +293,38 @@ function getLocalIP() {
   }
   return '192.168.x.x';
 }
+// ========================================
+// REAL-TIME EVENT HELPERS
+// ========================================
+const realtime = {
+  voteUpdate: async (electionId) => {
+    const Vote = require('./models/Vote');
+    const totalVotes = await Vote.countDocuments({ electionId });
 
-module.exports = { app, server, io };
+    io.emit('voteUpdate', {
+      electionId,
+      totalVotes
+    });
+  },
+
+  electionUpdate: (data) => {
+    io.emit('electionUpdate', data);
+  },
+
+  userUpdate: async () => {
+    const User = require('./models/User');
+    const totalUsers = await User.countDocuments();
+
+    io.emit('userUpdate', {
+      totalUsers
+    });
+  },
+
+  systemAlert: (message) => {
+    io.to('admins').emit('systemAlert', {
+      message,
+      time: new Date()
+    });
+  }
+};
+module.exports = { app, server, io, realtime };

@@ -1,528 +1,112 @@
-<<<<<<< HEAD
-
-<body class="dashboard-body">
-
-  <!-- Animated Mesh Background -->
-  <div class="dashboard-bg">
-    <div class="gradient-orb purple"></div>
-    <div class="gradient-orb cyan"></div>
-    <div class="gradient-orb pink"></div>
-  </div>
-
-  <!-- Sidebar -->
-  <aside class="sidebar glass-panel">
-
-    <div class="brand-row">
-      <div class="brand-icon">V</div>
-      <div>
-        <h2>VoteWave</h2>
-        <span>Enterprise Suite</span>
-      </div>
-    </div>
-
-    <nav class="nav-menu">
-      <button class="nav-link active">
-        <i data-lucide="layout-dashboard"></i>
-        Dashboard
-      </button>
-
-      <button class="nav-link">
-        <i data-lucide="vote"></i>
-        Elections
-      </button>
-
-      <button class="nav-link">
-        <i data-lucide="users"></i>
-        Candidates
-      </button>
-
-      <button class="nav-link">
-        <i data-lucide="shield-check"></i>
-        Security
-      </button>
-
-      <button class="nav-link">
-        <i data-lucide="activity"></i>
-        Analytics
-      </button>
-    </nav>
-
-    <div class="sidebar-footer glass-soft">
-      <div class="admin-avatar">SA</div>
-
-      <div>
-        <strong>System Admin</strong>
-        <small>Super Administrator</small>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main -->
-  <main class="dashboard-main">
-
-    <!-- Topbar -->
-    <header class="topbar glass-panel">
-
-      <div class="searchbar">
-        <i data-lucide="search"></i>
-        <input type="text" placeholder="Search elections, candidates, analytics...">
-      </div>
-
-      <div class="topbar-actions">
-
-        <button class="top-btn">
-          <i data-lucide="command"></i>
-        </button>
-
-        <button class="top-btn notification-btn">
-          <i data-lucide="bell"></i>
-          <span class="pulse-dot"></span>
-        </button>
-
-        <button class="create-btn">
-          <i data-lucide="plus"></i>
-          Create Election
-=======
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VoteWave Dashboard</title>
+  <title>VoteWave Admin Dashboard</title>
 
-  <!-- Unified CSS (ONLY ONE FILE) -->
-  <link rel="stylesheet" href="admin.css" />
+  <!-- SINGLE CSS -->
+  <link rel="stylesheet" href="../css/admin.css" />
 
-  <!-- Icons (optional but used in layout) -->
+  <!-- Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Chart.js (LOAD ONCE ONLY) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body>
+<body class="admin-body">
 
 <div class="admin-layout">
 
-  <!-- ================= SIDEBAR ================= -->
+  <!-- SIDEBAR -->
   <aside class="admin-sidebar">
-
     <div class="admin-sidebar-header">
       <div class="admin-logo">VW</div>
-      <a href="#" class="admin-brand">Vote<span>Wave</span></a>
+      <div class="admin-brand">Vote<span>Wave</span></div>
     </div>
 
     <nav class="admin-sidebar-nav">
-
-      <a class="admin-nav-item active" href="#">
-        <i class="fa-solid fa-gauge"></i> Dashboard
-      </a>
-
-      <a class="admin-nav-item" href="#">
-        <i class="fa-solid fa-check-to-slot"></i> Elections
-      </a>
-
-      <a class="admin-nav-item" href="#">
-        <i class="fa-solid fa-users"></i> Candidates
-      </a>
-
-      <a class="admin-nav-item" href="#">
-        <i class="fa-solid fa-chart-column"></i> Results
-      </a>
-
-      <a class="admin-nav-item" href="#">
-        <i class="fa-solid fa-user"></i> Users
-      </a>
-
-      <a class="admin-nav-item" href="#">
-        <i class="fa-solid fa-gear"></i> Settings
-      </a>
-
+      <a class="admin-nav-item active" href="#">Dashboard</a>
+      <a class="admin-nav-item" href="#">Elections</a>
+      <a class="admin-nav-item" href="#">Candidates</a>
+      <a class="admin-nav-item" href="#">Results</a>
+      <a class="admin-nav-item" href="#">Users</a>
+      <a class="admin-nav-item" href="#">Settings</a>
     </nav>
-
   </aside>
 
-  <!-- ================= MAIN ================= -->
+  <!-- MAIN -->
   <main class="admin-main">
 
     <!-- TOPBAR -->
     <header class="admin-topbar">
-
-      <div class="admin-topbar-left">
-        <h1>Dashboard</h1>
-      </div>
-
-      <div class="admin-topbar-right">
-        <button class="btn btn-secondary">
-          <i class="fa-solid fa-bell"></i>
-        </button>
-
-        <button class="btn btn-primary">
-          New Election
->>>>>>> 94d15d6591b0c671967b06572da71198fa58e5f1
-        </button>
-      </div>
-
-    </header>
-<<<<<<< HEAD
-
-    <!-- Hero Section -->
-    <section class="hero-panel glass-panel">
+      <h1>Dashboard</h1>
 
       <div>
-        <span class="hero-badge">
-          LIVE SYSTEM STATUS
-        </span>
-
-        <h1>
-          Election operations are running smoothly.
-        </h1>
-
-        <p>
-          4 elections are currently active with a
-          98.2% participation reliability score.
-        </p>
+        <button class="btn btn-secondary">Notifications</button>
+        <button class="btn btn-primary">New Election</button>
       </div>
-
-      <div class="hero-metrics">
-
-        <div class="metric-ring">
-          <svg>
-            <!-- radial progress -->
-          </svg>
-          <strong>98%</strong>
-          <span>Integrity</span>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Analytics Grid -->
-    <section class="analytics-grid">
-
-      <div class="metric-card glass-panel">
-        <div class="metric-top">
-          <span>Total Votes</span>
-          <i data-lucide="bar-chart-3"></i>
-        </div>
-
-        <h2>1.24M</h2>
-
-        <div class="trend positive">
-          +12.4% this week
-        </div>
-      </div>
-
-      <div class="metric-card glass-panel">
-        <div class="metric-top">
-          <span>Active Elections</span>
-          <i data-lucide="vote"></i>
-        </div>
-
-        <h2>18</h2>
-
-        <div class="trend positive">
-          +4 new elections
-        </div>
-      </div>
-
-      <div class="metric-card glass-panel warning">
-        <div class="metric-top">
-          <span>Pending Reviews</span>
-          <i data-lucide="shield-alert"></i>
-        </div>
-
-        <h2>7</h2>
-
-        <div class="trend negative">
-          Requires attention
-        </div>
-      </div>
-
-      <div class="metric-card glass-panel success">
-        <div class="metric-top">
-          <span>System Health</span>
-          <i data-lucide="activity"></i>
-        </div>
-
-        <h2>99.99%</h2>
-
-        <div class="trend positive">
-          Stable infrastructure
-        </div>
-      </div>
-    </section>
-
-    <!-- Main Grid -->
-    <section class="dashboard-grid">
-
-      <!-- Chart -->
-      <div class="chart-panel glass-panel">
-        <div class="panel-header">
-          <div>
-            <h3>Voting Activity</h3>
-            <p>Live election engagement metrics</p>
-          </div>
-
-          <div class="panel-actions">
-            <button>24H</button>
-            <button class="active">7D</button>
-            <button>30D</button>
-          </div>
-        </div>
-
-        <canvas id="advancedAnalytics"></canvas>
-      </div>
-
-      <!-- Activity Feed -->
-      <div class="activity-panel glass-panel">
-
-        <div class="panel-header">
-          <h3>Live Activity</h3>
-        </div>
-
-        <div class="activity-feed">
-
-          <div class="activity-item">
-            <div class="activity-icon green"></div>
-
-            <div>
-              <strong>Presidential Election Activated</strong>
-              <p>2 minutes ago</p>
-            </div>
-          </div>
-
-          <div class="activity-item">
-            <div class="activity-icon blue"></div>
-
-            <div>
-              <strong>4,281 new votes processed</strong>
-              <p>5 minutes ago</p>
-            </div>
-          </div>
-
-          <div class="activity-item">
-            <div class="activity-icon orange"></div>
-
-            <div>
-              <strong>Security review requested</strong>
-              <p>12 minutes ago</p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Elections Data Table -->
-    <section class="table-panel glass-panel">
-
-      <div class="panel-header">
-        <div>
-          <h3>Election Management</h3>
-          <p>Monitor and manage all active elections</p>
-        </div>
-
-        <div class="table-controls">
-          <input type="text" placeholder="Search elections...">
-
-          <select>
-            <option>All Status</option>
-            <option>Active</option>
-            <option>Pending</option>
-            <option>Completed</option>
-          </select>
-        </div>
-      </div>
-
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>Election</th>
-            <th>Status</th>
-            <th>Votes</th>
-            <th>Turnout</th>
-            <th>Security</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td>
-              <div class="election-cell">
-                <div class="election-icon"></div>
-
-                <div>
-                  <strong>National Student Election</strong>
-                  <small>Started 2 days ago</small>
-                </div>
-              </div>
-            </td>
-
-            <td>
-              <span class="status-badge live">
-                Live
-              </span>
-            </td>
-
-            <td>84,290</td>
-            <td>78%</td>
-            <td>
-              <span class="security-badge secure">
-                Protected
-              </span>
-            </td>
-
-            <td>
-              <div class="table-actions">
-                <button>
-                  <i data-lucide="eye"></i>
-                </button>
-
-                <button>
-                  <i data-lucide="edit"></i>
-                </button>
-
-                <button>
-                  <i data-lucide="bar-chart"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-  </main>
-=======
+    </header>
 
     <!-- CONTENT -->
-    <div class="admin-content">
-
-      <!-- PAGE HEADER -->
-      <div class="page-header">
-        <div>
-          <h1>Welcome Back</h1>
-          <p>Manage elections, candidates, and results</p>
-        </div>
-      </div>
+    <section class="admin-content">
 
       <!-- STATS -->
-      <section class="stats-grid">
-
+      <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-value">12</div>
-          <div class="stat-label">Active Elections</div>
+          <div class="stat-value" id="totalElections">0</div>
+          <div class="stat-label">Elections</div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-value">48</div>
-          <div class="stat-label">Candidates</div>
+          <div class="stat-value" id="activeElections">0</div>
+          <div class="stat-label">Active</div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-value">2,340</div>
-          <div class="stat-label">Total Votes</div>
+          <div class="stat-value" id="totalUsers">0</div>
+          <div class="stat-label">Users</div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-value">8</div>
-          <div class="stat-label">Completed Elections</div>
+          <div class="stat-value" id="totalVotes">0</div>
+          <div class="stat-label">Votes</div>
         </div>
-
-      </section>
-
-      <!-- FILTERS -->
-      <div class="filters">
-
-        <button class="filter-btn active">All</button>
-        <button class="filter-btn">Active</button>
-        <button class="filter-btn">Upcoming</button>
-        <button class="filter-btn">Closed</button>
-
       </div>
 
-      <!-- ELECTION GRID -->
-      <section class="elections-grid">
-
-        <!-- CARD 1 -->
-        <div class="card election-card">
-
-          <div class="card-image">
-            <i class="fa-solid fa-vote-yea"></i>
-          </div>
-
-          <div class="card-body">
-            <h3 class="card-title">Student Council Election</h3>
-            <p class="card-description">
-              Vote for your next student leaders and representatives.
-            </p>
-
-            <div class="card-meta">
-              <span class="badge badge-success">Active</span>
-              <span class="card-date">
-                <i class="fa-regular fa-calendar"></i>
-                May 2026
-              </span>
-            </div>
-          </div>
-
+      <!-- CHARTS -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Voting Activity</h3>
         </div>
-
-        <!-- CARD 2 -->
-        <div class="card election-card">
-
-          <div class="card-image">
-            <i class="fa-solid fa-building"></i>
-          </div>
-
-          <div class="card-body">
-            <h3 class="card-title">Department Head Vote</h3>
-            <p class="card-description">
-              Internal election for department leadership roles.
-            </p>
-
-            <div class="card-meta">
-              <span class="badge badge-warning">Upcoming</span>
-              <span class="card-date">
-                <i class="fa-regular fa-calendar"></i>
-                June 2026
-              </span>
-            </div>
-          </div>
-
+        <div class="card-body">
+          <canvas id="activityChart" height="120"></canvas>
         </div>
+      </div>
 
-        <!-- CARD 3 -->
-        <div class="card election-card">
-
-          <div class="card-image">
-            <i class="fa-solid fa-check"></i>
-          </div>
-
-          <div class="card-body">
-            <h3 class="card-title">Campus Referendum</h3>
-            <p class="card-description">
-              Voting on campus infrastructure improvements.
-            </p>
-
-            <div class="card-meta">
-              <span class="badge badge-danger">Closed</span>
-              <span class="card-date">
-                <i class="fa-regular fa-calendar"></i>
-                April 2026
-              </span>
-            </div>
-          </div>
-
+      <div class="card">
+        <div class="card-header">
+          <h3>Election Status</h3>
         </div>
+        <div class="card-body">
+          <canvas id="statusChart" height="120"></canvas>
+        </div>
+      </div>
 
-      </section>
-
-    </div>
+    </section>
 
   </main>
 
 </div>
 
->>>>>>> 94d15d6591b0c671967b06572da71198fa58e5f1
+<!-- ================= SCRIPTS (IMPORTANT ORDER) ================= -->
+
+<!-- 1. SOCKET.IO (MUST LOAD FIRST FOR REAL-TIME) -->
+<script src="/socket.io/socket.io.js"></script>
+
+<!-- 2. DASHBOARD LOGIC -->
+<script src="../js/admin-dashboard.js"></script>
+
 </body>
+</html>
