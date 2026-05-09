@@ -219,6 +219,40 @@ a:hover {
   box-shadow: var(--shadow-lg);
 }
 
+/* Accessibility: visible focus styles */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: 3px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+button:focus-visible, .form-input:focus-visible, .submit-btn:focus-visible, .btn:focus-visible {
+  box-shadow: 0 6px 24px rgba(99,102,241,0.12);
+}
+
+/* Screen-reader only helper */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ARIA live region visual helper (non-disruptive) */
+.aria-live {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 /* ─── Gradient Text ─── */
 .gradient-text {
   background: linear-gradient(135deg, var(--primary-400), var(--secondary-400), var(--accent-cyan));

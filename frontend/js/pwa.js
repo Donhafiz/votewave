@@ -7,28 +7,46 @@ let deferredPrompt = null;
 let installButton = null;
 
 // Register Service Worker
+// Register Service Worker (skip during local development to avoid cached page swaps)
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/frontend/service-worker.js', { scope: '/' })
-      .then((registration) => {
-        console.log('📱 PWA Service Worker registered:', registration.scope);
-        
-        // Check for updates
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('🔄 New update available!');
-              showUpdateNotification();
-            }
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
+  if (!isLocalhost) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker
+        .register('/frontend/service-worker.js', { scope: '/' })
+        .then((registration) => {
+          console.log('📱 PWA Service Worker registered:', registration.scope);
+          
+          // Check for updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('🔄 New update available!');
+                showUpdateNotification();
+              }
+            });
           });
+        })
+        .catch((error) => {
+          console.error('❌ Service Worker registration failed:', error);
         });
-      })
-      .catch((error) => {
-        console.error('❌ Service Worker registration failed:', error);
-      });
-  });
+    });
+  } else {
+    console.log('📱 Skipping service worker registration on localhost (development mode)');
+    // expose a dev-mode flag and show a small banner when DOM is ready
+    window.__VOTEWAVE_SW_SKIPPED = true;
+    window.addEventListener('DOMContentLoaded', () => {
+      if (document.getElementById('dev-mode-banner')) return;
+      const b = document.createElement('div');
+      b.id = 'dev-mode-banner';
+      b.textContent = 'Dev mode: service worker disabled (local)';
+      b.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:10000;padding:0.35rem 0.75rem;background:#f59e0b;color:#041124;border-radius:6px;font-weight:600;font-family:inherit;box-shadow:0 6px 20px rgba(0,0,0,0.08);';
+      document.body.appendChild(b);
+      setTimeout(() => { b.style.opacity = '0'; b.style.transform = 'translateX(-50%) translateY(-8px)'; setTimeout(()=>b.remove(),300); }, 6000);
+    });
+  }
 }
 
 // Capture install prompt
@@ -150,7 +168,7 @@ function showUpdateNotification() {
   
   document.body.appendChild(banner);
   
-  document.getElementById('pwa-update-btn').addEventListener('click', () => {
+  document.getElementById('pwa-update-btn')?.addEventListener('click', () => {
     if (navigator.serviceWorker) {
       navigator.serviceWorker.getRegistration().then((reg) => {
         if (reg && reg.waiting) {

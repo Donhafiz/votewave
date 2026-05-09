@@ -42,7 +42,8 @@
   </nav>
 
   <!-- Main Content -->
-  <main class="main-content">
+  <main class="main-content" role="main" aria-label="Election details">
+    <div id="electionStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div class="container">
       <!-- Back Link -->
       <a href="elections.html" class="back-link">
@@ -106,7 +107,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3>Confirm Your Vote</h3>
-        <button class="modal-close" id="closeVoteModal">
+        <button class="modal-close" id="closeVoteModal" aria-label="Close vote confirmation">
           <i data-lucide="x"></i>
         </button>
       </div>
@@ -116,8 +117,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-ghost" id="cancelVote">Cancel</button>
-        <button class="btn btn-primary" id="confirmVote">
+        <button class="btn btn-ghost" id="cancelVote" aria-label="Cancel vote">Cancel</button>
+        <button class="btn btn-primary" id="confirmVote" aria-label="Confirm vote">
           <span>Confirm Vote</span>
           <i data-lucide="check"></i>
         </button>
@@ -137,7 +138,7 @@
       <div class="confirmation-code" id="confirmationCode">
         <!-- Confirmation code will be shown here -->
       </div>
-      <button class="btn btn-primary" id="closeSuccessModal">Done</button>
+      <button class="btn btn-primary" id="closeSuccessModal" aria-label="Close success dialog">Done</button>
     </div>
   </div>
 
@@ -154,6 +155,7 @@
     </div>
   </footer>
 
+  <script src="../js/a11y.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/election-detail.js"></script>
 </body>

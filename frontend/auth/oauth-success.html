@@ -91,7 +91,8 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" role="main" aria-label="OAuth sign in completion">
+    <div id="oauthStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div id="loadingState">
       <div class="spinner"></div>
       <h1>Completing Sign In</h1>
@@ -150,6 +151,7 @@
           // Show success and redirect
           document.getElementById('loadingState').style.display = 'none';
           document.getElementById('successState').style.display = 'block';
+          if (window.announce) window.announce('Sign in successful. Redirecting to your dashboard.', 'polite');
 
           setTimeout(() => {
             const redirectUrl = getRedirectUrl(response.data.role);
@@ -167,7 +169,9 @@
     function showError() {
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('errorState').style.display = 'block';
+      if (window.announce) window.announce('There was an error completing sign in. Please try again.', 'polite');
     }
   </script>
+    <script src="../js/a11y.js"></script>
 </body>
 </html>

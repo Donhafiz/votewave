@@ -34,12 +34,14 @@
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="card" role="main" aria-label="Payment processing">
+    <div id="paymentStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div class="spinner"></div>
     <h1>Processing Payment...</h1>
     <p>Please wait while we verify your payment.</p>
   </div>
   
+  <script src="../js/a11y.js"></script>
   <script>
     // Get transaction reference from URL
     const params = new URLSearchParams(window.location.search);
@@ -47,7 +49,9 @@
     
     if (reference) {
       // Verify and redirect
+      if (window.announce) window.announce('Verifying payment, please wait', 'polite');
       setTimeout(() => {
+        if (window.announce) window.announce('Payment verified. Redirecting.', 'polite');
         window.location.href = `elections.html?payment=success&ref=${reference}`;
       }, 2000);
     } else {

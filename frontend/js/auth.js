@@ -168,26 +168,57 @@ function initRegisterForm() {
     setButtonLoading(submitBtn, true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store userId for OTP verification
-        sessionStorage.setItem('pendingUserId', data.data.userId);
-        sessionStorage.setItem('pendingEmail', email);
-        
-        showToast('Registration successful! Please verify your email.', 'success');
-        window.location.href = 'verify-otp.html';
-      } else {
-        showToast(data.message || 'Registration failed', 'error');
+      // Check if user already exists
+      const users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      
+      if (existingUser) {
+        showToast('An account with this email already exists', 'error');
+        return;
       }
+      
+      // Create new user
+      const newUser = {
+        _id: 'user_' + Date.now(),
+        firstName,
+        lastName,
+        email,
+        password, // In production, this would be hashed
+        role: 'voter',
+        isEmailVerified: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Save to localStorage
+      users.push(newUser);
+      localStorage.setItem('votewave_users', JSON.stringify(users));
+      
+      // Generate demo OTP (6-digit code)
+      const demoOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Store OTP for verification
+      const otpData = {
+        userId: newUser._id,
+        email: newUser.email,
+        otp: demoOTP,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10 minutes
+      };
+      
+      localStorage.setItem('votewave_pending_otp', JSON.stringify(otpData));
+      
+      // Store userId for OTP verification
+      sessionStorage.setItem('pendingUserId', newUser._id);
+      sessionStorage.setItem('pendingEmail', email);
+      
+      // Show demo OTP in console for testing
+      console.log('🔔 DEMO OTP CODE:', demoOTP, 'for email:', email);
+      
+      showToast('Registration successful! Check console for demo OTP code.', 'success');
+      window.location.href = 'verify-otp.html';
+      
     } catch (error) {
-      showToast('Network error. Please try again.', 'error');
+      showToast('Registration error. Please try again.', 'error');
       console.error('Registration error:', error);
     } finally {
       setButtonLoading(submitBtn, false);
@@ -286,38 +317,68 @@ function initOTPForm() {
     setButtonLoading(verifyBtn, true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, otp }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setTokens(data.data.accessToken, data.data.refreshToken);
-        setUser(data.data.user);
-
-        // Clear session storage
-        sessionStorage.removeItem('pendingUserId');
-        sessionStorage.removeItem('pendingEmail');
-
-        showToast('Email verified successfully!', 'success');
-        
-        // Redirect to elections
-        window.location.href = '../voter/elections.html';
-      } else {
-        showToast(data.message || 'Verification failed', 'error');
-        
-        // Clear inputs on error
-        inputs.forEach(input => {
-          input.value = '';
-          input.classList.remove('filled');
-        });
-        inputs[0]?.focus();
+      // Get stored OTP data
+      const otpData = JSON.parse(localStorage.getItem('votewave_pending_otp') || '{}');
+      
+      // Check if OTP exists and is valid
+      if (!otpData.otp || !otpData.userId || !otpData.expiresAt) {
+        showToast('Invalid or expired verification code', 'error');
+        return;
       }
+      
+      // Check if OTP has expired
+      if (new Date() > new Date(otpData.expiresAt)) {
+        showToast('Verification code has expired', 'error');
+        // Clean up expired OTP
+        localStorage.removeItem('votewave_pending_otp');
+        return;
+      }
+      
+      // Check if OTP matches
+      if (otp !== otpData.otp) {
+        showToast('Invalid verification code', 'error');
+        return;
+      }
+      
+      // Check if userId matches
+      if (userId !== otpData.userId) {
+        showToast('Invalid verification session', 'error');
+        return;
+      }
+      
+      // Mark user as verified
+      const users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+      const userIndex = users.findIndex(u => u._id === userId);
+      
+      if (userIndex === -1) {
+        showToast('User not found', 'error');
+        return;
+      }
+      
+      users[userIndex].isEmailVerified = true;
+      users[userIndex].updatedAt = new Date().toISOString();
+      localStorage.setItem('votewave_users', JSON.stringify(users));
+      
+      // Clean up OTP data
+      localStorage.removeItem('votewave_pending_otp');
+      
+      // Log audit event
+      if (typeof logAuditEvent === 'function') {
+        logAuditEvent('USER_REGISTERED', `Email verified for user: ${users[userIndex].email}`);
+      }
+      
+      // Auto-login the user
+      setTokens('demo_token_' + Date.now(), 'demo_refresh_' + Date.now());
+      setUser(users[userIndex]);
+      
+      showToast('Email verified successfully!', 'success');
+      
+      // Redirect to appropriate page
+      const redirect = getRedirectUrl(users[userIndex].role);
+      window.location.href = redirect;
+      
     } catch (error) {
-      showToast('Network error. Please try again.', 'error');
+      showToast('Verification error. Please try again.', 'error');
       console.error('OTP verification error:', error);
     } finally {
       setButtonLoading(verifyBtn, false);
@@ -335,24 +396,39 @@ function initOTPForm() {
       setButtonLoading(resendBtn, true, 'Sending...');
 
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          showToast('New OTP sent!', 'success');
-          startResendTimer();
-        } else {
-          showToast(data.message || 'Failed to resend OTP', 'error');
+        // Get user info
+        const users = JSON.parse(localStorage.getItem('votewave_users') || '[]');
+        const user = users.find(u => u._id === userId);
+        
+        if (!user) {
+          showToast('User not found', 'error');
+          return;
         }
+        
+        // Generate new demo OTP
+        const newOTP = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Update OTP data
+        const otpData = {
+          userId: user._id,
+          email: user.email,
+          otp: newOTP,
+          expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10 minutes
+        };
+        
+        localStorage.setItem('votewave_pending_otp', JSON.stringify(otpData));
+        
+        // Show new OTP in console for testing
+        console.log(' NEW DEMO OTP CODE:', newOTP, 'for email:', user.email);
+        
+        showToast('New OTP sent! Check console for demo code.', 'success');
+        startResendTimer();
+        
       } catch (error) {
-        showToast('Network error. Please try again.', 'error');
+        showToast('Resend error. Please try again.', 'error');
+        console.error('Resend OTP error:', error);
       } finally {
-        setButtonLoading(resendBtn, false, 'Resend');
+        setButtonLoading(resendBtn, false);
       }
     });
   }

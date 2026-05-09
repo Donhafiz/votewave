@@ -505,6 +505,38 @@ window.formatNumber = formatNumber;
 window.truncateText = truncateText;
 window.showToast = showToast;
 
+// ─── Audit Log Functions ───
+function logAuditEvent(action, details, user = null) {
+  try {
+    const auditLogs = JSON.parse(localStorage.getItem('votewave_audit_logs') || '[]');
+    const currentUser = user || getUser();
+    
+    const newLog = {
+      timestamp: new Date().toISOString(),
+      user: currentUser ? {
+        firstName: currentUser.firstName || 'Unknown',
+        lastName: currentUser.lastName || 'User'
+      } : { firstName: 'System', lastName: 'Admin' },
+      action: action,
+      details: details || '',
+      ipAddress: '127.0.0.1' // Local demo
+    };
+    
+    auditLogs.unshift(newLog); // Add to beginning
+    
+    // Keep only last 1000 logs
+    if (auditLogs.length > 1000) {
+      auditLogs.splice(1000);
+    }
+    
+    localStorage.setItem('votewave_audit_logs', JSON.stringify(auditLogs));
+  } catch (error) {
+    console.error('Error logging audit event:', error);
+  }
+}
+
+window.logAuditEvent = logAuditEvent;
+
 // ─── Toast Animation Style ───
 if (!document.getElementById('toast-style')) {
   const style = document.createElement('style');

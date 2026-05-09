@@ -10,7 +10,32 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
-    :root { --bg:#0f172a; --surface:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.06); --text:#f1f5f9; --text-muted:#94a3b8; --primary:#6366f1; }
+    :root {
+      --bg-deep: #0a0a14;
+      --bg-primary: #12122a;
+      --bg-card: rgba(18, 18, 42, 0.75);
+      --glass-bg: rgba(255,255,255,0.015);
+      --glass-border: rgba(255,255,255,0.05);
+      --glass-hover: rgba(255,255,255,0.03);
+      
+      --coral: #ff6b6b; --coral-glow: rgba(255,107,107,0.3);
+      --tangerine: #ffa726; --tangerine-glow: rgba(255,167,38,0.3);
+      --mint: #2ed573; --mint-glow: rgba(46,213,115,0.3);
+      --ocean: #4834d4; --twilight: #6c5ce7; --rose: #ff6b9d; --cyan: #00d2d3;
+      
+      --text-primary: #f0f0f5; --text-secondary: #c5c5d2;
+      --text-muted: #8888a0; --text-dim: #666680;
+      
+      --shadow-coral: 0 8px 40px rgba(255,107,107,0.25);
+      --shadow-card: 0 20px 60px rgba(0,0,0,0.4);
+      
+      --bg: var(--bg-deep);
+      --surface: var(--glass-bg);
+      --border: var(--glass-border);
+      --text: var(--text-primary);
+      --text-muted: var(--text-muted);
+      --primary: var(--coral);
+    }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; }
     
@@ -20,7 +45,7 @@
       box-shadow:0 25px 50px rgba(0,0,0,0.3);
     }
     
-    .verify-icon { width:4rem; height:4rem; background:rgba(99,102,241,0.1); border-radius:1rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; }
+    .verify-icon { width:4rem; height:4rem; background:rgba(255,107,107,0.1); border-radius:1rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; }
     .verify-icon svg { width:2rem; height:2rem; color:var(--primary); }
     
     h1 { font-size:1.75rem; font-weight:800; margin-bottom:0.5rem; }
@@ -34,10 +59,10 @@
       color:var(--text); font-family:inherit; outline:none; transition:all 0.3s;
     }
     
-    .otp-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(99,102,241,0.1); }
+    .otp-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(255,107,107,0.1); }
     
-    .btn { width:100%; padding:0.9rem; background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; border-radius:0.75rem; color:white; font-size:1rem; font-weight:600; font-family:inherit; cursor:pointer; transition:all 0.3s; }
-    .btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(99,102,241,0.4); }
+    .btn { width:100%; padding:0.9rem; background:linear-gradient(135deg,var(--coral),#ff5252); border:none; border-radius:0.75rem; color:white; font-size:1rem; font-weight:600; font-family:inherit; cursor:pointer; transition:all 0.3s; }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,107,107,0.4); }
     .btn:disabled { opacity:0.5; cursor:not-allowed; }
     
     .resend { margin-top:1rem; font-size:0.85rem; color:var(--text-muted); }
@@ -49,12 +74,14 @@
   </style>
 </head>
 <body>
-  <div class="verify-card">
+  <div class="verify-card" role="main" aria-label="Verify email">
+    <div id="verifyStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     <div class="verify-icon"><i data-lucide="mail-check"></i></div>
     <h1>Verify Your Email</h1>
     <p>We sent a 6-digit code to<br><strong id="userEmail">your@email.com</strong></p>
     
     <form id="otpForm">
+      <input type="hidden" id="otpCode" name="otpCode">
       <div class="otp-inputs" id="otpInputs">
         <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code">
         <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
@@ -70,8 +97,14 @@
     </form>
     
     <p class="resend">
-      Didn't receive the code? <button type="button" id="resendBtn" style="background:none;border:none;padding:0;color:var(--primary);cursor:pointer;font:inherit;">Resend Code</button>
+      Didn't receive the code? <button type="button" id="resendBtn" aria-label="Resend code" style="background:none;border:none;padding:0;color:var(--primary);cursor:pointer;font:inherit;">Resend Code</button>
     </p>
+    
+    <!-- Demo OTP Display -->
+    <div class="demo-otp" style="margin-top:1.5rem;padding:1rem;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.2);border-radius:0.75rem;font-size:0.85rem;">
+      <p style="color:var(--text-muted);margin-bottom:0.5rem;">🔔 <strong>Demo Mode:</strong> Check browser console for OTP code</p>
+      <p style="color:var(--text-muted);font-size:0.8rem;">Press F12 → Console to see the 6-digit code</p>
+    </div>
     
     <a href="register.html" class="back-link"><i data-lucide="arrow-left"></i> Back to Register</a>
   </div>
@@ -83,6 +116,7 @@
     @keyframes spin { to { transform:rotate(360deg); } }
     @keyframes slideIn { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
   </style>
+  <script src="../js/a11y.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/auth.js"></script>
 </body>

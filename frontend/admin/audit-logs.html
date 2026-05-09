@@ -25,12 +25,13 @@
         <a href="candidates.html" class="admin-nav-item"><i data-lucide="users"></i> Candidates</a>
         <a href="results.html" class="admin-nav-item"><i data-lucide="bar-chart-3"></i> Results</a>
         <a href="users.html" class="admin-nav-item"><i data-lucide="user-cog"></i> Users</a>
-        <a href="audit.html" class="admin-nav-item active"><i data-lucide="file-text"></i> Audit Log</a>
+        <a href="audit-logs.html" class="admin-nav-item active"><i data-lucide="file-text"></i> Audit Log</a>
         <a href="settings.html" class="admin-nav-item"><i data-lucide="settings"></i> Settings</a>
       </nav>
     </aside>
     
-    <main class="admin-main">
+    <main class="admin-main" role="main" aria-label="Audit log">
+      <div id="adminStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
       <header class="admin-topbar">
         <div class="admin-topbar-left">
           <button class="admin-menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
@@ -50,7 +51,7 @@
           <button class="admin-filter-btn" data-type="user">Users</button>
           <button class="admin-filter-btn" data-type="vote">Votes</button>
           <button class="admin-filter-btn" data-type="system">System</button>
-          <input type="text" class="admin-filter-select" id="searchAudit" placeholder="Search audit log..." style="margin-left:auto;min-width:200px;">
+          <input type="text" class="admin-filter-select" id="searchAudit" aria-label="Search audit log" placeholder="Search audit log..." style="margin-left:auto;min-width:200px;">
         </div>
         
         <!-- Audit Table -->
@@ -77,14 +78,15 @@
   
   <div class="admin-toast-container" id="toastContainer"></div>
   
+  <script src="../js/a11y.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/admin.js"></script>
   
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      document.getElementById('menuToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('menuToggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar')?.classList.toggle('open');
       });
       
       initAdminAuth();
@@ -100,37 +102,49 @@
       });
       
       // Search
-      document.getElementById('searchAudit').addEventListener('input', debounce(loadAuditLogs, 300));
+      document.getElementById('searchAudit')?.addEventListener('input', debounce(loadAuditLogs, 300));
     });
     
     async function loadAuditLogs() {
       try {
         const typeFilter = document.querySelector('.admin-filter-btn.active')?.dataset.type;
-        const searchQuery = document.getElementById('searchAudit')?.value;
+        const searchQuery = document.getElementById('searchAudit')?.value?.toLowerCase();
         
-        let endpoint = '/admin/audit-logs?page=1&limit=50';
+        // Get audit logs from localStorage (demo data)
+        let logs = JSON.parse(localStorage.getItem('votewave_audit_logs') || '[]');
+        
+        // If no logs exist, create demo data
+        if (logs.length === 0) {
+          logs = generateDemoAuditLogs();
+          localStorage.setItem('votewave_audit_logs', JSON.stringify(logs));
+        }
+        
+        // Filter by type
         if (typeFilter && typeFilter !== 'all') {
-          // Map frontend types to backend actions
           const actionMap = {
-            'election': 'ELECTION_CREATED,ELECTION_UPDATED,ELECTION_ACTIVATED,ELECTION_CLOSED',
-            'user': 'USER_REGISTERED,USER_LOGIN,USER_BANNED,USER_UNBANNED,ROLE_CHANGE',
-            'vote': 'VOTE_CAST',
-            'system': 'SETTINGS_CHANGED'
+            'election': ['ELECTION_CREATED', 'ELECTION_UPDATED', 'ELECTION_ACTIVATED', 'ELECTION_CLOSED'],
+            'user': ['USER_REGISTERED', 'USER_LOGIN', 'USER_BANNED', 'USER_UNBANNED', 'ROLE_CHANGE'],
+            'vote': ['VOTE_CAST'],
+            'system': ['SETTINGS_CHANGED']
           };
           if (actionMap[typeFilter]) {
-            endpoint += `&action=${actionMap[typeFilter]}`;
+            logs = logs.filter(log => actionMap[typeFilter].includes(log.action));
           }
         }
         
-        const response = await adminApiRequest(endpoint);
-        
-        if (response.success) {
-          const logs = response.data || [];
-          renderAuditLogs(logs);
-        } else {
-          showAdminToast('Failed to load audit logs', 'error');
-          renderAuditLogs([]);
+        // Filter by search
+        if (searchQuery) {
+          logs = logs.filter(log => 
+            (log.user?.firstName + ' ' + log.user?.lastName).toLowerCase().includes(searchQuery) ||
+            log.action.toLowerCase().includes(searchQuery) ||
+            (log.details && log.details.toLowerCase().includes(searchQuery))
+          );
         }
+        
+        // Sort by timestamp (newest first)
+        logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        renderAuditLogs(logs);
       } catch (error) {
         console.error('Error loading audit logs:', error);
         showAdminToast('Error loading audit logs', 'error');
@@ -138,19 +152,68 @@
       }
     }
     
+    function generateDemoAuditLogs() {
+      const demoLogs = [
+        {
+          timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+          user: { firstName: 'John', lastName: 'Doe' },
+          action: 'ELECTION_CREATED',
+          details: 'Created election: Presidential Election 2024',
+          ipAddress: '192.168.1.100'
+        },
+        {
+          timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+          user: { firstName: 'Jane', lastName: 'Smith' },
+          action: 'USER_LOGIN',
+          details: 'User logged in successfully',
+          ipAddress: '192.168.1.101'
+        },
+        {
+          timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+          user: { firstName: 'Admin', lastName: 'User' },
+          action: 'ELECTION_ACTIVATED',
+          details: 'Activated election: Student Council Elections',
+          ipAddress: '192.168.1.102'
+        },
+        {
+          timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+          user: { firstName: 'Mike', lastName: 'Johnson' },
+          action: 'VOTE_CAST',
+          details: 'Cast vote in Presidential Election 2024',
+          ipAddress: '192.168.1.103'
+        },
+        {
+          timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+          user: { firstName: 'Sarah', lastName: 'Williams' },
+          action: 'USER_REGISTERED',
+          details: 'New user registration completed',
+          ipAddress: '192.168.1.104'
+        },
+        {
+          timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+          user: { firstName: 'Admin', lastName: 'User' },
+          action: 'SETTINGS_CHANGED',
+          details: 'Updated system configuration settings',
+          ipAddress: '192.168.1.105'
+        }
+      ];
+      return demoLogs;
+    }
+    
     function renderAuditLogs(logs) {
       const typeBadge = (action) => {
         const colors = { 
-          'ELECTION_CREATED':'#6366f1', 'ELECTION_UPDATED':'#6366f1', 'ELECTION_ACTIVATED':'#6366f1', 'ELECTION_CLOSED':'#6366f1',
-          'USER_REGISTERED':'#10b981', 'USER_LOGIN':'#10b981', 'USER_BANNED':'#10b981', 'USER_UNBANNED':'#10b981', 'ROLE_CHANGE':'#10b981',
-          'VOTE_CAST':'#f59e0b',
-          'SETTINGS_CHANGED':'#06b6d4'
+          'ELECTION_CREATED':'#ff6b6b', 'ELECTION_UPDATED':'#ff6b6b', 'ELECTION_ACTIVATED':'#ff6b6b', 'ELECTION_CLOSED':'#ff6b6b',
+          'USER_REGISTERED':'#2ed573', 'USER_LOGIN':'#2ed573', 'USER_BANNED':'#2ed573', 'USER_UNBANNED':'#2ed573', 'ROLE_CHANGE':'#2ed573',
+          'VOTE_CAST':'#ffa726',
+          'SETTINGS_CHANGED':'#00d2d3'
         };
         const type = action.split('_')[0].toLowerCase();
         return `<span style="display:inline-block;padding:0.15rem 0.6rem;border-radius:100px;font-size:0.7rem;font-weight:600;background:${colors[action] || '#64748b'}22;color:${colors[action] || '#94a3b8'};">${type.toUpperCase()}</span>`;
       };
       
-      document.getElementById('auditTableBody').innerHTML = logs.map(log => `
+      const auditBody = document.getElementById('auditTableBody');
+      if (auditBody) auditBody.innerHTML = logs.map(log => `
         <tr>
           <td style="white-space:nowrap;">${new Date(log.timestamp).toLocaleString()}</td>
           <td><strong>${escapeHtml(log.user?.firstName + ' ' + log.user?.lastName || 'System')}</strong></td>
@@ -181,12 +244,15 @@
       a.download = `audit-log-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
+      if (window.announce) window.announce('Audit log exported', 'polite');
     }
     
     function clearAuditLog() {
       if (!confirm('This will only clear logs from the current view. Database logs cannot be cleared.')) return;
-      document.getElementById('auditTableBody').innerHTML = '';
+      const auditBody2 = document.getElementById('auditTableBody');
+      if (auditBody2) auditBody2.innerHTML = '';
       showAdminToast('Audit log view cleared', 'success');
+      if (window.announce) window.announce('Audit log view cleared', 'polite');
     }
     
     function debounce(func, wait) {

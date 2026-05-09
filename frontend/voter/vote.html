@@ -3,243 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cast Your Vote - VoteWave</title>
-  <meta name="theme-color" content="#6366f1">
+  <title>Cast Vote - VoteWave</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://js.paystack.co/v2/paystack.js"></script>
   <script src="../js/main.js"></script>
-  <script src="../js/payment.js"></script>
   <style>
-    :root { --bg:#0f172a; --surface:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.06); --text:#f1f5f9; --text-muted:#94a3b8; --primary:#6366f1; --success:#10b981; --warning:#f59e0b; --radius:1rem; }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
-    .container { max-width:900px; margin:0 auto; padding:2rem 1.5rem; }
-    .back-link { color:var(--text-muted); text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; margin-bottom:1.5rem; }
-    .back-link:hover { color:var(--text); }
-    .election-header { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; margin-bottom:1.5rem; }
-    .election-header h1 { font-size:2rem; font-weight:800; margin-bottom:0.5rem; }
-    .election-header .desc { color:var(--text-muted); margin-bottom:1rem; }
-    .badge { padding:0.25rem 0.75rem; border-radius:100px; font-size:0.7rem; font-weight:600; display:inline-block; margin-right:0.5rem; }
-    .badge.type { background:rgba(99,102,241,0.15); color:#818cf8; }
-    .badge.status { background:rgba(16,185,129,0.15); color:var(--success); }
-    .position-section { margin-bottom:2rem; }
-    .position-header { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius) var(--radius) 0 0; padding:1rem 1.5rem; display:flex; align-items:center; gap:0.75rem; }
-    .position-icon { width:2.5rem; height:2.5rem; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:0.75rem; display:flex; align-items:center; justify-content:center; font-weight:800; color:white; font-size:1.1rem; }
-    .position-header h3 { font-size:1.1rem; font-weight:700; }
-    .position-header .contestants-count { margin-left:auto; font-size:0.8rem; color:var(--text-muted); }
-    .candidates-list { border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); overflow:hidden; }
-    .candidate-card { display:flex; align-items:center; gap:1rem; padding:1.25rem 1.5rem; cursor:pointer; transition:all 0.3s; border-bottom:1px solid var(--border); }
-    .candidate-card:last-child { border-bottom:none; }
-    .candidate-card:hover { background:rgba(99,102,241,0.05); }
-    .candidate-card.selected { background:rgba(99,102,241,0.1); border-left:3px solid #6366f1; }
-    .candidate-avatar { width:3.5rem; height:3.5rem; border-radius:1rem; display:flex; align-items:center; justify-content:center; font-size:1.25rem; font-weight:800; color:white; flex-shrink:0; }
-    .candidate-info { flex:1; }
-    .candidate-info h4 { font-size:1rem; font-weight:600; margin-bottom:0.25rem; }
-    .candidate-info .bio { font-size:0.8rem; color:var(--text-muted); }
-    .candidate-info .manifesto { margin-top:0.5rem; padding:0.5rem; background:rgba(255,255,255,0.02); border-radius:0.5rem; font-style:italic; font-size:0.85rem; }
-    .radio-circle { width:1.5rem; height:1.5rem; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; transition:all 0.3s; flex-shrink:0; }
-    .candidate-card.selected .radio-circle { border-color:#6366f1; background:#6366f1; }
-    .radio-inner { width:0.5rem; height:0.5rem; border-radius:50%; background:white; opacity:0; transition:opacity 0.3s; }
-    .candidate-card.selected .radio-inner { opacity:1; }
-    .vote-purchase { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin:2rem 0; }
-    .quantity-selector { display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem; }
-    .quantity-selector button { width:2.5rem; height:2.5rem; border:1px solid var(--border); border-radius:0.5rem; background:var(--surface); color:var(--text); font-size:1.2rem; cursor:pointer; }
-    .quantity-selector input { width:5rem; text-align:center; padding:0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:0.5rem; color:var(--text); font-size:1rem; font-family:inherit; outline:none; }
-    .price-display { margin-top:1rem; font-size:1.5rem; font-weight:800; }
-    .per-vote { color:var(--text-muted); font-size:0.8rem; }
-    .submit-btn { width:100%; padding:1rem; background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; border-radius:0.75rem; color:white; font-size:1.1rem; font-weight:700; font-family:inherit; cursor:pointer; transition:all 0.3s; margin-top:1rem; }
-    .submit-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 10px 30px rgba(99,102,241,0.4); }
-    .submit-btn:disabled { opacity:0.5; cursor:not-allowed; }
-    .success-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; }
-    .success-overlay.show { display:flex; }
-    .success-card { background:#1e293b; border:1px solid rgba(255,255,255,0.1); border-radius:1.5rem; padding:3rem 2rem; text-align:center; max-width:450px; width:90%; }
-    .success-icon { width:5rem; height:5rem; background:rgba(16,185,129,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; }
-    .success-icon svg { width:2.5rem; height:2.5rem; color:#10b981; }
-    .success-card h2 { font-size:1.5rem; margin-bottom:0.5rem; }
-    .success-card p { color:#94a3b8; margin-bottom:1.5rem; }
-    @media (max-width:600px) { .candidate-card { flex-direction:column; text-align:center; } }
+    :root {
+      --bg-deep: #0a0a14;
+      --bg-primary: #12122a;
+      --bg-card: rgba(18, 18, 42, 0.75);
+      --glass-bg: rgba(255,255,255,0.015);
+      --glass-border: rgba(255,255,255,0.05);
+      --glass-hover: rgba(255,255,255,0.03);
+      
+      --coral: #ff6b6b; --coral-glow: rgba(255,107,107,0.3);
+      --tangerine: #ffa726; --tangerine-glow: rgba(255,167,38,0.3);
+      --mint: #2ed573; --mint-glow: rgba(46,213,115,0.3);
+      --ocean: #4834d4; --twilight: #6c5ce7; --rose: #ff6b9d; --cyan: #00d2d3;
+      
+      --text-primary: #f0f0f5; --text-secondary: #c5c5d2;
+      --text-muted: #8888a0; --text-dim: #666680;
+      
+      --shadow-coral: 0 8px 40px rgba(255,107,107,0.25);
+      --shadow-card: 0 20px 60px rgba(0,0,0,0.4);
+      
+      --bg: var(--bg-deep);
+      --surface: var(--glass-bg);
+      --border: var(--glass-border);
+      --text: var(--text-primary);
+      --text-muted: var(--text-muted);
+      --primary: var(--coral);
+      --success: var(--mint);
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; margin:0; padding:2rem; }
+    .container { max-width:800px; margin:0 auto; }
+    .back { color:var(--text-muted); text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; margin-bottom:1.5rem; }
+    .candidate-card { background:var(--surface); border:2px solid var(--border); border-radius:1rem; padding:1.25rem; display:flex; align-items:center; gap:1rem; cursor:pointer; margin-bottom:0.75rem; transition:0.3s; }
+    .candidate-card.selected { border-color:var(--primary); background:rgba(255,107,107,0.05); }
+    .radio { width:1.5rem; height:1.5rem; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; }
+    .candidate-card.selected .radio { border-color:var(--primary); background:var(--primary); }
+    .radio::after { content:''; width:0.5rem; height:0.5rem; background:white; border-radius:50%; opacity:0; }
+    .candidate-card.selected .radio::after { opacity:1; }
+    .btn { width:100%; padding:1rem; background:linear-gradient(135deg,var(--coral),#ff5252); color:white; border:none; border-radius:0.75rem; font-size:1rem; font-weight:700; cursor:pointer; margin-top:1rem; }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <a href="elections.html" class="back-link"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Back to Elections</a>
-    
-    <div class="election-header" id="electionHeader">
-      <div><span class="badge type" id="electionType">🎓 Student</span><span class="badge status">● Active</span></div>
-      <h1 id="electionTitle">Loading...</h1>
-      <p class="desc" id="electionDesc"></p>
-      <div style="display:flex;gap:1.5rem;color:var(--text-muted);font-size:0.85rem;">
-        <span><i data-lucide="calendar" style="width:14px;height:14px;"></i> <span id="electionDates"></span></span>
-        <span><i data-lucide="users" style="width:14px;height:14px;"></i> <span id="electionVoters"></span></span>
+  <div class="container" role="main" aria-label="Cast vote">
+    <div id="voteStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <a href="elections.html" class="back">← Back</a>
+    <h1 id="title"></h1>
+    <div id="positions"></div>
+    <div style="margin:1.5rem 0;">
+      <label>Number of votes (GHS 5 each)</label>
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;">
+        <button onclick="changeQty(-1)" style="width:2rem;height:2rem;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;">-</button>
+        <input type="number" id="qty" value="1" min="1" max="100" readonly style="width:4rem;text-align:center;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.5rem;">
+        <button onclick="changeQty(1)" style="width:2rem;height:2rem;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;">+</button>
       </div>
+      <p style="margin-top:0.5rem;font-size:1.2rem;">Total: GHS <span id="total">5.00</span></p>
     </div>
-    
-    <div id="positionsContainer"></div>
-    
-    <div class="vote-purchase" id="votePurchase">
-      <h3>Purchase Votes</h3>
-      <p style="color:var(--text-muted);">Select a candidate above, then choose how many votes to cast. Each vote costs <strong>GHS 1.00</strong>.</p>
-      <div class="quantity-selector">
-        <button id="qtyMinus">−</button>
-        <input type="number" id="voteQty" value="1" min="1" max="100" readonly>
-        <button id="qtyPlus">+</button>
-      </div>
-      <div class="price-display">Total: <span id="totalPrice">GHS 1.00</span></div>
-      <p class="per-vote">GHS 1.00 × <span id="voteCountDisplay">1</span> vote(s)</p>
-      <button class="submit-btn" id="payAndVote" disabled onclick="initiateVotePayment()">
-        <i data-lucide="credit-card" style="width:18px;height:18px;"></i> Pay & Vote Now
-      </button>
-      <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-muted);">🔒 Secured by Paystack · MTN MoMo, Vodafone Cash, AirtelTigo, Visa, Mastercard</p>
-    </div>
+    <button class="btn" id="payBtn" disabled onclick="pay()" aria-label="Pay and cast vote">Pay & Vote</button>
   </div>
-  
-  <div class="success-overlay" id="successOverlay">
-    <div class="success-card">
-      <div class="success-icon"><i data-lucide="check-circle"></i></div>
-      <h2>🎉 Payment Successful!</h2>
-      <p>Your <strong id="successVoteCount">1</strong> vote(s) have been recorded. A confirmation will be sent to your email/SMS.</p>
-      <button class="submit-btn" onclick="window.location.href='elections.html'" style="max-width:300px;">Back to Elections</button>
-    </div>
-  </div>
-
+  <script src="../js/a11y.js"></script>
   <script>
-    // API Configuration
-    const API_BASE_URL = window.location.origin.includes('localhost') 
-      ? 'http://localhost:5000/api'
-      : `${window.location.origin}/api`;
-    
-    const VOTE_PRICE = 1.00; // GHS per vote
+    const VOTE_PRICE = 5;
     let selectedCandidate = null;
-    let selectedCategoryId = null;
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-      loadElectionDetails();
-      
-      // Check for payment callback
-      checkPaymentCallback();
-      
-      document.getElementById('qtyPlus').addEventListener('click', () => {
-        const input = document.getElementById('voteQty');
-        if (parseInt(input.value) < 100) input.value = parseInt(input.value) + 1;
-        updateTotal();
-      });
-      document.getElementById('qtyMinus').addEventListener('click', () => {
-        const input = document.getElementById('voteQty');
-        if (parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
-        updateTotal();
-      });
-    });
-    
-      function loadElectionDetails() {
     const params = new URLSearchParams(window.location.search);
-    const electionId = params.get('id') || '1';
-
-    // Get real election data
-    let elections = JSON.parse(localStorage.getItem('votewave_elections') || '[]');
-    const election = elections.find(e => e._id === electionId) || {
-      _id: '1', title: 'Sample Election', type: 'student', status: 'active',
-      description: 'This is a fallback election.', positions: ['President'],
-      totalVotes: 0, startDate: '2026-01-01', endDate: '2026-12-31'
-    };
-
-    document.getElementById('electionTitle').textContent = election.title;
-    document.getElementById('electionDesc').textContent = election.description;
-    document.getElementById('electionType').textContent = '🎓 ' + election.type;
-    document.getElementById('electionDates').textContent = 
-      new Date(election.startDate).toLocaleDateString() + ' - ' + new Date(election.endDate).toLocaleDateString();
-    document.getElementById('electionVoters').textContent = (election.totalVotes || 0) + ' votes cast';
-
-    // Get real candidates from localStorage
-    let allCandidates = JSON.parse(localStorage.getItem('votewave_candidates') || '[]');
-    const electionCandidates = allCandidates.filter(c => c.electionId === electionId);
-
-    const container = document.getElementById('positionsContainer');
-    container.innerHTML = '';
-
-    (election.positions || []).forEach((pos, idx) => {
-      const positionCandidates = electionCandidates.filter(c => c.position === pos);
-      
-      container.innerHTML += `
-        <div class="position-section">
-          <div class="position-header">
-            <div class="position-icon">${idx+1}</div>
-            <h3>${pos}</h3>
-            <span class="contestants-count">${positionCandidates.length} nominee${positionCandidates.length!==1?'s':''}</span>
-          </div>
-          <div class="candidates-list">
-            ${positionCandidates.map(c => `
-              <div class="candidate-card" onclick="selectCandidate('${c._id}', this)" data-candidate="${c._id}">
-                <div class="candidate-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">${c.firstName[0]}${c.lastName[0]}</div>
-                <div class="candidate-info">
-                  <h4>${c.firstName} ${c.lastName}</h4>
-                  <p class="bio">${c.bio || 'No bio available'}</p>
-                </div>
-                <div class="radio-circle"><div class="radio-inner"></div></div>
-              </div>
-            `).join('')}
-            ${positionCandidates.length === 0 ? '<p style="padding:1rem;color:var(--text-muted);">No nominees yet for this position.</p>' : ''}
-          </div>
-        </div>
-      `;
-    });
-  }
+    const electionId = params.get('id');
     
-    async function initiateVotePayment() {
-      if (!selectedCandidate) {
-        showToast('Please select a candidate first', 'error');
-        return;
+    // Error handling for missing election ID
+    if (!electionId) {
+      document.getElementById('positions').innerHTML = '<div style="text-align:center;padding:2rem;"><h3>No Election Selected</h3><p>Please select an election from the <a href="elections.html" style="color:var(--primary);">elections page</a>.</p></div>';
+      document.getElementById('title').textContent = 'Error';
+      document.querySelector('.btn').style.display = 'none';
+      document.querySelector('label').parentElement.style.display = 'none';
+    } else {
+      const elections = JSON.parse(localStorage.getItem('votewave_elections')||'[]');
+      const election = elections.find(e=>e._id===electionId);
+      
+      if (!election) {
+        document.getElementById('positions').innerHTML = '<div style="text-align:center;padding:2rem;"><h3>Election Not Found</h3><p>The election you\'re looking for doesn\'t exist. Please <a href="elections.html" style="color:var(--primary);">return to elections</a>.</p></div>';
+        document.getElementById('title').textContent = 'Election Not Found';
+        document.querySelector('.btn').style.display = 'none';
+        document.querySelector('label').parentElement.style.display = 'none';
+      } else {
+        document.getElementById('title').textContent = election.title;
+        const candidates = JSON.parse(localStorage.getItem('votewave_candidates')||'[]').filter(c=>c.electionId===electionId);
+        // Handle case with no positions
+        if (!election.positions || election.positions.length === 0) {
+          document.getElementById('positions').innerHTML = '<div style="text-align:center;padding:2rem;"><h3>No Positions Available</h3><p>This election has no positions configured yet.</p></div>';
+        } else {
+          document.getElementById('positions').innerHTML = (election.positions||[]).map(pos => {
+            const posCandidates = candidates.filter(c=>c.position===pos);
+            if (posCandidates.length === 0) {
+              return `<div style="margin-bottom:2rem;"><h3>${pos} (0 candidates)</h3><p style="color:var(--text-muted);">No candidates registered for this position.</p></div>`;
+            }
+            return `<div style="margin-bottom:2rem;"><h3>${pos} (${posCandidates.length})</h3>` +
+              posCandidates.map(c => `<div class="candidate-card" onclick="select('${c._id}',this)"><div style="width:3rem;height:3rem;border-radius:0.75rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;">${c.firstName[0]}${c.lastName[0]}</div><div><strong>${c.firstName} ${c.lastName}</strong><p style="color:var(--text-muted);font-size:0.85rem;">${c.bio||''}</p></div><div class="radio"></div></div>`).join('') + '</div>';
+          }).join('');
+        }
       }
-      
-      const electionId = new URLSearchParams(window.location.search).get('id');
-      if (!electionId) {
-        showToast('Election ID not found', 'error');
-        return;
-      }
-      
-      const votes = parseInt(document.getElementById('voteQty').value);
-      const categoryId = selectedCategoryId || 'default';
-      
-      // Show loading state
-      const btn = document.getElementById('payAndVote');
-      btn.disabled = true;
-      btn.innerHTML = '<i data-lucide="loader-2" style="width:18px;height:18px;animation:spin 1s linear infinite;"></i> Processing...';
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-      
-      // Initialize payment through backend
-      const result = await initializeVotePayment(electionId, categoryId, selectedCandidate, votes);
-      
-      if (!result) {
-        // Reset button state on failure
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="credit-card" style="width:18px;height:18px;"></i> Pay & Vote Now';
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-      }
-      // On success, page will redirect to Paystack
     }
-    
-    // Select candidate handler
-    function selectCandidate(candidateId, element) {
-      // Remove previous selection
-      document.querySelectorAll('.candidate-card').forEach(card => {
-        card.classList.remove('selected');
+    function select(id, el) {
+      document.querySelectorAll('.candidate-card').forEach(c=>c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedCandidate = id;
+      document.getElementById('payBtn').disabled = false;
+    }
+    function changeQty(delta) {
+      const qty = document.getElementById('qty');
+      let val = parseInt(qty.value) + delta;
+      if (val<1) val=1; if (val>100) val=100;
+      qty.value = val;
+      document.getElementById('total').textContent = (val*VOTE_PRICE).toFixed(2);
+    }
+    function pay() {
+      if (!selectedCandidate) return;
+      const qty = parseInt(document.getElementById('qty').value);
+      const amount = qty * VOTE_PRICE;
+      const handler = PaystackPop.setup({
+        key: 'pk_test_1234567890abcdef', // replace with your actual Paystack test key
+        email: (getUser()?.email) || 'voter@example.com',
+        amount: amount*100,
+        currency: 'GHS',
+        ref: 'VW-'+Date.now(),
+        callback: function(response) {
+          let candidates = JSON.parse(localStorage.getItem('votewave_candidates')||'[]');
+          const idx = candidates.findIndex(c=>c._id===selectedCandidate);
+          if (idx!==-1) candidates[idx].votes = (candidates[idx].votes||0) + qty;
+          localStorage.setItem('votewave_candidates', JSON.stringify(candidates));
+          if (window.announce) window.announce('Vote recorded successfully', 'polite');
+        },
+        onClose: ()=> { if (window.announce) window.announce('Payment cancelled', 'polite'); }
       });
-      
-      // Add selection to clicked card
-      element.classList.add('selected');
-      selectedCandidate = candidateId;
-      
-      // Enable pay button
-      document.getElementById('payAndVote').disabled = false;
-      
-      // Find category ID
-      const section = element.closest('.position-section');
-      if (section) {
-        const categoryName = section.querySelector('h3')?.textContent;
-        // Map category name to ID (in production, use actual IDs)
-        selectedCategoryId = categoryName || 'default';
-      }
+      handler.openIframe();
     }
   </script>
 </body>
