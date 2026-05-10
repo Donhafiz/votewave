@@ -2,15 +2,14 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-
     "worker:vote": "node src/workers/vote.worker.js",
     "worker:email": "node src/workers/email.worker.js",
     "worker:analytics": "node src/workers/analytics.worker.js",
-
     "worker:erie": "node src/core/erie/erie.router.js",
-
     "worker:ml": "node src/ml/ml.worker.js",
-
     "worker:fraud": "node src/security/fraud/fraud.worker.js"
+  },
+  "dependencies": {
+    "redis": "^5.12.1"
   }
 }
