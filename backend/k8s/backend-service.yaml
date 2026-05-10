@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: votewave-api-service
+  namespace: votewave
+
+spec:
+  selector:
+    app: votewave-api
+
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+
+  type: LoadBalancer

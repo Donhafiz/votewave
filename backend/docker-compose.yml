@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    container_name: votewave-app
+    restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      - mongo
+      - redis
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    command: npm run dev
+
+  mongo:
+    image: mongo:7
+    container_name: votewave-mongo
+    restart: unless-stopped
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:7
+    container_name: votewave-redis
+    restart: unless-stopped
+
+    ports:
+      - "6379:6379"
+
+volumes:
+  mongo_data:
