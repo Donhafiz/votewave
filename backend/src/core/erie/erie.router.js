@@ -1,10 +1,19 @@
 const { createERIEWorker } = require("./erie.processor");
 const eventBus = require("../../events/eventBus");
+
+// ✅ ADD THIS (analytics + ML + fraud event wiring)
+const { registerAnalyticsEvents } = require("../../events/analytics.events");
+
 /**
  * SPAWNS SHARDED WORKERS
  */
 function bootstrapERIECluster(shardCount = 4) {
   const workers = [];
+
+  // =========================================================
+  // 🔗 EVENT REGISTRATION (CRITICAL FIX)
+  // =========================================================
+  registerAnalyticsEvents(eventBus);
 
   for (let i = 0; i < shardCount; i++) {
     const worker = createERIEWorker(i);
@@ -24,10 +33,15 @@ function bootstrapERIECluster(shardCount = 4) {
 
   return workers;
 }
+
+/**
+ * OPTIONAL: manual event trigger helper
+ */
 function emitVoteEvent(data) {
   eventBus.emit("vote:cast", data);
 }
 
 module.exports = {
   bootstrapERIECluster,
+  emitVoteEvent,
 };

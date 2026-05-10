@@ -1,7 +1,13 @@
-const broker = require("./broker");
+const Broker = require("./broker");
+const { getPartition } = require("./partitions");
 
-function produceEvent(topic, event) {
-  broker.send(topic, event);
+const broker = new Broker(6);
+
+/**
+ * Kafka-style event producer
+ */
+function publish(topic, key, payload) {
+  return broker.publish(topic, key, payload);
 }
 
-module.exports = { produceEvent };
+module.exports = { publish, broker };

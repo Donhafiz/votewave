@@ -1,95 +1,81 @@
-const { Election, Candidate, Vote, AuditLog } = require('../models');
-const { getClientIP } = require('../utils');
+const { Election, Candidate, Vote, AuditLog } = require("../models");
+const { getClientIP } = require("../utils");
 
 const {
   emitElectionStatusChange,
   emitNewElection,
   emitActivity,
-} = require('../utils/socketService');
+} = require("../utils/socketService");
 
-/* ================= GET ALL ELECTIONS ================= */
+/* =========================================================
+   GET ALL ELECTIONS
+========================================================= */
 const getAllElections = async (req, res) => {
   try {
     const { status, type, search, page = 1, limit = 10 } = req.query;
 
-    let query = {};
+    const query = {};
 
     if (status) query.status = status;
     if (type) query.type = type;
 
     if (search) {
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { tags: { $in: [new RegExp(search, 'i')] } },
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
       ];
     }
 
-    if (!req.user || req.user.role === 'voter') {
-      query.status = { $in: ['upcoming', 'active', 'closed'] };
-      query['settings.publicAccess'] = true;
-    }
-
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const pageNum = Math.max(parseInt(page) || 1, 1);
+    const limitNum = Math.min(Math.max(parseInt(limit) || 10, 1), 100);
+    const skip = (pageNum - 1) * limitNum;
 
     const elections = await Election.find(query)
-      .populate('createdBy', 'firstName lastName')
-      .populate('candidates', 'name photo voteCount votePercentage')
+      .populate("createdBy", "firstName lastName")
+      .populate("candidates")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(limitNum);
 
     const total = await Election.countDocuments(query);
 
-    res.status(200).json({
+    res.json({
       success: true,
       data: elections,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: pageNum,
+        limit: limitNum,
         total,
-        totalPages: Math.ceil(total / parseInt(limit)),
+        totalPages: Math.ceil(total / limitNum),
       },
     });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-/* ================= GET ELECTION BY ID ================= */
+/* =========================================================
+   GET SINGLE ELECTION
+========================================================= */
 const getElectionById = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const election = await Election.findById(id)
-      .populate('createdBy', 'firstName lastName email')
-      .populate('candidates');
+    const election = await Election.findById(req.params.id)
+      .populate("createdBy")
+      .populate("candidates");
 
     if (!election) {
-      return res.status(404).json({
-        success: false,
-        message: 'Election not found',
-      });
+      return res.status(404).json({ success: false, message: "Not found" });
     }
 
-    res.status(200).json({
-      success: true,
-      data: election,
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.json({ success: true, data: election });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-/* ================= CREATE ELECTION ================= */
+/* =========================================================
+   CREATE ELECTION
+========================================================= */
 const createElection = async (req, res) => {
   try {
     const election = await Election.create({
@@ -97,9 +83,8 @@ const createElection = async (req, res) => {
       createdBy: req.user._id,
     });
 
-    await election.populate('createdBy', 'firstName lastName');
+    await election.populate("createdBy", "firstName lastName");
 
-    /* ================= REAL-TIME ================= */
     emitNewElection(election);
 
     emitActivity({
@@ -110,201 +95,264 @@ const createElection = async (req, res) => {
 
     await AuditLog.create({
       user: req.user._id,
-      action: 'ELECTION_CREATE',
-      targetType: 'election',
+      action: "CREATE_ELECTION",
       targetId: election._id,
       ipAddress: getClientIP(req),
-      details: { title: election.title },
     });
 
-    res.status(201).json({
-      success: true,
-      message: 'Election created successfully',
-      data: election,
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(201).json({ success: true, data: election });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-/* ================= UPDATE ELECTION ================= */
+/* =========================================================
+   UPDATE ELECTION
+========================================================= */
 const updateElection = async (req, res) => {
   try {
-    const { id } = req.params;
-    const updates = req.body;
-
-    const election = await Election.findById(id);
+    const election = await Election.findById(req.params.id);
 
     if (!election) {
-      return res.status(404).json({
-        success: false,
-        message: 'Election not found',
-      });
+      return res.status(404).json({ success: false, message: "Not found" });
     }
 
-    const previousStatus = election.status;
+    const prevStatus = election.status;
 
-    Object.assign(election, updates);
+    Object.assign(election, req.body);
     await election.save();
 
-    /* ================= REAL-TIME STATUS CHANGE ================= */
-    if (updates.status && updates.status !== previousStatus) {
-      emitElectionStatusChange(id, updates.status);
-
-      emitActivity({
-        type: "election",
-        title: `Election status changed to ${updates.status}`,
-        electionId: id,
-      });
+    if (req.body.status && req.body.status !== prevStatus) {
+      emitElectionStatusChange(election._id, req.body.status);
     }
 
-    await AuditLog.create({
-      user: req.user._id,
-      action: 'ELECTION_UPDATE',
-      targetType: 'election',
-      targetId: election._id,
-      ipAddress: getClientIP(req),
-      details: { changes: Object.keys(updates) },
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Election updated successfully',
-      data: election,
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.json({ success: true, data: election });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-/* ================= DELETE ELECTION ================= */
+/* =========================================================
+   DELETE ELECTION
+========================================================= */
 const deleteElection = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const election = await Election.findById(id);
-
-    if (!election) {
-      return res.status(404).json({
-        success: false,
-        message: 'Election not found',
-      });
-    }
-
-    await Election.findByIdAndDelete(id);
-    await Candidate.deleteMany({ election: id });
-    await Vote.deleteMany({ election: id });
+    await Election.findByIdAndDelete(req.params.id);
+    await Candidate.deleteMany({ election: req.params.id });
+    await Vote.deleteMany({ election: req.params.id });
 
     emitActivity({
       type: "election",
       title: "Election deleted",
-      electionId: id,
+      electionId: req.params.id,
     });
 
-    await AuditLog.create({
-      user: req.user._id,
-      action: 'ELECTION_DELETE',
-      targetType: 'election',
-      targetId: id,
-      ipAddress: getClientIP(req),
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Election deleted successfully',
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.json({ success: true, message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-/* ================= BROADCAST ELECTION ================= */
-const broadcastElection = async (req, res) => {
+/* =========================================================
+   PUBLIC RESULTS
+========================================================= */
+const getPublicResults = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const election = await Election.findById(id);
+    const election = await Election.findById(req.params.id).populate(
+      "candidates"
+    );
 
     if (!election) {
-      return res.status(404).json({
-        success: false,
-        message: 'Election not found',
-      });
+      return res.status(404).json({ success: false, message: "Not found" });
     }
 
-    if (election.status !== 'active') {
-      return res.status(400).json({
-        success: false,
-        message: 'Only active elections can be broadcasted',
-      });
+    res.json({
+      success: true,
+      data: {
+        title: election.title,
+        status: election.status,
+        candidates: election.candidates,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/* =========================================================
+   CATEGORY SYSTEM (SAFE FIXED VERSION)
+========================================================= */
+const addCategory = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    if (!election) return res.status(404).json({ success: false });
+
+    election.categories = election.categories || [];
+
+    const category = {
+      _id: new Date().getTime().toString(),
+      name: req.body.name,
+      nominees: [],
+    };
+
+    election.categories.push(category);
+    await election.save();
+
+    res.json({ success: true, data: category });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const updateCategory = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    if (!election) return res.status(404).json({ success: false });
+
+    const cat = election.categories?.find(
+      (c) => c._id === req.params.categoryId
+    );
+
+    if (!cat) {
+      return res.status(404).json({ success: false, message: "Category not found" });
     }
 
-    election.broadcasted = true;
-    election.broadcastedAt = new Date();
-    election.settings.publicAccess = true;
+    cat.name = req.body.name || cat.name;
 
     await election.save();
 
-    emitElectionStatusChange(id, 'broadcasted');
-
-    emitActivity({
-      type: "election",
-      title: "Election broadcasted live",
-      electionId: id,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Election broadcasted successfully',
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.json({ success: true, data: cat });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-/* ================= LIVE ELECTIONS ================= */
+const deleteCategory = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    if (!election) return res.status(404).json({ success: false });
+
+    election.categories =
+      election.categories?.filter((c) => c._id !== req.params.categoryId) || [];
+
+    await election.save();
+
+    res.json({ success: true, message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/* =========================================================
+   NOMINEES (SAFE VERSION)
+========================================================= */
+const addNominee = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    if (!election) return res.status(404).json({ success: false });
+
+    const cat = election.categories?.find(
+      (c) => c._id === req.params.categoryId
+    );
+
+    if (!cat) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
+    const nominee = {
+      _id: new Date().getTime().toString(),
+      name: req.body.name,
+      photo: req.body.photo,
+      votes: 0,
+    };
+
+    cat.nominees = cat.nominees || [];
+    cat.nominees.push(nominee);
+
+    await election.save();
+
+    res.json({ success: true, data: nominee });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const removeNominee = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+    if (!election) return res.status(404).json({ success: false });
+
+    const cat = election.categories?.find(
+      (c) => c._id === req.params.categoryId
+    );
+
+    if (!cat) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
+    cat.nominees =
+      cat.nominees?.filter((n) => n._id !== req.params.nomineeId) || [];
+
+    await election.save();
+
+    res.json({ success: true, message: "Removed" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/* =========================================================
+   LIVE / BROADCAST
+========================================================= */
+const broadcastElection = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+
+    if (!election) {
+      return res.status(404).json({ success: false });
+    }
+
+    election.broadcasted = true;
+    election.status = "active";
+
+    await election.save();
+
+    emitElectionStatusChange(election._id, "broadcasted");
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 const getLiveElections = async (req, res) => {
   try {
-    const elections = await Election.find({
-      status: 'active',
+    const data = await Election.find({
+      status: "active",
       broadcasted: true,
-    }).populate('createdBy', 'firstName lastName');
-
-    res.status(200).json({
-      success: true,
-      data: elections,
     });
 
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
+/* =========================================================
+   EXPORTS
+========================================================= */
 module.exports = {
   getAllElections,
   getElectionById,
   createElection,
   updateElection,
   deleteElection,
+  getPublicResults,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+  addNominee,
+  removeNominee,
   broadcastElection,
   getLiveElections,
 };

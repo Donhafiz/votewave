@@ -1,28 +1,44 @@
-const eventBus = require("../../events/eventBus");
+class Broker {
+  constructor(partitions = 4) {
+    this.partitions = new Map();
+    this.partitionCount = partitions;
 
-const partitions = new Map();
-
-/**
- * ERIE v4 STREAM BROKER
- */
-
-function send(topic, event) {
-  if (!partitions.has(topic)) {
-    partitions.set(topic, []);
+    for (let i = 0; i < partitions; i++) {
+      this.partitions.set(i, []);
+    }
   }
 
-  const stream = partitions.get(topic);
+  publish(topic, key, payload) {
+    const partition = this._getPartition(key);
 
-  stream.push({
-    ...event,
-    ts: Date.now(),
-  });
+    const event = {
+      topic,
+      key,
+      payload,
+      timestamp: Date.now(),
+      offset: this.partitions.get(partition).length,
+    };
 
-  eventBus.emit(`stream:${topic}`, event);
+    this.partitions.get(partition).push(event);
+
+    return event;
+  }
+
+  consume(partition, offset = 0) {
+    return this.partitions.get(partition).slice(offset);
+  }
+
+  _getPartition(key) {
+    let hash = 0;
+
+    if (!key) return 0;
+
+    for (let i = 0; i < key.length; i++) {
+      hash += key.charCodeAt(i);
+    }
+
+    return hash % this.partitionCount;
+  }
 }
 
-function getStream(topic) {
-  return partitions.get(topic) || [];
-}
-
-module.exports = { send, getStream };
+module.exports = Broker;
