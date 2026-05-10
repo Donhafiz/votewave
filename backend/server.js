@@ -118,6 +118,27 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/payment", paymentRoutes);
 
 /* =========================================================
+   ROOT ROUTE
+========================================================= */
+app.get("/", (req, res) => {
+  res.json({
+    message: "VoteWave API Server",
+    status: "Running",
+    version: "1.0.0",
+    endpoints: {
+      health: "/api/health",
+      auth: "/api/auth",
+      elections: "/api/elections",
+      admin: "/api/admin",
+      users: "/api/users",
+      ai: "/api/ai",
+      payment: "/api/payment",
+    },
+    documentation: "API endpoints available above",
+  });
+});
+
+/* =========================================================
    HEALTH CHECK
 ========================================================= */
 app.get("/api/health", (req, res) => {

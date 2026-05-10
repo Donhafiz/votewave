@@ -20,9 +20,26 @@ async function getCachedVotes(tenantId, electionId, candidateId) {
   return parseInt(value || "0", 10);
 }
 
+async function getLeaderboard(tenantId, electionId) {
+  const key = `election:${tenantId}:${electionId}:votes`;
+  
+  const votes = await redis.hgetall(key);
+  
+  // Convert to array and sort by vote count
+  const leaderboard = Object.entries(votes || {})
+    .map(([candidateId, voteCount]) => ({
+      candidateId,
+      votes: parseInt(voteCount, 10)
+    }))
+    .sort((a, b) => b.votes - a.votes);
+  
+  return leaderboard;
+}
+
 module.exports = {
   incrementVote,
   getCachedVotes,
+  getLeaderboard,
 };
 
 

@@ -10,6 +10,7 @@
     "worker:fraud": "node src/security/fraud/fraud.worker.js"
   },
   "dependencies": {
+    "ioredis": "^5.10.1",
     "redis": "^5.12.1"
   }
 }
