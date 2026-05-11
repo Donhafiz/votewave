@@ -3,306 +3,193 @@ const redis = require('../config/redis');
 const EventEmitter = require('events');
 
 class DeadLetterQueue extends EventEmitter {
-  constructor() {
+  constructor(options = {}) {
     super();
-    this.queues = new Map();
-    this.retryAttempts = new Map();
-    this.maxRetries = 3;
-    this.retryDelay = 5000; // 5 seconds
-    this.dlqPrefix = 'dlq:';
-    this.retryPrefix = 'retry:';
+    this.redis = redis;
+    this.queuePrefix = options.queuePrefix || 'dlq:';
+    this.maxRetries = options.maxRetries || 3;
+    this.retryDelay = options.retryDelay || 5000; // 5 seconds
+    this.maxQueueSize = options.maxQueueSize || 10000;
+    this.ttl = options.ttl || 86400000; // 24 hours
+    this.processingInterval = options.processingInterval || 30000; // 30 seconds
+    this.alertThreshold = options.alertThreshold || 100;
     
-    this.initializeQueues();
-    this.startRetryProcessor();
+    this.stats = {
+      totalEvents: 0,
+      failedEvents: 0,
+      retriedEvents: 0,
+      resolvedEvents: 0,
+      expiredEvents: 0,
+      queueSize: 0
+    };
+
+    this.processors = new Map();
+    this.retryStrategies = new Map();
+    
+    this.initializeRetryStrategies();
+    this.startProcessing();
   }
 
-  // Initialize dead letter queues
-  initializeQueues() {
-    const queueTypes = [
-      'vote:cast.failed',
-      'fraud:failed',
-      'ml:failed',
-      'analytics:failed',
-      'auth:failed',
-      'notification:failed',
-      'backup:failed',
-      'system:failed'
-    ];
+  /**
+   * Initialize default retry strategies
+   */
+  initializeRetryStrategies() {
+    // Exponential backoff strategy
+    this.addRetryStrategy('exponential', (attempt) => {
+      return this.retryDelay * Math.pow(2, attempt - 1);
+    });
 
-    for (const queueType of queueTypes) {
-      this.queues.set(queueType, {
-        name: queueType,
-        size: 0,
-        lastProcessed: null,
-        processing: false
-      });
-    }
+    // Linear backoff strategy
+    this.addRetryStrategy('linear', (attempt) => {
+      return this.retryDelay * attempt;
+    });
 
-    logger.info('Dead letter queues initialized', {
-      queueTypes: Array.from(this.queues.keys())
+    // Fixed delay strategy
+    this.addRetryStrategy('fixed', () => {
+      return this.retryDelay;
+    });
+
+    // Immediate retry strategy (for transient issues)
+    this.addRetryStrategy('immediate', () => {
+      return 100; // 100ms
     });
   }
 
-  // Add failed event to DLQ
-  async addToDLQ(event, error, queueType) {
+  /**
+   * Add retry strategy
+   * @param {string} name - Strategy name
+   * @param {Function} delayCalculator - Function to calculate delay
+   */
+  addRetryStrategy(name, delayCalculator) {
+    this.retryStrategies.set(name, delayCalculator);
+    logger.info('Retry strategy added', { name });
+  }
+
+  /**
+   * Add failed event to dead letter queue
+   * @param {Object} event - Failed event
+   * @param {Error} error - Error that caused failure
+   * @param {Object} context - Additional context
+   * @returns {Promise<string>} - DLQ entry ID
+   */
+  async addEvent(event, error, context = {}) {
     try {
-      const dlqEvent = {
-        id: event.id || this.generateEventId(),
+      const dlqId = this.generateDLQId();
+      const dlqEntry = {
+        id: dlqId,
         originalEvent: event,
         error: {
           message: error.message,
           stack: error.stack,
-          code: error.code || 'UNKNOWN_ERROR'
+          code: error.code,
+          status: error.status
         },
-        queueType,
-        timestamp: new Date().toISOString(),
-        retryCount: this.retryAttempts.get(event.id) || 0,
-        metadata: {
-          source: event.source || 'unknown',
-          tenantId: event.tenantId || 'unknown',
-          severity: this.determineSeverity(error, queueType)
-        }
+        context: {
+          ...context,
+          timestamp: new Date().toISOString(),
+          retryCount: 0,
+          maxRetries: this.maxRetries,
+          retryStrategy: context.retryStrategy || 'exponential',
+          severity: this.determineSeverity(error, context)
+        },
+        status: 'pending',
+        addedAt: Date.now(),
+        lastRetryAt: null,
+        nextRetryAt: this.calculateNextRetry(0, context.retryStrategy || 'exponential')
       };
 
-      // Add to Redis DLQ
-      const dlqKey = `${this.dlqPrefix}${queueType}`;
-      await redis.lpush(dlqKey, JSON.stringify(dlqEvent));
-      
-      // Update queue statistics
-      const queue = this.queues.get(queueType);
-      if (queue) {
-        queue.size++;
-        queue.lastProcessed = new Date().toISOString();
-      }
-
-      // Track retry attempts
-      this.retryAttempts.set(event.id, dlqEvent.retryCount + 1);
-
-      logger.warn('Event added to dead letter queue', {
-        eventId: event.id,
-        queueType,
-        error: error.message,
-        retryCount: dlqEvent.retryCount,
-        severity: dlqEvent.metadata.severity
-      });
-
-      // Emit event for monitoring
-      this.emit('dlqEventAdded', {
-        queueType,
-        event: dlqEvent,
-        severity: dlqEvent.metadata.severity
-      });
-
-      return {
-        success: true,
-        eventId: dlqEvent.id,
-        queueType,
-        retryCount: dlqEvent.retryCount
-      };
-
-    } catch (error) {
-      logger.error('Failed to add event to DLQ', {
-        eventId: event.id,
-        queueType,
-        error: error.message
-      });
-
-      throw error;
-    }
-  }
-
-  // Determine error severity
-  determineSeverity(error, queueType) {
-    // Critical errors that should be handled immediately
-    const criticalErrors = [
-      'DATABASE_CONNECTION_FAILED',
-      'AUTHENTICATION_FAILED',
-      'SECURITY_VIOLATION',
-      'DATA_CORRUPTION',
-      'SYSTEM_OVERLOAD'
-    ];
-
-    // High-priority queues
-    const criticalQueues = [
-      'vote:cast.failed',
-      'auth:failed',
-      'system:failed'
-    ];
-
-    if (criticalErrors.includes(error.code) || criticalQueues.includes(queueType)) {
-      return 'critical';
-    }
-
-    // Warning-level errors
-    const warningErrors = [
-      'TIMEOUT',
-      'RATE_LIMIT_EXCEEDED',
-      'TEMPORARY_UNAVAILABLE'
-    ];
-
-    if (warningErrors.includes(error.code)) {
-      return 'warning';
-    }
-
-    return 'error';
-  }
-
-  // Get events from DLQ
-  async getFromDLQ(queueType, limit = 10) {
-    try {
-      const dlqKey = `${this.dlqPrefix}${queueType}`;
-      const events = await redis.lrange(dlqKey, 0, limit - 1);
-      
-      const parsedEvents = events.map(eventStr => {
-        try {
-          return JSON.parse(eventStr);
-        } catch (error) {
-          logger.error('Failed to parse DLQ event', {
-            queueType,
-            error: error.message
-          });
-          return null;
-        }
-      }).filter(event => event !== null);
-
-      return {
-        success: true,
-        queueType,
-        events: parsedEvents,
-        count: parsedEvents.length
-      };
-
-    } catch (error) {
-      logger.error('Failed to get events from DLQ', {
-        queueType,
-        error: error.message
-      });
-
-      return {
-        success: false,
-        error: error.message,
-        queueType
-      };
-    }
-  }
-
-  // Retry failed event
-  async retryEvent(queueType, eventId) {
-    try {
-      // Get the event from DLQ
-      const dlqKey = `${this.dlqPrefix}${queueType}`;
-      const events = await redis.lrange(dlqKey, 0, -1);
-      
-      let targetEvent = null;
-      let targetIndex = -1;
-
-      for (let i = 0; i < events.length; i++) {
-        const event = JSON.parse(events[i]);
-        if (event.id === eventId) {
-          targetEvent = event;
-          targetIndex = i;
-          break;
-        }
-      }
-
-      if (!targetEvent) {
-        throw new Error(`Event ${eventId} not found in DLQ ${queueType}`);
-      }
-
-      // Check if max retries exceeded
-      if (targetEvent.retryCount >= this.maxRetries) {
-        logger.warn('Max retries exceeded for event', {
-          eventId,
-          queueType,
-          retryCount: targetEvent.retryCount,
-          maxRetries: this.maxRetries
+      // Check queue size limit
+      const currentSize = await this.getQueueSize();
+      if (currentSize >= this.maxQueueSize) {
+        logger.error('Dead letter queue is full', {
+          currentSize,
+          maxSize: this.maxQueueSize,
+          eventId: event.id
         });
-
-        return {
-          success: false,
-          reason: 'MAX_RETRIES_EXCEEDED',
-          eventId,
-          queueType
-        };
+        
+        // Emit alert
+        this.emit('queueFull', {
+          currentSize,
+          maxSize: this.maxQueueSize,
+          event
+        });
+        
+        throw new Error('Dead letter queue is full');
       }
+
+      // Store in Redis
+      await this.redis.hset(
+        this.queuePrefix + 'events',
+        dlqId,
+        JSON.stringify(dlqEntry)
+      );
 
       // Add to retry queue
-      const retryKey = `${this.retryPrefix}${queueType}`;
-      const retryEvent = {
-        ...targetEvent,
-        retryAt: new Date(Date.now() + this.retryDelay).toISOString(),
-        retryCount: targetEvent.retryCount + 1
-      };
+      await this.redis.zadd(
+        this.queuePrefix + 'retry_queue',
+        dlqEntry.nextRetryAt,
+        dlqId
+      );
 
-      await redis.lpush(retryKey, JSON.stringify(retryEvent));
+      // Update stats
+      this.stats.totalEvents++;
+      this.stats.failedEvents++;
+      this.stats.queueSize = currentSize + 1;
 
-      // Remove from DLQ
-      await redis.lrem(dlqKey, 1, events[targetIndex]);
+      // Check alert threshold
+      if (this.stats.queueSize >= this.alertThreshold) {
+        this.emit('alertThresholdReached', {
+          queueSize: this.stats.queueSize,
+          threshold: this.alertThreshold
+        });
+      }
 
-      // Update retry attempts
-      this.retryAttempts.set(eventId, retryEvent.retryCount);
-
-      logger.info('Event queued for retry', {
-        eventId,
-        queueType,
-        retryCount: retryEvent.retryCount,
-        retryAt: retryEvent.retryAt
-      });
-
-      this.emit('eventRetryQueued', {
-        queueType,
-        event: retryEvent
-      });
-
-      return {
-        success: true,
-        eventId,
-        queueType,
-        retryCount: retryEvent.retryCount,
-        retryAt: retryEvent.retryAt
-      };
-
-    } catch (error) {
-      logger.error('Failed to retry event', {
-        eventId,
-        queueType,
-        error: error.message
-      });
-
-      return {
-        success: false,
+      logger.warn('Event added to dead letter queue', {
+        dlqId,
+        eventId: event.id,
+        eventType: event.type,
         error: error.message,
-        eventId,
-        queueType
-      };
+        retryCount: 0,
+        severity: dlqEntry.context.severity
+      });
+
+      this.emit('eventAdded', dlqEntry);
+
+      return dlqId;
+
+    } catch (err) {
+      logger.error('Failed to add event to dead letter queue', {
+        eventId: event.id,
+        error: err.message
+      });
+      throw err;
     }
   }
 
-  // Process retry queue
+  /**
+   * Process events ready for retry
+   */
   async processRetryQueue() {
     try {
-      for (const queueType of this.queues.keys()) {
-        const retryKey = `${this.retryPrefix}${queueType}`;
-        const events = await redis.lrange(retryKey, 0, -1);
+      const now = Date.now();
+      
+      // Get events ready for retry
+      const readyEvents = await this.redis.zrangebyscore(
+        this.queuePrefix + 'retry_queue',
+        0,
+        now
+      );
 
-        for (const eventStr of events) {
-          try {
-            const retryEvent = JSON.parse(eventStr);
-            
-            // Check if it's time to retry
-            if (new Date(retryEvent.retryAt) <= new Date()) {
-              await this.executeRetry(retryEvent);
-              
-              // Remove from retry queue
-              await redis.lrem(retryKey, 1, eventStr);
-            }
-          } catch (error) {
-            logger.error('Failed to process retry event', {
-              queueType,
-              error: error.message
-            });
-          }
-        }
+      if (readyEvents.length === 0) {
+        return;
+      }
+
+      logger.info('Processing retry queue', {
+        readyCount: readyEvents.length
+      });
+
+      for (const dlqId of readyEvents) {
+        await this.processRetryEvent(dlqId);
       }
 
     } catch (error) {
@@ -312,270 +199,552 @@ class DeadLetterQueue extends EventEmitter {
     }
   }
 
-  // Execute retry
-  async executeRetry(retryEvent) {
+  /**
+   * Process individual retry event
+   * @param {string} dlqId - DLQ entry ID
+   */
+  async processRetryEvent(dlqId) {
     try {
-      logger.info('Executing retry for event', {
-        eventId: retryEvent.id,
-        queueType: retryEvent.queueType,
-        retryCount: retryEvent.retryCount
-      });
+      // Get DLQ entry
+      const dlqData = await this.redis.hget(
+        this.queuePrefix + 'events',
+        dlqId
+      );
 
-      // This would integrate with your event processing system
-      // For now, we'll just emit the event
-      this.emit('eventRetry', retryEvent);
+      if (!dlqData) {
+        // Remove from retry queue if entry doesn't exist
+        await this.redis.zrem(this.queuePrefix + 'retry_queue', dlqId);
+        return;
+      }
 
-      return {
-        success: true,
-        eventId: retryEvent.id,
-        queueType: retryEvent.queueType
-      };
+      const dlqEntry = JSON.parse(dlqData);
 
-    } catch (error) {
-      logger.error('Retry execution failed', {
-        eventId: retryEvent.id,
-        queueType: retryEvent.queueType,
-        error: error.message
-      });
+      // Check if max retries exceeded
+      if (dlqEntry.context.retryCount >= dlqEntry.context.maxRetries) {
+        await this.markAsExhausted(dlqId, dlqEntry);
+        return;
+      }
 
-      // Add back to DLQ with increased retry count
-      await this.addToDLQ(retryEvent.originalEvent, error, retryEvent.queueType);
-
-      return {
-        success: false,
-        error: error.message,
-        eventId: retryEvent.id,
-        queueType: retryEvent.queueType
-      };
-    }
-  }
-
-  // Start retry processor
-  startRetryProcessor() {
-    setInterval(async () => {
-      await this.processRetryQueue();
-    }, 10000); // Check every 10 seconds
-
-    logger.info('Retry processor started', {
-      interval: '10 seconds'
-    });
-  }
-
-  // Get DLQ statistics
-  async getDLQStats() {
-    try {
-      const stats = {
-        queues: {},
-        totalEvents: 0,
-        criticalEvents: 0,
-        warningEvents: 0,
-        errorEvents: 0
-      };
-
-      for (const queueType of this.queues.keys()) {
-        const dlqKey = `${this.dlqPrefix}${queueType}`;
-        const retryKey = `${this.retryPrefix}${queueType}`;
+      // Get processor for event type
+      const processor = this.processors.get(dlqEntry.originalEvent.type);
+      
+      if (!processor) {
+        logger.error('No processor found for event type', {
+          dlqId,
+          eventType: dlqEntry.originalEvent.type
+        });
         
-        const dlqSize = await redis.llen(dlqKey);
-        const retrySize = await redis.llen(retryKey);
-
-        // Get sample events for severity analysis
-        const sampleEvents = await redis.lrange(dlqKey, 0, 9);
-        let criticalCount = 0;
-        let warningCount = 0;
-        let errorCount = 0;
-
-        for (const eventStr of sampleEvents) {
-          try {
-            const event = JSON.parse(eventStr);
-            switch (event.metadata.severity) {
-              case 'critical':
-                criticalCount++;
-                break;
-              case 'warning':
-                warningCount++;
-                break;
-              case 'error':
-                errorCount++;
-                break;
-            }
-          } catch (error) {
-            // Skip malformed events
-          }
-        }
-
-        stats.queues[queueType] = {
-          dlqSize,
-          retrySize,
-          criticalCount,
-          warningCount,
-          errorCount,
-          lastUpdated: new Date().toISOString()
-        };
-
-        stats.totalEvents += dlqSize;
-        stats.criticalEvents += criticalCount;
-        stats.warningEvents += warningCount;
-        stats.errorEvents += errorCount;
+        await this.markAsFailed(dlqId, dlqEntry, 'No processor available');
+        return;
       }
 
-      return {
-        success: true,
-        timestamp: new Date().toISOString(),
-        ...stats
-      };
+      // Attempt to process event
+      try {
+        logger.info('Retrying event from dead letter queue', {
+          dlqId,
+          eventId: dlqEntry.originalEvent.id,
+          eventType: dlqEntry.originalEvent.type,
+          retryCount: dlqEntry.context.retryCount + 1
+        });
+
+        await processor(dlqEntry.originalEvent, dlqEntry.context);
+
+        // Success - remove from DLQ
+        await this.markAsResolved(dlqId, dlqEntry);
+
+      } catch (retryError) {
+        // Retry failed - update retry count and schedule next retry
+        await this.scheduleNextRetry(dlqId, dlqEntry, retryError);
+      }
 
     } catch (error) {
-      logger.error('Failed to get DLQ statistics', {
+      logger.error('Failed to process retry event', {
+        dlqId,
         error: error.message
       });
-
-      return {
-        success: false,
-        error: error.message
-      };
     }
   }
 
-  // Clear DLQ
-  async clearDLQ(queueType) {
+  /**
+   * Schedule next retry for event
+   * @param {string} dlqId - DLQ entry ID
+   * @param {Object} dlqEntry - DLQ entry
+   * @param {Error} retryError - Retry error
+   */
+  async scheduleNextRetry(dlqId, dlqEntry, retryError) {
     try {
-      const dlqKey = `${this.dlqPrefix}${queueType}`;
-      const retryKey = `${this.retryPrefix}${queueType}`;
-      
-      await redis.del(dlqKey);
-      await redis.del(retryKey);
+      const nextRetryCount = dlqEntry.context.retryCount + 1;
+      const nextRetryAt = this.calculateNextRetry(
+        nextRetryCount,
+        dlqEntry.context.retryStrategy
+      );
 
-      // Reset queue statistics
-      const queue = this.queues.get(queueType);
-      if (queue) {
-        queue.size = 0;
-        queue.lastProcessed = new Date().toISOString();
-      }
+      // Update DLQ entry
+      dlqEntry.context.retryCount = nextRetryCount;
+      dlqEntry.context.lastError = {
+        message: retryError.message,
+        stack: retryError.stack,
+        timestamp: new Date().toISOString()
+      };
+      dlqEntry.lastRetryAt = Date.now();
+      dlqEntry.nextRetryAt = nextRetryAt;
 
-      logger.info('DLQ cleared', {
-        queueType
+      // Save updated entry
+      await this.redis.hset(
+        this.queuePrefix + 'events',
+        dlqId,
+        JSON.stringify(dlqEntry)
+      );
+
+      // Update retry queue
+      await this.redis.zadd(
+        this.queuePrefix + 'retry_queue',
+        nextRetryAt,
+        dlqId
+      );
+
+      this.stats.retriedEvents++;
+
+      logger.warn('Event retry scheduled', {
+        dlqId,
+        eventId: dlqEntry.originalEvent.id,
+        retryCount: nextRetryCount,
+        maxRetries: dlqEntry.context.maxRetries,
+        nextRetryAt: new Date(nextRetryAt).toISOString(),
+        error: retryError.message
       });
 
-      return {
-        success: true,
-        queueType
-      };
+      this.emit('retryScheduled', {
+        dlqId,
+        dlqEntry,
+        retryError
+      });
 
     } catch (error) {
-      logger.error('Failed to clear DLQ', {
-        queueType,
+      logger.error('Failed to schedule next retry', {
+        dlqId,
         error: error.message
       });
-
-      return {
-        success: false,
-        error: error.message,
-        queueType
-      };
     }
   }
 
-  // Archive old events
-  async archiveDLQEvents(queueType, olderThanHours = 24) {
+  /**
+   * Mark event as resolved
+   * @param {string} dlqId - DLQ entry ID
+   * @param {Object} dlqEntry - DLQ entry
+   */
+  async markAsResolved(dlqId, dlqEntry) {
     try {
-      const dlqKey = `${this.dlqPrefix}${queueType}`;
-      const events = await redis.lrange(dlqKey, 0, -1);
-      
-      const cutoffTime = new Date(Date.now() - (olderThanHours * 60 * 60 * 1000));
-      const eventsToArchive = [];
-      const eventsToKeep = [];
+      // Update status
+      dlqEntry.status = 'resolved';
+      dlqEntry.resolvedAt = Date.now();
 
-      for (const eventStr of events) {
+      // Save updated entry
+      await this.redis.hset(
+        this.queuePrefix + 'events',
+        dlqId,
+        JSON.stringify(dlqEntry)
+      );
+
+      // Remove from retry queue
+      await this.redis.zrem(this.queuePrefix + 'retry_queue', dlqId);
+
+      // Update stats
+      this.stats.resolvedEvents++;
+      this.stats.queueSize = Math.max(0, this.stats.queueSize - 1);
+
+      logger.info('Event resolved from dead letter queue', {
+        dlqId,
+        eventId: dlqEntry.originalEvent.id,
+        totalRetries: dlqEntry.context.retryCount,
+        resolutionTime: dlqEntry.resolvedAt - dlqEntry.addedAt
+      });
+
+      this.emit('eventResolved', dlqEntry);
+
+    } catch (error) {
+      logger.error('Failed to mark event as resolved', {
+        dlqId,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Mark event as exhausted (max retries reached)
+   * @param {string} dlqId - DLQ entry ID
+   * @param {Object} dlqEntry - DLQ entry
+   */
+  async markAsExhausted(dlqId, dlqEntry) {
+    try {
+      // Update status
+      dlqEntry.status = 'exhausted';
+      dlqEntry.exhaustedAt = Date.now();
+
+      // Save updated entry
+      await this.redis.hset(
+        this.queuePrefix + 'events',
+        dlqId,
+        JSON.stringify(dlqEntry)
+      );
+
+      // Remove from retry queue
+      await this.redis.zrem(this.queuePrefix + 'retry_queue', dlqId);
+
+      // Update stats
+      this.stats.queueSize = Math.max(0, this.stats.queueSize - 1);
+
+      logger.error('Event exhausted from dead letter queue', {
+        dlqId,
+        eventId: dlqEntry.originalEvent.id,
+        maxRetries: dlqEntry.context.maxRetries,
+        totalAttempts: dlqEntry.context.retryCount,
+        finalError: dlqEntry.context.lastError?.message
+      });
+
+      this.emit('eventExhausted', dlqEntry);
+
+    } catch (error) {
+      logger.error('Failed to mark event as exhausted', {
+        dlqId,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Mark event as permanently failed
+   * @param {string} dlqId - DLQ entry ID
+   * @param {Object} dlqEntry - DLQ entry
+   * @param {string} reason - Failure reason
+   */
+  async markAsFailed(dlqId, dlqEntry, reason) {
+    try {
+      // Update status
+      dlqEntry.status = 'failed';
+      dlqEntry.failedAt = Date.now();
+      dlqEntry.failureReason = reason;
+
+      // Save updated entry
+      await this.redis.hset(
+        this.queuePrefix + 'events',
+        dlqId,
+        JSON.stringify(dlqEntry)
+      );
+
+      // Remove from retry queue
+      await this.redis.zrem(this.queuePrefix + 'retry_queue', dlqId);
+
+      // Update stats
+      this.stats.queueSize = Math.max(0, this.stats.queueSize - 1);
+
+      logger.error('Event marked as permanently failed', {
+        dlqId,
+        eventId: dlqEntry.originalEvent.id,
+        reason
+      });
+
+      this.emit('eventFailed', { dlqEntry, reason });
+
+    } catch (error) {
+      logger.error('Failed to mark event as failed', {
+        dlqId,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Add event processor
+   * @param {string} eventType - Event type
+   * @param {Function} processor - Processing function
+   */
+  addProcessor(eventType, processor) {
+    this.processors.set(eventType, processor);
+    logger.info('Event processor added', { eventType });
+  }
+
+  /**
+   * Remove event processor
+   * @param {string} eventType - Event type
+   */
+  removeProcessor(eventType) {
+    this.processors.delete(eventType);
+    logger.info('Event processor removed', { eventType });
+  }
+
+  /**
+   * Get queue statistics
+   * @returns {Promise<Object>} - Queue statistics
+   */
+  async getStats() {
+    try {
+      const queueSize = await this.getQueueSize();
+      const retryQueueSize = await this.redis.zcard(this.queuePrefix + 'retry_queue');
+      
+      // Get events by status
+      const allEvents = await this.redis.hgetall(this.queuePrefix + 'events');
+      const events = Object.values(allEvents).map(data => JSON.parse(data));
+      
+      const statusCounts = events.reduce((counts, event) => {
+        counts[event.status] = (counts[event.status] || 0) + 1;
+        return counts;
+      }, {});
+
+      const severityCounts = events.reduce((counts, event) => {
+        const severity = event.context.severity || 'unknown';
+        counts[severity] = (counts[severity] || 0) + 1;
+        return counts;
+      }, {});
+
+      // Calculate average retry time
+      const resolvedEvents = events.filter(e => e.status === 'resolved');
+      const avgRetryTime = resolvedEvents.length > 0
+        ? resolvedEvents.reduce((sum, e) => sum + (e.resolvedAt - e.addedAt), 0) / resolvedEvents.length
+        : 0;
+
+      return {
+        ...this.stats,
+        queueSize,
+        retryQueueSize,
+        statusCounts,
+        severityCounts,
+        averageRetryTime: Math.round(avgRetryTime),
+        processorCount: this.processors.size,
+        retryStrategyCount: this.retryStrategies.size
+      };
+
+    } catch (error) {
+      logger.error('Failed to get DLQ stats', {
+        error: error.message
+      });
+      
+      return this.stats;
+    }
+  }
+
+  /**
+   * Get events by status
+   * @param {string} status - Event status
+   * @param {number} limit - Limit results
+   * @returns {Promise<Array>} - Array of events
+   */
+  async getEventsByStatus(status, limit = 100) {
+    try {
+      const allEvents = await this.redis.hgetall(this.queuePrefix + 'events');
+      const events = Object.values(allEvents)
+        .map(data => JSON.parse(data))
+        .filter(event => event.status === status)
+        .sort((a, b) => b.addedAt - a.addedAt)
+        .slice(0, limit);
+
+      return events;
+
+    } catch (error) {
+      logger.error('Failed to get events by status', {
+        status,
+        error: error.message
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Get events by severity
+   * @param {string} severity - Event severity
+   * @param {number} limit - Limit results
+   * @returns {Promise<Array>} - Array of events
+   */
+  async getEventsBySeverity(severity, limit = 100) {
+    try {
+      const allEvents = await this.redis.hgetall(this.queuePrefix + 'events');
+      const events = Object.values(allEvents)
+        .map(data => JSON.parse(data))
+        .filter(event => event.context.severity === severity)
+        .sort((a, b) => b.addedAt - a.addedAt)
+        .slice(0, limit);
+
+      return events;
+
+    } catch (error) {
+      logger.error('Failed to get events by severity', {
+        severity,
+        error: error.message
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Manually retry event
+   * @param {string} dlqId - DLQ entry ID
+   * @returns {Promise<boolean>} - True if retry scheduled
+   */
+  async manualRetry(dlqId) {
+    try {
+      const dlqData = await this.redis.hget(
+        this.queuePrefix + 'events',
+        dlqId
+      );
+
+      if (!dlqData) {
+        return false;
+      }
+
+      const dlqEntry = JSON.parse(dlqData);
+
+      // Reset retry count for manual retry
+      dlqEntry.context.retryCount = 0;
+      dlqEntry.context.manualRetry = true;
+      dlqEntry.nextRetryAt = Date.now();
+
+      // Save updated entry
+      await this.redis.hset(
+        this.queuePrefix + 'events',
+        dlqId,
+        JSON.stringify(dlqEntry)
+      );
+
+      // Add to retry queue
+      await this.redis.zadd(
+        this.queuePrefix + 'retry_queue',
+        dlqEntry.nextRetryAt,
+        dlqId
+      );
+
+      logger.info('Manual retry scheduled', {
+        dlqId,
+        eventId: dlqEntry.originalEvent.id
+      });
+
+      this.emit('manualRetryScheduled', dlqEntry);
+
+      return true;
+
+    } catch (error) {
+      logger.error('Failed to schedule manual retry', {
+        dlqId,
+        error: error.message
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Clear resolved events
+   * @param {number} olderThan - Clear events older than this timestamp
+   * @returns {Promise<number>} - Number of events cleared
+   */
+  async clearResolvedEvents(olderThan = Date.now() - (7 * 24 * 60 * 60 * 1000)) { // 7 days
+    let clearedCount = 0;
+
+    try {
+      const allEvents = await this.redis.hgetall(this.queuePrefix + 'events');
+      
+      for (const [dlqId, eventData] of Object.entries(allEvents)) {
         try {
-          const event = JSON.parse(eventStr);
-          if (new Date(event.timestamp) < cutoffTime) {
-            eventsToArchive.push(eventStr);
-          } else {
-            eventsToKeep.push(eventStr);
+          const event = JSON.parse(eventData);
+          
+          if (event.status === 'resolved' && event.resolvedAt < olderThan) {
+            await this.redis.hdel(this.queuePrefix + 'events', dlqId);
+            clearedCount++;
           }
         } catch (error) {
-          // Archive malformed events
-          eventsToArchive.push(eventStr);
+          // Remove malformed entries
+          await this.redis.hdel(this.queuePrefix + 'events', dlqId);
+          clearedCount++;
         }
       }
 
-      if (eventsToArchive.length > 0) {
-        // Remove old events and re-add remaining
-        await redis.del(dlqKey);
-        if (eventsToKeep.length > 0) {
-          await redis.lpush(dlqKey, ...eventsToKeep);
-        }
-
-        // This would save to archive storage
-        logger.info('DLQ events archived', {
-          queueType,
-          archivedCount: eventsToArchive.length,
-          remainingCount: eventsToKeep.length,
-          cutoffTime: cutoffTime.toISOString()
-        });
-
-        this.emit('eventsArchived', {
-          queueType,
-          archivedCount: eventsToArchive.length,
-          events: eventsToArchive.map(e => JSON.parse(e))
+      if (clearedCount > 0) {
+        logger.info('Resolved events cleared', {
+          clearedCount,
+          olderThan: new Date(olderThan).toISOString()
         });
       }
-
-      return {
-        success: true,
-        queueType,
-        archivedCount: eventsToArchive.length,
-        remainingCount: eventsToKeep.length
-      };
 
     } catch (error) {
-      logger.error('Failed to archive DLQ events', {
-        queueType,
+      logger.error('Failed to clear resolved events', {
         error: error.message
       });
-
-      return {
-        success: false,
-        error: error.message,
-        queueType
-      };
     }
+
+    return clearedCount;
   }
 
-  // Generate event ID
-  generateEventId() {
+  /**
+   * Helper methods
+   */
+  generateDLQId() {
     return `dlq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  // Get queue configuration
-  getQueueConfig() {
-    return {
-      maxRetries: this.maxRetries,
-      retryDelay: this.retryDelay,
-      dlqPrefix: this.dlqPrefix,
-      retryPrefix: this.retryPrefix,
-      queueTypes: Array.from(this.queues.keys())
-    };
+  determineSeverity(error, context) {
+    // Determine severity based on error and context
+    if (error.status >= 500) {
+      return 'critical';
+    } else if (error.status >= 400) {
+      return 'warning';
+    } else if (context.essential === true) {
+      return 'high';
+    } else {
+      return 'medium';
+    }
   }
 
-  // Update configuration
-  updateConfig(config) {
-    if (config.maxRetries !== undefined) {
-      this.maxRetries = config.maxRetries;
-    }
-    
-    if (config.retryDelay !== undefined) {
-      this.retryDelay = config.retryDelay;
+  calculateNextRetry(attempt, strategy) {
+    const delayCalculator = this.retryStrategies.get(strategy);
+    if (!delayCalculator) {
+      return Date.now() + this.retryDelay;
     }
 
-    logger.info('DLQ configuration updated', {
-      config: this.getQueueConfig()
+    const delay = delayCalculator(attempt);
+    return Date.now() + delay;
+  }
+
+  async getQueueSize() {
+    try {
+      return await this.redis.hlen(this.queuePrefix + 'events');
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  /**
+   * Start processing loop
+   */
+  startProcessing() {
+    setInterval(async () => {
+      await this.processRetryQueue();
+    }, this.processingInterval);
+
+    // Start cleanup
+    setInterval(async () => {
+      await this.clearResolvedEvents();
+    }, 3600000); // Every hour
+
+    logger.info('Dead letter queue processing started', {
+      processingInterval: this.processingInterval,
+      maxRetries: this.maxRetries
     });
+  }
+
+  /**
+   * Stop processing
+   */
+  stop() {
+    logger.info('Dead letter queue processing stopped');
   }
 }
 
 // Create singleton instance
-const deadLetterQueue = new DeadLetterQueue();
+const deadLetterQueue = new DeadLetterQueue({
+  maxRetries: 3,
+  retryDelay: 5000,
+  maxQueueSize: 10000,
+  ttl: 86400000,
+  processingInterval: 30000,
+  alertThreshold: 100
+});
 
 module.exports = deadLetterQueue;

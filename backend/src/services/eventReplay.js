@@ -2,104 +2,388 @@ const { logger } = require('../utils/logger');
 const redis = require('../config/redis');
 const EventEmitter = require('events');
 
-class EventReplayService extends EventEmitter {
-  constructor() {
+class EventReplay extends EventEmitter {
+  constructor(options = {}) {
     super();
-    this.eventStore = new Map();
-    this.consumerOffsets = new Map();
-    this.consumerGroups = new Map();
-    this.replaySessions = new Map();
-    this.eventRetention = 7 * 24 * 60 * 60 * 1000; // 7 days
-    this.maxReplayEvents = 10000; // Max events per replay session
+    this.redis = redis;
+    this.eventStorePrefix = options.eventStorePrefix || 'events:';
+    this.replayPrefix = options.replayPrefix || 'replay:';
+    this.consumerGroupPrefix = options.consumerGroupPrefix || 'consumer:';
+    this.maxReplaySpeed = options.maxReplaySpeed || 1000; // events per second
+    this.defaultBatchSize = options.defaultBatchSize || 100;
+    this.replayTimeout = options.replayTimeout || 300000; // 5 minutes
     
-    this.initializeEventStore();
+    this.activeReplays = new Map();
+    this.consumerGroups = new Map();
+    this.replayStats = {
+      totalReplays: 0,
+      successfulReplays: 0,
+      failedReplays: 0,
+      eventsReplayed: 0,
+      averageReplayTime: 0
+    };
+
     this.startCleanup();
   }
 
-  // Initialize event store
-  async initializeEventStore() {
+  /**
+   * Create a new replay session
+   * @param {Object} config - Replay configuration
+   * @returns {Promise<string>} - Replay session ID
+   */
+  async createReplaySession(config) {
     try {
-      // Load existing events from Redis
-      const eventKeys = await redis.keys('event:*');
-      
-      for (const key of eventKeys) {
-        const events = await redis.lrange(key, 0, -1);
-        const parsedEvents = events.map(e => JSON.parse(e));
-        const topic = key.replace('event:', '');
-        
-        this.eventStore.set(topic, parsedEvents);
-      }
+      const replayId = this.generateReplayId();
+      const session = {
+        id: replayId,
+        status: 'created',
+        config: {
+          ...config,
+          startTime: config.startTime || Date.now() - (24 * 60 * 60 * 1000), // Default 24 hours ago
+          endTime: config.endTime || Date.now(),
+          eventTypes: config.eventTypes || [],
+          filters: config.filters || {},
+          batchSize: config.batchSize || this.defaultBatchSize,
+          speed: Math.min(config.speed || 1, this.maxReplaySpeed),
+          dryRun: config.dryRun || false,
+          consumerGroup: config.consumerGroup || 'replay_default'
+        },
+        progress: {
+          totalEvents: 0,
+          processedEvents: 0,
+          failedEvents: 0,
+          currentOffset: null,
+          startTime: null,
+          endTime: null,
+          estimatedCompletion: null
+        },
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
 
-      // Load consumer offsets
-      const offsetKeys = await redis.keys('offset:*');
-      
-      for (const key of offsetKeys) {
-        const offset = await redis.get(key);
-        const [consumerGroup, topic] = key.replace('offset:', '').split(':');
-        
-        if (!this.consumerOffsets.has(consumerGroup)) {
-          this.consumerOffsets.set(consumerGroup, new Map());
-        }
-        
-        this.consumerOffsets.get(consumerGroup).set(topic, parseInt(offset));
-      }
+      // Store replay session
+      await this.redis.hset(
+        this.replayPrefix + 'sessions',
+        replayId,
+        JSON.stringify(session)
+      );
 
-      logger.info('Event store initialized', {
-        topics: Array.from(this.eventStore.keys()),
-        consumerGroups: Array.from(this.consumerOffsets.keys())
+      // Calculate total events
+      session.progress.totalEvents = await this.countReplayEvents(session.config);
+      session.progress.estimatedCompletion = this.estimateCompletion(session);
+
+      // Update stored session
+      await this.redis.hset(
+        this.replayPrefix + 'sessions',
+        replayId,
+        JSON.stringify(session)
+      );
+
+      this.activeReplays.set(replayId, session);
+
+      logger.info('Replay session created', {
+        replayId,
+        config: session.config,
+        totalEvents: session.progress.totalEvents
       });
+
+      this.emit('sessionCreated', session);
+
+      return replayId;
 
     } catch (error) {
-      logger.error('Failed to initialize event store', {
-        error: error.message
+      logger.error('Failed to create replay session', {
+        error: error.message,
+        config
       });
+      throw error;
     }
   }
 
-  // Store event
-  async storeEvent(topic, event) {
+  /**
+   * Start replay session
+   * @param {string} replayId - Replay session ID
+   * @returns {Promise<boolean>} - True if started successfully
+   */
+  async startReplay(replayId) {
     try {
-      // Add metadata
-      const storedEvent = {
-        ...event,
-        offset: this.getNextOffset(topic),
-        storedAt: new Date().toISOString(),
-        checksum: this.calculateChecksum(event)
-      };
-
-      // Store in Redis
-      const key = `event:${topic}`;
-      await redis.lpush(key, JSON.stringify(storedEvent));
+      const session = await this.getReplaySession(replayId);
       
-      // Trim old events based on retention
-      await redis.ltrim(key, 0, 10000); // Keep last 10k events
-      
-      // Update in-memory store
-      if (!this.eventStore.has(topic)) {
-        this.eventStore.set(topic, []);
-      }
-      
-      const topicEvents = this.eventStore.get(topic);
-      topicEvents.push(storedEvent);
-      
-      // Trim in-memory store
-      if (topicEvents.length > 10000) {
-        this.eventStore.set(topic, topicEvents.slice(-10000));
+      if (!session) {
+        throw new Error('Replay session not found');
       }
 
-      logger.debug('Event stored', {
-        topic,
-        eventId: event.id,
-        offset: storedEvent.offset
+      if (session.status !== 'created') {
+        throw new Error(`Replay session is ${session.status}`);
+      }
+
+      // Update session status
+      session.status = 'running';
+      session.progress.startTime = Date.now();
+      session.updatedAt = Date.now();
+
+      await this.saveReplaySession(session);
+
+      // Start replay process
+      this.processReplay(replayId);
+
+      logger.info('Replay session started', {
+        replayId,
+        totalEvents: session.progress.totalEvents
       });
 
-      this.emit('eventStored', { topic, event: storedEvent });
+      this.emit('sessionStarted', session);
 
-      return storedEvent;
+      return true;
 
     } catch (error) {
-      logger.error('Failed to store event', {
-        topic,
+      logger.error('Failed to start replay session', {
+        replayId,
+        error: error.message
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Process replay session
+   * @param {string} replayId - Replay session ID
+   */
+  async processReplay(replayId) {
+    try {
+      const session = await this.getReplaySession(replayId);
+      
+      if (!session || session.status !== 'running') {
+        return;
+      }
+
+      logger.info('Processing replay session', {
+        replayId,
+        batchSize: session.config.batchSize,
+        speed: session.config.speed
+      });
+
+      let currentOffset = session.progress.currentOffset;
+      let processedInBatch = 0;
+      const batchDelay = 1000 / session.config.speed; // Calculate delay for speed control
+
+      while (session.status === 'running') {
+        // Get next batch of events
+        const events = await this.getReplayEvents(session.config, currentOffset, session.config.batchSize);
+        
+        if (events.length === 0) {
+          // No more events to process
+          await this.completeReplay(replayId);
+          break;
+        }
+
+        // Process events in batch
+        for (const event of events) {
+          try {
+            if (!session.config.dryRun) {
+              await this.processReplayEvent(event, session.config);
+            }
+
+            session.progress.processedEvents++;
+            processedInBatch++;
+            currentOffset = event.offset;
+
+          } catch (error) {
+            session.progress.failedEvents++;
+            
+            logger.error('Failed to process replay event', {
+              replayId,
+              eventId: event.id,
+              error: error.message
+            });
+
+            this.emit('eventProcessingFailed', {
+              replayId,
+              event,
+              error
+            });
+          }
+
+          // Update progress periodically
+          if (processedInBatch % 10 === 0) {
+            session.progress.currentOffset = currentOffset;
+            session.progress.estimatedCompletion = this.estimateCompletion(session);
+            session.updatedAt = Date.now();
+            
+            await this.saveReplaySession(session);
+          }
+
+          // Speed control
+          if (session.config.speed < this.maxReplaySpeed) {
+            await this.sleep(batchDelay);
+          }
+        }
+
+        // Check for timeout
+        if (Date.now() - session.progress.startTime > this.replayTimeout) {
+          await this.timeoutReplay(replayId);
+          break;
+        }
+      }
+
+    } catch (error) {
+      logger.error('Replay processing failed', {
+        replayId,
+        error: error.message
+      });
+      
+      await this.failReplay(replayId, error);
+    }
+  }
+
+  /**
+   * Get events for replay
+   * @param {Object} config - Replay configuration
+   * @param {string} offset - Starting offset
+   * @param {number} limit - Number of events to retrieve
+   * @returns {Promise<Array>} - Array of events
+   */
+  async getReplayEvents(config, offset = null, limit = 100) {
+    try {
+      const query = {
+        startTime: config.startTime,
+        endTime: config.endTime,
+        eventTypes: config.eventTypes,
+        filters: config.filters,
+        limit
+      };
+
+      if (offset) {
+        query.offset = offset;
+      }
+
+      // Query event store
+      const events = await this.queryEventStore(query);
+      
+      return events.map(event => ({
+        ...event,
+        replayData: {
+          replayTimestamp: Date.now(),
+          dryRun: config.dryRun
+        }
+      }));
+
+    } catch (error) {
+      logger.error('Failed to get replay events', {
+        error: error.message,
+        config
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Query event store for events
+   * @param {Object} query - Query parameters
+   * @returns {Promise<Array>} - Array of events
+   */
+  async queryEventStore(query) {
+    try {
+      // This would integrate with your actual event store (ERIE v8)
+      // For now, we'll simulate with Redis
+      
+      const eventKeys = await this.redis.keys(this.eventStorePrefix + '*');
+      const events = [];
+
+      for (const key of eventKeys) {
+        try {
+          const eventData = await this.redis.get(key);
+          if (eventData) {
+            const event = JSON.parse(eventData);
+            
+            // Apply filters
+            if (this.matchesQuery(event, query)) {
+              events.push(event);
+            }
+          }
+        } catch (error) {
+          // Skip malformed events
+        }
+      }
+
+      // Sort by timestamp
+      events.sort((a, b) => a.timestamp - b.timestamp);
+
+      // Apply offset and limit
+      const startIndex = query.offset ? events.findIndex(e => e.offset === query.offset) : 0;
+      const endIndex = startIndex + query.limit;
+      
+      return events.slice(startIndex, endIndex);
+
+    } catch (error) {
+      logger.error('Failed to query event store', {
+        error: error.message,
+        query
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Check if event matches query
+   * @param {Object} event - Event object
+   * @param {Object} query - Query parameters
+   * @returns {boolean} - True if event matches
+   */
+  matchesQuery(event, query) {
+    // Time range filter
+    if (query.startTime && event.timestamp < query.startTime) {
+      return false;
+    }
+    if (query.endTime && event.timestamp > query.endTime) {
+      return false;
+    }
+
+    // Event type filter
+    if (query.eventTypes && query.eventTypes.length > 0) {
+      if (!query.eventTypes.includes(event.type)) {
+        return false;
+      }
+    }
+
+    // Custom filters
+    if (query.filters) {
+      for (const [key, value] of Object.entries(query.filters)) {
+        if (event[key] !== value) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Process individual replay event
+   * @param {Object} event - Event to process
+   * @param {Object} config - Replay configuration
+   */
+  async processReplayEvent(event, config) {
+    try {
+      // Get consumer group
+      const consumerGroup = this.consumerGroups.get(config.consumerGroup);
+      
+      if (!consumerGroup) {
+        throw new Error(`Consumer group not found: ${config.consumerGroup}`);
+      }
+
+      // Process event through consumer group
+      await consumerGroup.processEvent(event);
+
+      this.replayStats.eventsReplayed++;
+
+      this.emit('eventProcessed', {
+        replayId: config.replayId,
+        event
+      });
+
+    } catch (error) {
+      logger.error('Failed to process replay event', {
         eventId: event.id,
         error: error.message
       });
@@ -107,520 +391,460 @@ class EventReplayService extends EventEmitter {
     }
   }
 
-  // Get next offset
-  getNextOffset(topic) {
-    const topicEvents = this.eventStore.get(topic) || [];
-    return topicEvents.length > 0 ? topicEvents[topicEvents.length - 1].offset + 1 : 0;
-  }
-
-  // Calculate event checksum
-  calculateChecksum(event) {
-    const crypto = require('crypto');
-    const eventStr = JSON.stringify(event);
-    return crypto.createHash('sha256').update(eventStr).digest('hex');
-  }
-
-  // Create consumer group
-  async createConsumerGroup(consumerGroup, topics = []) {
+  /**
+   * Count events for replay
+   * @param {Object} config - Replay configuration
+   * @returns {Promise<number>} - Number of events
+   */
+  async countReplayEvents(config) {
     try {
-      if (!this.consumerGroups.has(consumerGroup)) {
-        this.consumerGroups.set(consumerGroup, {
-          topics: new Set(topics),
-          created: new Date().toISOString(),
-          consumers: new Map()
-        });
-      }
-
-      // Initialize offsets for topics
-      if (!this.consumerOffsets.has(consumerGroup)) {
-        this.consumerOffsets.set(consumerGroup, new Map());
-      }
-
-      const offsets = this.consumerOffsets.get(consumerGroup);
-      
-      for (const topic of topics) {
-        if (!offsets.has(topic)) {
-          offsets.set(topic, 0);
-          await redis.set(`offset:${consumerGroup}:${topic}`, '0');
-        }
-      }
-
-      logger.info('Consumer group created', {
-        consumerGroup,
-        topics
-      });
-
-      return {
-        success: true,
-        consumerGroup,
-        topics
-      };
-
+      const events = await this.getReplayEvents(config, null, 1000000); // Large limit
+      return events.length;
     } catch (error) {
-      logger.error('Failed to create consumer group', {
-        consumerGroup,
-        error: error.message
+      logger.error('Failed to count replay events', {
+        error: error.message,
+        config
       });
-
-      return {
-        success: false,
-        error: error.message
-      };
+      return 0;
     }
   }
 
-  // Start replay session
-  async startReplaySession(options) {
-    const sessionId = this.generateSessionId();
-    
+  /**
+   * Estimate completion time
+   * @param {Object} session - Replay session
+   * @returns {number} - Estimated completion timestamp
+   */
+  estimateCompletion(session) {
+    if (session.progress.processedEvents === 0) {
+      return Date.now() + 3600000; // Default 1 hour
+    }
+
+    const elapsed = Date.now() - session.progress.startTime;
+    const rate = session.progress.processedEvents / elapsed;
+    const remaining = session.progress.totalEvents - session.progress.processedEvents;
+    const estimatedTime = remaining / rate;
+
+    return Date.now() + estimatedTime;
+  }
+
+  /**
+   * Complete replay session
+   * @param {string} replayId - Replay session ID
+   */
+  async completeReplay(replayId) {
     try {
-      const session = {
-        id: sessionId,
-        status: 'active',
-        startTime: new Date().toISOString(),
-        endTime: null,
-        config: {
-          topics: options.topics || [],
-          startTime: options.startTime || null,
-          endTime: options.endTime || null,
-          consumerGroup: options.consumerGroup || 'replay',
-          filters: options.filters || {},
-          batchSize: options.batchSize || 100,
-          speed: options.speed || 1.0 // 1.0 = normal speed
-        },
-        progress: {
-          totalEvents: 0,
-          processedEvents: 0,
-          currentTopic: null,
-          currentOffset: 0,
-          errors: []
-        }
-      };
-
-      // Calculate total events to replay
-      for (const topic of session.config.topics) {
-        const events = this.getEventsForReplay(topic, session.config);
-        session.progress.totalEvents += events.length;
-      }
-
-      this.replaySessions.set(sessionId, session);
-
-      logger.info('Replay session started', {
-        sessionId,
-        topics: session.config.topics,
-        totalEvents: session.progress.totalEvents
-      });
-
-      this.emit('replaySessionStarted', session);
-
-      // Start replay processing
-      this.processReplaySession(sessionId);
-
-      return {
-        success: true,
-        sessionId,
-        session
-      };
-
-    } catch (error) {
-      logger.error('Failed to start replay session', {
-        error: error.message
-      });
-
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  }
-
-  // Get events for replay
-  getEventsForReplay(topic, config) {
-    const events = this.eventStore.get(topic) || [];
-    let filteredEvents = [...events];
-
-    // Apply time range filter
-    if (config.startTime) {
-      const startTime = new Date(config.startTime);
-      filteredEvents = filteredEvents.filter(event => 
-        new Date(event.timestamp) >= startTime
-      );
-    }
-
-    if (config.endTime) {
-      const endTime = new Date(config.endTime);
-      filteredEvents = filteredEvents.filter(event => 
-        new Date(event.timestamp) <= endTime
-      );
-    }
-
-    // Apply custom filters
-    if (config.filters && Object.keys(config.filters).length > 0) {
-      filteredEvents = filteredEvents.filter(event => 
-        this.matchesFilters(event, config.filters)
-      );
-    }
-
-    return filteredEvents;
-  }
-
-  // Check if event matches filters
-  matchesFilters(event, filters) {
-    for (const [field, value] of Object.entries(filters)) {
-      const eventValue = this.getNestedValue(event, field);
+      const session = await this.getReplaySession(replayId);
       
-      if (typeof value === 'string') {
-        if (eventValue !== value) return false;
-      } else if (typeof value === 'object') {
-        if (value.$in && !value.$in.includes(eventValue)) return false;
-        if (value.$gt && !(eventValue > value.$gt)) return false;
-        if (value.$lt && !(eventValue < value.$lt)) return false;
-        if (value.$regex && !new RegExp(value.$regex).test(eventValue)) return false;
-      }
-    }
-    
-    return true;
-  }
-
-  // Get nested value
-  getNestedValue(obj, path) {
-    return path.split('.').reduce((current, key) => 
-      current && current[key] !== undefined ? current[key] : undefined, obj
-    );
-  }
-
-  // Process replay session
-  async processReplaySession(sessionId) {
-    const session = this.replaySessions.get(sessionId);
-    if (!session || session.status !== 'active') {
-      return;
-    }
-
-    try {
-      for (const topic of session.config.topics) {
-        session.progress.currentTopic = topic;
-        const events = this.getEventsForReplay(topic, session.config);
-        
-        for (let i = 0; i < events.length; i += session.config.batchSize) {
-          const batch = events.slice(i, i + session.config.batchSize);
-          
-          // Process batch
-          for (const event of batch) {
-            try {
-              // Emit event for replay
-              this.emit('replayEvent', {
-                sessionId,
-                topic,
-                event,
-                replayTimestamp: new Date().toISOString()
-              });
-
-              session.progress.processedEvents++;
-              session.progress.currentOffset = event.offset;
-
-              // Apply speed control
-              if (session.config.speed < 1.0) {
-                await new Promise(resolve => 
-                  setTimeout(resolve, (1.0 - session.config.speed) * 100)
-                );
-              }
-
-            } catch (error) {
-              session.progress.errors.push({
-                eventId: event.id,
-                error: error.message,
-                timestamp: new Date().toISOString()
-              });
-
-              logger.error('Replay event error', {
-                sessionId,
-                eventId: event.id,
-                error: error.message
-              });
-            }
-          }
-
-          // Update session progress
-          this.replaySessions.set(sessionId, session);
-
-          // Emit progress update
-          this.emit('replayProgress', {
-            sessionId,
-            progress: session.progress,
-            percentage: (session.progress.processedEvents / session.progress.totalEvents) * 100
-          });
-        }
+      if (!session) {
+        return;
       }
 
-      // Complete session
       session.status = 'completed';
-      session.endTime = new Date().toISOString();
-      this.replaySessions.set(sessionId, session);
+      session.progress.endTime = Date.now();
+      session.updatedAt = Date.now();
+
+      const duration = session.progress.endTime - session.progress.startTime;
+      this.replayStats.successfulReplays++;
+      this.replayStats.totalReplays++;
+      
+      // Update average replay time
+      this.replayStats.averageReplayTime = 
+        (this.replayStats.averageReplayTime * (this.replayStats.successfulReplays - 1) + duration) / 
+        this.replayStats.successfulReplays;
+
+      await this.saveReplaySession(session);
 
       logger.info('Replay session completed', {
-        sessionId,
+        replayId,
+        duration,
         processedEvents: session.progress.processedEvents,
-        errors: session.progress.errors.length
+        failedEvents: session.progress.failedEvents
       });
 
-      this.emit('replaySessionCompleted', session);
+      this.emit('sessionCompleted', session);
 
     } catch (error) {
-      session.status = 'failed';
-      session.endTime = new Date().toISOString();
-      session.error = error.message;
-      this.replaySessions.set(sessionId, session);
-
-      logger.error('Replay session failed', {
-        sessionId,
+      logger.error('Failed to complete replay session', {
+        replayId,
         error: error.message
       });
-
-      this.emit('replaySessionFailed', session);
     }
   }
 
-  // Stop replay session
-  async stopReplaySession(sessionId) {
-    const session = this.replaySessions.get(sessionId);
-    if (!session) {
-      return {
-        success: false,
-        error: 'Session not found'
-      };
-    }
-
-    if (session.status === 'completed' || session.status === 'failed') {
-      return {
-        success: false,
-        error: 'Session already completed or failed'
-      };
-    }
-
-    session.status = 'stopped';
-    session.endTime = new Date().toISOString();
-    this.replaySessions.set(sessionId, session);
-
-    logger.info('Replay session stopped', {
-      sessionId,
-      processedEvents: session.progress.processedEvents
-    });
-
-    this.emit('replaySessionStopped', session);
-
-    return {
-      success: true,
-      sessionId,
-      session
-    };
-  }
-
-  // Get replay session status
-  getReplaySessionStatus(sessionId) {
-    const session = this.replaySessions.get(sessionId);
-    if (!session) {
-      return {
-        success: false,
-        error: 'Session not found'
-      };
-    }
-
-    return {
-      success: true,
-      session: {
-        ...session,
-        progress: {
-          ...session.progress,
-          percentage: session.progress.totalEvents > 0 
-            ? (session.progress.processedEvents / session.progress.totalEvents) * 100 
-            : 0
-        }
+  /**
+   * Fail replay session
+   * @param {string} replayId - Replay session ID
+   * @param {Error} error - Error that caused failure
+   */
+  async failReplay(replayId, error) {
+    try {
+      const session = await this.getReplaySession(replayId);
+      
+      if (!session) {
+        return;
       }
-    };
-  }
 
-  // Get consumer offset
-  async getConsumerOffset(consumerGroup, topic) {
-    if (this.consumerOffsets.has(consumerGroup)) {
-      return this.consumerOffsets.get(consumerGroup).get(topic) || 0;
+      session.status = 'failed';
+      session.progress.endTime = Date.now();
+      session.error = {
+        message: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      };
+      session.updatedAt = Date.now();
+
+      this.replayStats.failedReplays++;
+      this.replayStats.totalReplays++;
+
+      await this.saveReplaySession(session);
+
+      logger.error('Replay session failed', {
+        replayId,
+        error: error.message,
+        processedEvents: session.progress.processedEvents
+      });
+
+      this.emit('sessionFailed', { session, error });
+
+    } catch (err) {
+      logger.error('Failed to fail replay session', {
+        replayId,
+        error: err.message
+      });
     }
-    return 0;
   }
 
-  // Update consumer offset
-  async updateConsumerOffset(consumerGroup, topic, offset) {
-    if (!this.consumerOffsets.has(consumerGroup)) {
-      this.consumerOffsets.set(consumerGroup, new Map());
+  /**
+   * Timeout replay session
+   * @param {string} replayId - Replay session ID
+   */
+  async timeoutReplay(replayId) {
+    try {
+      const session = await this.getReplaySession(replayId);
+      
+      if (!session) {
+        return;
+      }
+
+      session.status = 'timeout';
+      session.progress.endTime = Date.now();
+      session.updatedAt = Date.now();
+
+      await this.saveReplaySession(session);
+
+      logger.warn('Replay session timed out', {
+        replayId,
+        duration: this.replayTimeout,
+        processedEvents: session.progress.processedEvents
+      });
+
+      this.emit('sessionTimedOut', session);
+
+    } catch (error) {
+      logger.error('Failed to timeout replay session', {
+        replayId,
+        error: error.message
+      });
     }
-
-    this.consumerOffsets.get(consumerGroup).set(topic, offset);
-    
-    // Persist to Redis
-    await redis.set(`offset:${consumerGroup}:${topic}`, offset.toString());
-
-    logger.debug('Consumer offset updated', {
-      consumerGroup,
-      topic,
-      offset
-    });
   }
 
-  // Get events from offset
-  async getEventsFromOffset(topic, offset, limit = 100) {
-    const events = this.eventStore.get(topic) || [];
-    const startIndex = events.findIndex(event => event.offset >= offset);
-    
-    if (startIndex === -1) {
+  /**
+   * Pause replay session
+   * @param {string} replayId - Replay session ID
+   * @returns {Promise<boolean>} - True if paused successfully
+   */
+  async pauseReplay(replayId) {
+    try {
+      const session = await this.getReplaySession(replayId);
+      
+      if (!session || session.status !== 'running') {
+        return false;
+      }
+
+      session.status = 'paused';
+      session.updatedAt = Date.now();
+
+      await this.saveReplaySession(session);
+
+      logger.info('Replay session paused', { replayId });
+
+      this.emit('sessionPaused', session);
+
+      return true;
+
+    } catch (error) {
+      logger.error('Failed to pause replay session', {
+        replayId,
+        error: error.message
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Resume replay session
+   * @param {string} replayId - Replay session ID
+   * @returns {Promise<boolean>} - True if resumed successfully
+   */
+  async resumeReplay(replayId) {
+    try {
+      const session = await this.getReplaySession(replayId);
+      
+      if (!session || session.status !== 'paused') {
+        return false;
+      }
+
+      session.status = 'running';
+      session.updatedAt = Date.now();
+
+      await this.saveReplaySession(session);
+
+      // Resume processing
+      this.processReplay(replayId);
+
+      logger.info('Replay session resumed', { replayId });
+
+      this.emit('sessionResumed', session);
+
+      return true;
+
+    } catch (error) {
+      logger.error('Failed to resume replay session', {
+        replayId,
+        error: error.message
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Cancel replay session
+   * @param {string} replayId - Replay session ID
+   * @returns {Promise<boolean>} - True if cancelled successfully
+   */
+  async cancelReplay(replayId) {
+    try {
+      const session = await this.getReplaySession(replayId);
+      
+      if (!session || ['completed', 'failed', 'timeout'].includes(session.status)) {
+        return false;
+      }
+
+      session.status = 'cancelled';
+      session.progress.endTime = Date.now();
+      session.updatedAt = Date.now();
+
+      await this.saveReplaySession(session);
+
+      logger.info('Replay session cancelled', { replayId });
+
+      this.emit('sessionCancelled', session);
+
+      return true;
+
+    } catch (error) {
+      logger.error('Failed to cancel replay session', {
+        replayId,
+        error: error.message
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Get replay session
+   * @param {string} replayId - Replay session ID
+   * @returns {Promise<Object|null>} - Replay session or null
+   */
+  async getReplaySession(replayId) {
+    try {
+      const sessionData = await this.redis.hget(
+        this.replayPrefix + 'sessions',
+        replayId
+      );
+
+      if (!sessionData) {
+        return null;
+      }
+
+      return JSON.parse(sessionData);
+
+    } catch (error) {
+      logger.error('Failed to get replay session', {
+        replayId,
+        error: error.message
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Save replay session
+   * @param {Object} session - Replay session
+   */
+  async saveReplaySession(session) {
+    try {
+      await this.redis.hset(
+        this.replayPrefix + 'sessions',
+        session.id,
+        JSON.stringify(session)
+      );
+
+      this.activeReplays.set(session.id, session);
+
+    } catch (error) {
+      logger.error('Failed to save replay session', {
+        replayId: session.id,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Get all replay sessions
+   * @param {Object} filters - Session filters
+   * @returns {Promise<Array>} - Array of replay sessions
+   */
+  async getReplaySessions(filters = {}) {
+    try {
+      const allSessions = await this.redis.hgetall(this.replayPrefix + 'sessions');
+      const sessions = Object.values(allSessions).map(data => JSON.parse(data));
+
+      // Apply filters
+      let filteredSessions = sessions;
+
+      if (filters.status) {
+        filteredSessions = filteredSessions.filter(s => s.status === filters.status);
+      }
+
+      if (filters.consumerGroup) {
+        filteredSessions = filteredSessions.filter(s => s.config.consumerGroup === filters.consumerGroup);
+      }
+
+      if (filters.dateFrom) {
+        filteredSessions = filteredSessions.filter(s => s.createdAt >= filters.dateFrom);
+      }
+
+      if (filters.dateTo) {
+        filteredSessions = filteredSessions.filter(s => s.createdAt <= filters.dateTo);
+      }
+
+      // Sort by creation time (newest first)
+      filteredSessions.sort((a, b) => b.createdAt - a.createdAt);
+
+      return filteredSessions;
+
+    } catch (error) {
+      logger.error('Failed to get replay sessions', {
+        error: error.message,
+        filters
+      });
       return [];
     }
-
-    return events.slice(startIndex, startIndex + limit);
   }
 
-  // Start cleanup process
-  startCleanup() {
-    setInterval(async () => {
-      await this.cleanupOldEvents();
-    }, 60 * 60 * 1000); // Clean every hour
+  /**
+   * Add consumer group
+   * @param {string} name - Consumer group name
+   * @param {Object} processor - Event processor
+   */
+  addConsumerGroup(name, processor) {
+    this.consumerGroups.set(name, {
+      name,
+      processor,
+      createdAt: Date.now()
+    });
+
+    logger.info('Consumer group added', { name });
   }
 
-  // Clean up old events
-  async cleanupOldEvents() {
+  /**
+   * Remove consumer group
+   * @param {string} name - Consumer group name
+   */
+  removeConsumerGroup(name) {
+    this.consumerGroups.delete(name);
+    logger.info('Consumer group removed', { name });
+  }
+
+  /**
+   * Get replay statistics
+   * @returns {Object} - Replay statistics
+   */
+  getStats() {
+    return {
+      ...this.replayStats,
+      activeReplays: this.activeReplays.size,
+      consumerGroups: this.consumerGroups.size,
+      averageProcessingRate: this.replayStats.eventsReplayed > 0 
+        ? this.replayStats.eventsReplayed / (this.replayStats.averageReplayTime / 1000)
+        : 0
+    };
+  }
+
+  /**
+   * Clean up old replay sessions
+   * @param {number} olderThan - Clean sessions older than this timestamp
+   * @returns {Promise<number>} - Number of sessions cleaned up
+   */
+  async cleanup(olderThan = Date.now() - (7 * 24 * 60 * 60 * 1000)) { // 7 days
+    let cleanedCount = 0;
+
     try {
-      const cutoffTime = Date.now() - this.eventRetention;
-      let cleanedCount = 0;
-
-      for (const [topic, events] of this.eventStore) {
-        const validEvents = events.filter(event => 
-          new Date(event.storedAt).getTime() > cutoffTime
-        );
-
-        const removedCount = events.length - validEvents.length;
-        if (removedCount > 0) {
-          this.eventStore.set(topic, validEvents);
-          cleanedCount += removedCount;
-
-          // Update Redis
-          const key = `event:${topic}`;
-          await redis.del(key);
+      const sessions = await this.getReplaySessions();
+      
+      for (const session of sessions) {
+        if (session.createdAt < olderThan && 
+            ['completed', 'failed', 'timeout', 'cancelled'].includes(session.status)) {
           
-          for (const event of validEvents) {
-            await redis.lpush(key, JSON.stringify(event));
-          }
-        }
-      }
-
-      // Clean up old replay sessions
-      const sessionCutoff = Date.now() - (24 * 60 * 60 * 1000); // 24 hours
-      for (const [sessionId, session] of this.replaySessions) {
-        if (new Date(session.startTime).getTime() < sessionCutoff) {
-          this.replaySessions.delete(sessionId);
+          await this.redis.hdel(this.replayPrefix + 'sessions', session.id);
+          this.activeReplays.delete(session.id);
           cleanedCount++;
         }
       }
 
       if (cleanedCount > 0) {
-        logger.info('Event cleanup completed', {
-          cleanedEvents: cleanedCount,
-          cutoffTime: new Date(cutoffTime).toISOString()
+        logger.info('Replay sessions cleaned up', {
+          cleanedCount,
+          olderThan: new Date(olderThan).toISOString()
         });
       }
 
     } catch (error) {
-      logger.error('Failed to cleanup old events', {
+      logger.error('Failed to cleanup replay sessions', {
         error: error.message
       });
     }
+
+    return cleanedCount;
   }
 
-  // Generate session ID
-  generateSessionId() {
+  /**
+   * Start periodic cleanup
+   */
+  startCleanup() {
+    setInterval(async () => {
+      await this.cleanup();
+    }, 3600000); // Every hour
+  }
+
+  /**
+   * Helper methods
+   */
+  generateReplayId() {
     return `replay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  // Get replay statistics
-  getReplayStatistics() {
-    const activeSessions = Array.from(this.replaySessions.values())
-      .filter(session => session.status === 'active');
-
-    const completedSessions = Array.from(this.replaySessions.values())
-      .filter(session => session.status === 'completed');
-
-    const failedSessions = Array.from(this.replaySessions.values())
-      .filter(session => session.status === 'failed');
-
-    return {
-      timestamp: new Date().toISOString(),
-      eventStore: {
-        topics: Array.from(this.eventStore.keys()),
-        totalEvents: Array.from(this.eventStore.values())
-          .reduce((sum, events) => sum + events.length, 0)
-      },
-      consumerGroups: {
-        count: this.consumerGroups.size,
-        groups: Array.from(this.consumerGroups.keys())
-      },
-      replaySessions: {
-        total: this.replaySessions.size,
-        active: activeSessions.length,
-        completed: completedSessions.length,
-        failed: failedSessions.length
-      },
-      retention: {
-        eventRetention: this.eventRetention,
-        maxReplayEvents: this.maxReplayEvents
-      }
-    };
-  }
-
-  // Export event data
-  async exportEvents(topic, options = {}) {
-    try {
-      const events = this.eventStore.get(topic) || [];
-      let filteredEvents = [...events];
-
-      // Apply filters
-      if (options.startTime) {
-        const startTime = new Date(options.startTime);
-        filteredEvents = filteredEvents.filter(event => 
-          new Date(event.timestamp) >= startTime
-        );
-      }
-
-      if (options.endTime) {
-        const endTime = new Date(options.endTime);
-        filteredEvents = filteredEvents.filter(event => 
-          new Date(event.timestamp) <= endTime
-        );
-      }
-
-      if (options.limit) {
-        filteredEvents = filteredEvents.slice(0, options.limit);
-      }
-
-      return {
-        success: true,
-        topic,
-        events: filteredEvents,
-        count: filteredEvents.length,
-        exportedAt: new Date().toISOString()
-      };
-
-    } catch (error) {
-      logger.error('Failed to export events', {
-        topic,
-        error: error.message
-      });
-
-      return {
-        success: false,
-        error: error.message
-      };
-    }
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 
 // Create singleton instance
-const eventReplayService = new EventReplayService();
+const eventReplay = new EventReplay({
+  maxReplaySpeed: 1000,
+  defaultBatchSize: 100,
+  replayTimeout: 300000
+});
 
-module.exports = eventReplayService;
+module.exports = eventReplay;

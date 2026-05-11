@@ -1,26 +1,40 @@
 {
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
     "test": "mocha test/**/*.test.js --timeout 10000",
+    "test:ts": "mocha test/**/*.test.ts --require ts-node/register --timeout 10000",
     "test:watch": "mocha test/**/*.test.js --watch --timeout 10000",
     "test:coverage": "nyc mocha test/**/*.test.js --timeout 10000",
-    "worker:vote": "node src/workers/vote.worker.js",
-    "worker:email": "node src/workers/email.worker.js",
-    "worker:analytics": "node src/workers/analytics.worker.js",
-    "worker:erie": "node src/core/erie/erie.router.js",
-    "worker:ml": "node src/ml/ml.worker.js",
-    "worker:fraud": "node src/security/fraud/fraud.worker.js"
+    "type-check": "tsc --noEmit",
+    "worker:vote": "node dist/workers/vote.worker.js",
+    "worker:email": "node dist/workers/email.worker.js",
+    "worker:analytics": "node dist/workers/analytics.worker.js",
+    "worker:erie": "node dist/core/erie/erie.router.js",
+    "worker:ml": "node dist/ml/ml.worker.js",
+    "worker:fraud": "node dist/security/fraud/fraud.worker.js"
   },
   "dependencies": {
     "express-validator": "^7.3.2",
     "helmet": "^8.1.0",
     "ioredis": "^5.10.1",
-    "redis": "^5.12.1"
+    "redis": "^5.12.1",
+    "@types/node": "^20.0.0",
+    "@types/express": "^4.17.21",
+    "@types/express-validator": "^3.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "chai": "^6.2.2",
     "mocha": "^11.7.5",
-    "supertest": "^7.2.2"
+    "supertest": "^7.2.2",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "@types/supertest": "^6.0.0",
+    "nyc": "^15.1.0"
   }
 }

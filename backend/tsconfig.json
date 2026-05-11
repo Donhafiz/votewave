@@ -1,0 +1,65 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@/utils/*": ["utils/*"],
+      "@/controllers/*": ["controllers/*"],
+      "@/services/*": ["services/*"],
+      "@/middleware/*": ["middleware/*"],
+      "@/models/*": ["models/*"],
+      "@/types/*": ["types/*"],
+      "@/config/*": ["config/*"],
+      "@/schema/*": ["schema/*"],
+      "@/analytics/*": ["analytics/*"],
+      "@/eventSourcing/*": ["eventSourcing/*"],
+      "@/readModels/*": ["readModels/*"],
+      "@/replication/*": ["replication/*"],
+      "@/geoPartitioning/*": ["geoPartitioning/*"],
+      "@/utils/distributedLock/*": ["utils/distributedLock/*"],
+      "@/utils/idempotency/*": ["utils/idempotency/*"],
+      "@/services/deadLetterQueue/*": ["services/deadLetterQueue/*"],
+      "@/services/eventReplay/*": ["services/eventReplay/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "**/*.test.js",
+    "**/*.spec.js"
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}
