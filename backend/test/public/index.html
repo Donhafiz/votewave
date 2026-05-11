@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoteWave Performance Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-healthy { background: #48bb78; }
+        .status-warning { background: #ed8936; }
+        .status-error { background: #f56565; }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .controls-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alerts-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-critical {
+            background: #fed7d7;
+            border-left: 4px solid #f56565;
+            color: #742a2a;
+        }
+
+        .alert-warning {
+            background: #feebc8;
+            border-left: 4px solid #ed8936;
+            color: #7c2d12;
+        }
+
+        .alert-info {
+            background: #bee3f8;
+            border-left: 4px solid #4299e1;
+            color: #2c5282;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .test-results {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .test-result-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-result-info {
+            flex: 1;
+        }
+
+        .test-result-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .test-result-status {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        .test-result-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .timestamp {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .dashboard-grid,
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>VoteWave Performance Dashboard</h1>
+        <p>Real-time performance monitoring and testing</p>
+    </header>
+
+    <div class="container">
+        <!-- Status Cards -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">System Status</span>
+                    <span class="status-indicator status-healthy" id="systemStatus"></span>
+                </div>
+                <div class="card-value" id="systemStatusText">Healthy</div>
+                <div class="card-subtitle">All systems operational</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Active Tests</span>
+                    <span class="status-indicator status-warning" id="activeTestsIndicator"></span>
+                </div>
+                <div class="card-value" id="activeTestsCount">0</div>
+                <div class="card-subtitle">Tests running</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Success Rate</span>
+                    <span class="status-indicator status-healthy" id="successRateIndicator"></span>
+                </div>
+                <div class="card-value" id="successRate">100%</div>
+                <div class="card-subtitle">Last 24 hours</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Alerts</span>
+                    <span class="status-indicator status-healthy" id="alertsIndicator"></span>
+                </div>
+                <div class="card-value" id="alertsCount">0</div>
+                <div class="card-subtitle">Active alerts</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-section">
+            <h2 class="card-title">Test Controls</h2>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="runTest('10k-concurrent-voters')">
+                    <span>🗳️</span> 10k Voters Test
+                </button>
+                <button class="btn btn-primary" onclick="runTest('sustained-throughput')">
+                    <span>📊</span> Throughput Test
+                </button>
+                <button class="btn btn-primary" onclick="runTest('failover-recovery')">
+                    <span>🔄</span> Failover Test
+                </button>
+                <button class="btn btn-primary" onclick="runTest('fraud-detection-latency')">
+                    <span>🔍</span> Fraud Detection
+                </button>
+                <button class="btn btn-primary" onclick="runTest('websocket-scalability')">
+                    <span>🌐</span> WebSocket Test
+                </button>
+                <button class="btn btn-secondary" onclick="runAllTests()">
+                    <span>🚀</span> Run All Tests
+                </button>
+                <button class="btn btn-danger" onclick="clearAlerts()">
+                    <span>🗑️</span> Clear Alerts
+                </button>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3 class="chart-title">Performance Metrics</h3>
+                <canvas id="performanceChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Test Results Timeline</h3>
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alerts-section">
+            <h2 class="card-title">System Alerts</h2>
+            <div id="alertsContainer">
+                <p style="color: #718096; text-align: center; padding: 2rem;">No active alerts</p>
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="test-results">
+            <h2 class="card-title">Recent Test Results</h2>
+            <div id="testResultsContainer">
+                <p style="color: #718096; text-align: center; padding: 2rem;">No test results available</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Socket.IO connection
+        const socket = io();
+        
+        // Chart instances
+        let performanceChart = null;
+        let timelineChart = null;
+        
+        // Data storage
+        let testResults = [];
+        let alerts = [];
+        let benchmarks = {};
+
+        // Initialize dashboard
+        function initDashboard() {
+            initCharts();
+            loadInitialData();
+            setupEventListeners();
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Performance metrics chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Response Time (ms)',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Throughput (req/s)',
+                        data: [],
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Timeline chart
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            timelineChart = new Chart(timelineCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Success Rate (%)',
+                        data: [],
+                        backgroundColor: function(context) {
+                            const value = context.parsed.y;
+                            return value >= 95 ? '#48bb78' : value >= 80 ? '#ed8936' : '#f56565';
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load initial data
+        async function loadInitialData() {
+            try {
+                const response = await fetch('/api/results');
+                const data = await response.json();
+                
+                if (data.success) {
+                    testResults = data.data.results;
+                    alerts = data.data.alerts;
+                    benchmarks = data.data.benchmarks;
+                    
+                    updateDashboard();
+                }
+            } catch (error) {
+                console.error('Failed to load initial data:', error);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            socket.on('initial-data', (data) => {
+                testResults = data.results;
+                alerts = data.alerts;
+                benchmarks = data.benchmarks;
+                updateDashboard();
+            });
+
+            socket.on('test-started', (data) => {
+                showNotification(`Test started: ${data.testType}`, 'info');
+                updateActiveTests();
+            });
+
+            socket.on('test-completed', (data) => {
+                showNotification(`Test completed: ${data.testType}`, 'success');
+                loadInitialData();
+            });
+
+            socket.on('test-error', (data) => {
+                showNotification(`Test failed: ${data.testType}`, 'error');
+                createAlert('error', `Test failed: ${data.testType}`, data.error);
+            });
+
+            socket.on('alert-created', (alert) => {
+                alerts.push(alert);
+                updateAlerts();
+            });
+
+            socket.on('benchmark-updated', (benchmark) => {
+                benchmarks[benchmark.name] = benchmark;
+                updateCharts();
+            });
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            updateStatusCards();
+            updateAlerts();
+            updateTestResults();
+            updateCharts();
+        }
+
+        // Update status cards
+        function updateStatusCards() {
+            const successCount = testResults.filter(r => r.result && r.result.success).length;
+            const totalCount = testResults.length;
+            const successRate = totalCount > 0 ? (successCount / totalCount) * 100 : 100;
+
+            document.getElementById('successRate').textContent = `${successRate.toFixed(1)}%`;
+            document.getElementById('alertsCount').textContent = alerts.length;
+            
+            // Update status indicators
+            updateStatusIndicator('successRateIndicator', successRate >= 95 ? 'healthy' : successRate >= 80 ? 'warning' : 'error');
+            updateStatusIndicator('alertsIndicator', alerts.length === 0 ? 'healthy' : alerts.length > 5 ? 'error' : 'warning');
+        }
+
+        // Update status indicator
+        function updateStatusIndicator(elementId, status) {
+            const element = document.getElementById(elementId);
+            element.className = `status-indicator status-${status}`;
+        }
+
+        // Update alerts
+        function updateAlerts() {
+            const container = document.getElementById('alertsContainer');
+            
+            if (alerts.length === 0) {
+                container.innerHTML = '<p style="color: #718096; text-align: center; padding: 2rem;">No active alerts</p>';
+                return;
+            }
+
+            container.innerHTML = alerts.map(alert => `
+                <div class="alert alert-${alert.type || 'info'}">
+                    <span class="status-indicator status-${alert.type === 'critical' ? 'error' : alert.type === 'warning' ? 'warning' : 'healthy'}"></span>
+                    <div>
+                        <strong>${alert.title || 'Alert'}</strong>
+                        <div style="font-size: 0.9rem; margin-top: 0.25rem;">${alert.message}</div>
+                        <div class="timestamp">${new Date(alert.timestamp).toLocaleString()}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update test results
+        function updateTestResults() {
+            const container = document.getElementById('testResultsContainer');
+            
+            if (testResults.length === 0) {
+                container.innerHTML = '<p style="color: #718096; text-align: center; padding: 2rem;">No test results available</p>';
+                return;
+            }
+
+            const recentResults = testResults.slice(-10).reverse();
+            
+            container.innerHTML = recentResults.map(result => `
+                <div class="test-result-item">
+                    <div class="test-result-info">
+                        <div class="test-result-name">${result.type}</div>
+                        <div class="test-result-status">
+                            ${result.result && result.result.success ? 
+                                '<span class="status-indicator status-healthy"></span> Success' : 
+                                '<span class="status-indicator status-error"></span> Failed'}
+                            • ${result.timestamp ? new Date(result.timestamp).toLocaleString() : 'Unknown time'}
+                        </div>
+                    </div>
+                    <div class="test-result-actions">
+                        <button class="btn btn-secondary" onclick="viewTestDetails('${result.id}')">Details</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update charts
+        function updateCharts() {
+            // Update performance chart with recent data
+            const recentResults = testResults.slice(-20);
+            const labels = recentResults.map(r => r.type);
+            const responseTimes = recentResults.map(r => r.result && r.result.duration ? r.result.duration : 0);
+            const successRates = recentResults.map(r => r.result && r.result.success ? 100 : 0);
+
+            performanceChart.data.labels = labels;
+            performanceChart.data.datasets[0].data = responseTimes;
+            performanceChart.data.datasets[1].data = successRates;
+            performanceChart.update();
+
+            // Update timeline chart
+            timelineChart.data.labels = labels;
+            timelineChart.data.datasets[0].data = successRates;
+            timelineChart.update();
+        }
+
+        // Run test
+        async function runTest(testType) {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            button.disabled = true;
+            button.innerHTML = '<span class="loading"></span> Running...';
+
+            try {
+                const response = await fetch(`/api/tests/${testType}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(`Test ${testType} started successfully`, 'success');
+                } else {
+                    showNotification(`Failed to start test: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`Error starting test: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            button.disabled = true;
+            button.innerHTML = '<span class="loading"></span> Running all tests...';
+
+            try {
+                const response = await fetch('/api/tests/run-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('All tests started successfully', 'success');
+                } else {
+                    showNotification(`Failed to start tests: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`Error starting tests: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        }
+
+        // Clear alerts
+        async function clearAlerts() {
+            try {
+                const response = await fetch('/api/alerts', {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alerts = [];
+                    updateAlerts();
+                    showNotification('Alerts cleared', 'success');
+                }
+            } catch (error) {
+                showNotification(`Error clearing alerts: ${error.message}`, 'error');
+            }
+        }
+
+        // View test details
+        function viewTestDetails(testId) {
+            // This would open a modal or navigate to detailed view
+            showNotification(`Test details for ${testId}`, 'info');
+        }
+
+        // Create alert
+        function createAlert(type, title, message) {
+            const alert = {
+                type,
+                title,
+                message,
+                timestamp: new Date().toISOString()
+            };
+            
+            alerts.push(alert);
+            updateAlerts();
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                min-width: 300px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            notification.innerHTML = `
+                <div style="padding: 1rem;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'} ${message}</div>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

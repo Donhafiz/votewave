@@ -12,12 +12,16 @@ const path = require("path");
 const os = require("os");
 
 const { Server } = require("socket.io");
+const { logger, createRequestLogger } = require("./src/utils/logger");
+const { requestTracer, performanceTracker, errorTracer } = require("./src/middleware/requestTracer");
+const { metricsCollector, healthMonitor, performanceMonitor, alertManager } = require("./src/utils/monitoring");
 
 /* =========================================================
    CORE SERVICES
 ========================================================= */
 const connectDB = require("./src/config/db");
 const User = require("./src/models/User");
+const { validateEnvironment } = require("./src/config/envValidator");
 
 const { initializeSocket } = require("./src/utils/socketService");
 const { errorHandler, notFound } = require("./src/middleware");
@@ -41,6 +45,9 @@ const {
   paymentRoutes,
 } = require("./src/routes");
 
+const { sanitizeInput } = require("./src/middleware/inputValidator");
+const { authLimiter, voteLimiter, uploadLimiter } = require("./src/middleware/rateLimit");
+
 const dashboardRoutes = require("./src/api/dashboard/dashboard.routes");
 
 /* =========================================================
@@ -63,6 +70,20 @@ app.set("io", io);
 
 app.use((req, _, next) => {
   req.io = io;
+  next();
+});
+
+/* =========================================================
+   REQUEST TRACING
+========================================================= */
+app.use(requestTracer);
+app.use(performanceTracker);
+
+/* =========================================================
+   REQUEST LOGGING
+========================================================= */
+app.use((req, res, next) => {
+  req.logger = createRequestLogger(req);
   next();
 });
 
@@ -108,14 +129,18 @@ app.use(passport.session());
 ========================================================= */
 app.use("/api/dashboard", dashboardRoutes);
 
-app.use("/api/auth", authRoutes);
-app.use("/api/elections", electionRoutes);
-app.use("/api/elections/:electionId/candidates", candidateRoutes);
-app.use("/api/elections/:electionId/votes", voteRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/ai", aiRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/payment", paymentRoutes);
+// Apply global security middleware
+app.use(sanitizeInput);
+
+// Apply rate limiting to API routes
+app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/elections", apiLimiter, electionRoutes);
+app.use("/api/elections/:electionId/candidates", apiLimiter, candidateRoutes);
+app.use("/api/elections/:electionId/votes", voteLimiter, voteRoutes);
+app.use("/api/users", apiLimiter, userRoutes);
+app.use("/api/ai", apiLimiter, aiRoutes);
+app.use("/api/admin", apiLimiter, adminRoutes);
+app.use("/api/payment", apiLimiter, paymentRoutes);
 
 /* =========================================================
    ROOT ROUTE
@@ -139,14 +164,42 @@ app.get("/", (req, res) => {
 });
 
 /* =========================================================
-   HEALTH CHECK
+   HEALTH CHECK WITH MONITORING
 ========================================================= */
 app.get("/api/health", (req, res) => {
-  res.json({
-    status: "OK",
+  const startTime = Date.now();
+  
+  // Check all services
+  const healthResults = await healthMonitor.checkAllServices();
+  
+  const response = {
+    status: healthResults.overall ? "OK" : "DEGRADED",
     time: new Date().toISOString(),
     env: process.env.NODE_ENV,
-  });
+    services: Object.fromEntries(healthResults.services),
+    metrics: metricsCollector.getMetrics(),
+    alerts: alertManager.getRecentAlerts(5),
+    uptime: process.uptime(),
+    responseTime: Date.now() - startTime
+  };
+
+  // Log health check with monitoring data
+  if (healthResults.overall) {
+    logger.info('System health check passed', {
+      services: healthResults.services,
+      metrics: response.metrics,
+      responseTime: response.responseTime
+    });
+  } else {
+    logger.warn('System health check failed', {
+      services: healthResults.services,
+      failedServices: Array.from(healthResults.services.entries())
+        .filter(([name, status]) => status.status !== 'healthy')
+        .map(([name]) => name)
+    });
+  }
+
+  res.status(healthResults.overall ? 200 : 503).json(response);
 });
 
 /* =========================================================
@@ -213,11 +266,20 @@ io.on("connection", (socket) => {
 });
 
 /* =========================================================
+   ENVIRONMENT VALIDATION
+========================================================= */
+const envValidation = validateEnvironment();
+if (!envValidation.isValid) {
+  process.exit(1);
+}
+
+/* =========================================================
    SAFE BOOTSTRAP (NO CRASH CHAIN)
 ========================================================= */
 async function bootstrap() {
   try {
     console.log("⏳ Starting system bootstrap...");
+    console.log(`🔧 Environment: ${envValidation.config.environment}`);
 
     /* 1. DATABASE FIRST */
     await connectDB();

@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: votewave-backend
+  labels:
+    app: votewave
+    environment: production
+    version: "1.0.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: votewave
+  template:
+    metadata:
+      labels:
+        app: votewave
+        environment: production
+    spec:
+      containers:
+        - name: votewave-backend
+          image: votewave/backend:1.0.0
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-uri
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: redis-url
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+            - name: PORT
+              value: "5000"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              timeoutSeconds: 5
+              failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+              initialDelaySeconds: 5
+              periodSeconds: 5
+              timeoutSeconds: 3
+              failureThreshold: 3
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/votewave
+            - name: backups
+              mountPath: /var/backups/votewave
+---
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: votewave-backend-service
+  labels:
+    app: votewave
+    environment: production
+spec:
+  selector:
+    app: votewave
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+      name: http
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: votewave-config
+  labels:
+    app: votewave
+    environment: production
+data:
+  NODE_ENV: "production"
+  PORT: "5000"
+  LOG_LEVEL: "info"
+  REDIS_URL: "redis://redis-service:6379"
+  MONGODB_URI: "mongodb://mongodb-service:27017/votewave"
+  BACKUP_ENCRYPTION_KEY: "change-in-production"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-uri
+  labels:
+    app: votewave
+    environment: production
+type: Opaque
+data:
+  mongodb-uri: "mongodb://admin:password@mongodb-service:27017/votewave?authSource=admin&replicaSet=rs0"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-url
+  labels:
+    app: votewave
+    environment: production
+type: Opaque
+data:
+  redis-url: "redis://redis-service:6379"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwt-secret
+  labels:
+    app: votewave
+    environment: production
+type: Opaque
+data:
+  jwt-secret: "your-super-secret-jwt-key-change-in-production"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: session-secret
+  labels:
+    app: votewave
+    environment: production
+type: Opaque
+data:
+  session-secret: "votewave-session-secret-change-in-production"

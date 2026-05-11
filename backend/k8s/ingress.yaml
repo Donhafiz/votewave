@@ -1,0 +1,66 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: votewave-ingress
+  labels:
+    app: votewave
+    environment: production
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: votewave.example.com
+      http:
+        paths:
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: votewave-backend-service
+                port:
+                  number: 5000
+          - path: /api/elections
+            pathType: Prefix
+            backend:
+              service:
+                name: votewave-backend-service
+                port:
+                  number: 5000
+          - path: /api/votes
+            pathType: Prefix
+            backend:
+              service:
+                name: votewave-backend-service
+                port:
+                  number: 5000
+          - path: /api/admin
+            pathType: Prefix
+            backend:
+              service:
+                name: votewave-backend-service
+                port:
+                  number: 5000
+          - path: /api/users
+            pathType: Prefix
+            backend:
+              service:
+                name: votewave-backend-service
+                port:
+                  number: 5000
+          - path: /api/ai
+            pathType: Prefix
+            backend:
+              service:
+                name: votewave-backend-service
+                port:
+                  number: 5000
+          - path: /api/payment
+            pathType: Prefix
+            backend:
+              service:
+                name: votewave-backend-service
+                port:
+                  number: 5000
+  tls:
+    - hosts:
+        - votewave.example.com
+      secretName: votewave-tls-secret

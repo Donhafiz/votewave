@@ -1,0 +1,59 @@
+apiVersion: autoscaling/v2
+kind: VerticalPodAutoscaler
+metadata:
+  name: votewave-backend-vpa
+  labels:
+    app: votewave
+    environment: production
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: votewave-backend
+  updatePolicy: Auto
+  resourcePolicy:
+    min:
+      cpu: 100m
+      memory: 256Mi
+    max:
+      cpu: 2000m
+      memory: 4Gi
+  containerPolicies:
+    - containerName: votewave-backend
+      minAllowed:
+        cpu: 100m
+        memory: 256Mi
+      maxAllowed:
+        cpu: 2000m
+        memory: 4Gi
+      controlledResources: cpu,memory
+---
+apiVersion: autoscaling/v2
+kind: VerticalPodAutoscaler
+metadata:
+  name: votewave-redis-vpa
+  labels:
+    app: votewave
+    environment: production
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: redis-service
+  updatePolicy: Auto
+  resourcePolicy:
+    min:
+      cpu: 50m
+      memory: 128Mi
+    max:
+      cpu: 1000m
+      memory: 2Gi
+  containerPolicies:
+    - containerName: redis
+      minAllowed:
+        cpu: 50m
+        memory: 128Mi
+      maxAllowed:
+        cpu: 1000m
+        memory: 2Gi
+      controlledResources: cpu,memory
