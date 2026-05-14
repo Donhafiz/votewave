@@ -195,7 +195,7 @@ export interface ResponseContext {
 }
 
 // Validation types
-export interface ValidationError {
+export interface SimpleValidationError {
   field: string;
   message: string;
   value?: any;
@@ -462,7 +462,7 @@ export interface DatabaseError extends AppError {
 export interface NetworkError extends AppError {
   url?: string;
   method?: string;
-  statusCode?: number;
+  statusCode: number;
 }
 
 // Utility type guards
@@ -511,30 +511,3 @@ export type Awaitable<T> = Promise<T> | T;
 
 export type Constructor<T = {}> = new (...args: any[]) => T;
 
-// Re-export commonly used types
-export {
-  ApiResponse,
-  PaginatedResponse,
-  Result,
-  Success,
-  Failure,
-  RequestContext,
-  ResponseContext,
-  ValidationResult,
-  AsyncOperation,
-  SearchQuery,
-  SearchResults,
-  Coordinates,
-  Location,
-  DateRange,
-  FileInfo,
-  Notification,
-  FeatureFlag,
-  Webhook,
-  AuditLog,
-  PerformanceMetrics,
-  AppError,
-  ValidationError,
-  DatabaseError,
-  NetworkError
-};

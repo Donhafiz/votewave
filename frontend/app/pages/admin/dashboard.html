@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <h2>VoteWave</h2>
+
+    <div class="nav-item">Dashboard</div>
+    <div class="nav-item">Elections</div>
+    <div class="nav-item">Voters</div>
+    <div class="nav-item">Analytics</div>
+    <div class="nav-item">Settings</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="topbar">
+      <button onclick="toggleSidebar()">☰</button>
+      <div>Admin Panel</div>
+      <div id="live-status">● LIVE</div>
+    </div>
+
+    <div class="content">
+
+      <div class="card">
+        <h3>System Overview</h3>
+        <p>Real-time election monitoring system active.</p>
+      </div>
+
+      <div class="card">
+        <h3>Active Elections</h3>
+        <div id="election-list">Loading...</div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="../js/dashboard.js"></script>
+
+</body>
+</html>

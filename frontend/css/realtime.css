@@ -1,0 +1,146 @@
+.live-results-card {
+  background: #121826;
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.live-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.live-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #00ff88;
+  animation: pulse 1s infinite;
+}
+
+.live-body h1 {
+  font-size: 48px;
+  margin: 20px 0 10px;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+
+.live-results-board {
+  background: #111827;
+  padding: 24px;
+  border-radius: 18px;
+  margin-top: 20px;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #00ff88;
+  font-weight: bold;
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  background: #00ff88;
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+.candidate-result-card {
+  background: #1f2937;
+  padding: 18px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+
+.candidate-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.progress-bar {
+  height: 12px;
+  background: #374151;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88, #00b8ff);
+}
+
+.candidate-footer {
+  margin-top: 10px;
+  color: #9ca3af;
+}
+
+.audit-feed-panel {
+  margin-top: 20px;
+  background: #111827;
+  padding: 20px;
+  border-radius: 18px;
+}
+
+.audit-item {
+  background: #1f2937;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 320px;
+  z-index: 9999;
+}
+
+.live-notification {
+  background: #111827;
+  color: white;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

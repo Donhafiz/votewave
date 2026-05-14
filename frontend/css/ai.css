@@ -1,0 +1,32 @@
+/* =========================
+   AI SYSTEM UI
+========================= */
+
+.ai-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.ai-card {
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.metric {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.warning {
+  color: #F59E0B;
+}
+.success {
+  color: var(--success);
+}
+
+.danger {
+  color: var(--danger);
+}

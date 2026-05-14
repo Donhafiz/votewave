@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>VoteWave Admin Dashboard</title>
+
+    <link rel="stylesheet" href="../../css/dashboard.css">
+
+</head>
+
+<body>
+
+    <div id="app"></div>
+
+    <script type="module">
+
+        import {
+            DashboardShell
+        } from "../../components/layout/dashboard-shell.js";
+
+        const dashboardContent = `
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <h3>Total Voters</h3>
+                    <div class="value">12,845</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Active Elections</h3>
+                    <div class="value">04</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Votes Cast</h3>
+                    <div class="value">8,241</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>System Status</h3>
+                    <div class="value">LIVE</div>
+                </div>
+
+            </div>
+
+        `;
+
+        document.getElementById("app").innerHTML =
+            DashboardShell({
+                page: "dashboard",
+                title: "Admin Dashboard",
+                content: dashboardContent
+            });
+
+    </script>
+
+<!-- TOTAL -->
+<div id="totalVotes">0</div>
+
+<!-- LIVE COUNTER -->
+<div id="liveVoteCounter">0</div>
+
+<!-- LEADERBOARD -->
+<div id="candidateLeaderboard"></div>
+
+<!-- REGIONAL -->
+<div id="regionalBreakdown"></div>
+
+<!-- AI -->
+<div id="aiProjectedWinner"></div>
+<div id="aiConfidence"></div>
+<div id="aiMargin"></div>
+
+<!-- WAR ROOM -->
+<div id="warRoomFeed"></div>
+
+<!-- NOTIFICATIONS -->
+<div id="notificationContainer"></div>
+
+<script type="module" src="./js/realtime/liveResultsEngine.js"></script>
+
+<script type="module" src="./js/ai/aiInsights.js"></script>
+
+<script type="module" src="./js/admin/warRoom.js"></script>
+
+<script type="module" src="./js/realtime/socket.js"></script>
+</body>
+
+</html>

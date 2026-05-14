@@ -1,0 +1,181 @@
+/* =========================
+   PREMIUM UX SYSTEM
+========================= */
+
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease;
+}
+
+.glow-hover {
+  transition: all 0.25s ease;
+}
+
+.glow-hover:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 30px rgba(108,92,231,0.3);
+}
+
+/* =========================
+   COMMAND PALETTE
+========================= */
+
+.command-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 120px;
+  z-index: 99999;
+}
+
+.command-box {
+  width: 700px;
+  background: rgba(20,20,30,0.95);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(25px);
+}
+
+.command-input {
+  width: 100%;
+  padding: 22px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 18px;
+}
+
+.command-results {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.command-item {
+  padding: 18px 22px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.command-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* =========================
+   AI ASSISTANT
+========================= */
+
+.ai-assistant {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+
+  width: 70px;
+  height: 70px;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6C5CE7,
+      #00D2FF
+    );
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 28px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 40px rgba(108,92,231,0.5);
+
+  z-index: 9999;
+
+  animation: pulse 2s infinite;
+}
+
+/* =========================
+   LOADING SKELETON
+========================= */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.05);
+}
+
+.skeleton::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  transform: translateX(-100%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.08),
+      transparent
+    );
+
+  animation: shimmer 1.5s infinite;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}

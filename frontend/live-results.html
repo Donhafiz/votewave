@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Live Election Results</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+
+  <style>
+
+    .results-container{
+      max-width:1200px;
+      margin:auto;
+      padding:50px 20px;
+    }
+
+    .results-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:20px;
+    }
+
+    .candidate-card{
+      padding:25px;
+    }
+
+    .progress{
+      height:14px;
+      background:#1e293b;
+      border-radius:50px;
+      overflow:hidden;
+      margin-top:15px;
+    }
+
+    .progress-bar{
+      height:100%;
+      background:var(--primary);
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div class="results-container">
+
+  <h1 class="section-title">
+    Live Election Results
+  </h1>
+
+  <div class="results-grid">
+
+    <div class="glass-card candidate-card">
+
+      <h2>Candidate Alpha</h2>
+
+      <h3>43,200 Votes</h3>
+
+      <div class="progress">
+        <div
+          class="progress-bar"
+          style="width:65%"
+        ></div>
+      </div>
+
+    </div>
+
+    <div class="glass-card candidate-card">
+
+      <h2>Candidate Beta</h2>
+
+      <h3>23,800 Votes</h3>
+
+      <div class="progress">
+        <div
+          class="progress-bar"
+          style="width:35%"
+        ></div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

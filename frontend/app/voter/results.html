@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Results</title>
+  <link rel="stylesheet" href="../../assets/css/global.css">
+</head>
+
+<body>
+
+<h2>Live Election Results</h2>
+
+<div id="results"></div>
+
+<script src="../../assets/js/core/api.js"></script>
+
+<script>
+const token = localStorage.getItem("token");
+const socket = initSocket(token);
+
+async function loadResults() {
+  const data = await request("/results", "GET");
+
+  render(data);
+}
+
+function render(data) {
+  const container = document.getElementById("results");
+
+  container.innerHTML = Object.entries(data)
+    .map(([candidate, votes]) => `
+      <div class="card">
+        <h3>${candidate}</h3>
+        <p id="v-${candidate}">${votes} votes</p>
+      </div>
+    `).join("");
+}
+
+// LIVE UPDATES
+socket.on("vote-cast", (event) => {
+  const { candidateId } = event;
+
+  const el = document.getElementById(`v-${candidateId}`);
+
+  if (el) {
+    let current = parseInt(el.innerText);
+    el.innerText = (current + 1) + " votes";
+  }
+});
+
+loadResults();
+</script>
+
+</body>
+</html>

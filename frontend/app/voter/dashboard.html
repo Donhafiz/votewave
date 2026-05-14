@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voter Dashboard</title>
+  <link rel="stylesheet" href="../../assets/css/global.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+  <div class="sidebar">
+    <h2>VoteWave</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Elections</a>
+    <a href="#">Results</a>
+  </div>
+
+  <div class="main">
+
+    <h2>Active Elections</h2>
+
+    <div id="elections"></div>
+
+  </div>
+
+</div>
+
+<script src="../../assets/js/core/api.js"></script>
+
+<script>
+async function loadElections() {
+  const elections = await request("/elections", "GET");
+
+  document.getElementById("elections").innerHTML = elections.map(e => `
+    <div class="card">
+      <h3>${e.title}</h3>
+      <p>${e.description}</p>
+      <button onclick="vote('${e._id}')">Vote</button>
+    </div>
+  `).join("");
+}
+
+async function vote(electionId) {
+  const candidateId = prompt("Enter Candidate ID");
+
+  await request("/votes/cast", "POST", {
+    electionId,
+    candidateId
+  });
+
+  alert("Vote submitted successfully");
+}
+
+loadElections();
+
+socket.on("vote-cast", (data) => {
+  showNotification("🗳️ New vote received");
+});
+
+socket.on("election-created", (data) => {
+  showNotification("📢 New election: " + data.title);
+});
+</script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="../../assets/js/core/socket.js"></script>
+</body>
+</html>
